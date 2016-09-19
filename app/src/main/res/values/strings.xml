@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Bookingapp</string>
+    <string name="title_activity_football">Football</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_badminton">Badminton</string>
+    <string name="title_activity_table_tennis">TableTennis</string>
+    <string name="title_activity_flocator">Map</string>
+    <string name="takes_you_to_a_list_w_a_maps_option">takes you to a list w / a maps option</string>
+    <string name="browse_turfs">browse turfs</string>
+    <string name="create_a_lobby">Create a Lobby</string>
+    <string name="more_on_this_later">More on this later</string>
+    <string name="badminton">badminton</string>
+    <string name="table_tennis">Table tennis</string>
+    <string name="add_fancy_image_button_later_footy">add fancy image button later footy</string>
 </resources>
