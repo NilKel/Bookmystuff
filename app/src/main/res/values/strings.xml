@@ -16,4 +16,8 @@
     <string name="badminton">badminton</string>
     <string name="table_tennis">Table tennis</string>
     <string name="add_fancy_image_button_later_footy">add fancy image button later footy</string>
+    <string name="LoginUsernameTagText">Username/Email:</string>
+    <string name="passwordTagText">Password:</string>
+    <string name="CreateAccountButtonText">Create Account</string>
+    <string name="LoginButtonText">Login</string>
 </resources>

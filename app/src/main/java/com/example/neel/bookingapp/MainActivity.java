@@ -11,6 +11,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Added code by Sush
     }
     public void openfooty(View v){
         startActivity(new Intent(MainActivity.this, Football.class));
