@@ -1,9 +1,12 @@
 package com.example.neel.bookingapp;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.os.Bundle;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,6 +15,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Added code by Sush
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
     }
     public void openfooty(View v){
         startActivity(new Intent(MainActivity.this, Football.class));
