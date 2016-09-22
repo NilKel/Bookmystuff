@@ -20,4 +20,16 @@
     <string name="passwordTagText">Password:</string>
     <string name="CreateAccountButtonText">Create Account</string>
     <string name="LoginButtonText">Login</string>
+    <string name="nameTagText">Full Name:</string>
+    <string name="emailTagText">Email:</string>
+    <string name="nameHintText">John Appleseed</string>
+    <string name="emailHintText">johnappleseed@email.com</string>
+    <string name="reenterPasswordTagText">Re-Enter Password:</string>
+    <string name="phoneNumberTagText">Phone number:</string>
+    <string name="clearText">Clear</string>
+    <string name="submitText">Submit</string>
+    <string name="googleSignInText">Google</string>
+    <string name="facebookSignInText">Facebook</string>
+    <string name="signInWithTagText">Sign in with</string>
+    <string name="facebook">Facebook</string>
 </resources>
