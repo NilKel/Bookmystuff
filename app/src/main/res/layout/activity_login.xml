@@ -70,4 +70,25 @@
         android:layout_alignBottom="@id/PasswordEditText"
         android:layout_alignLeft="@id/LoginButton"
         android:layout_alignStart="@id/CreateAccountButton" />
+
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/googleSignInButtonLogin"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@+id/CreateAccountButton"
+        android:layout_centerHorizontal="true"
+        android:textAllCaps="false"
+        android:layout_marginTop="10dp"
+        />
+
+    <!--<com.facebook.login.widget.DeviceLoginButton-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:text="@string/facebook"-->
+        <!--android:textAllCaps="false"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_below="@id/googleSignInButtonLogin"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:id="@+id/loginButton" />-->
 </RelativeLayout>

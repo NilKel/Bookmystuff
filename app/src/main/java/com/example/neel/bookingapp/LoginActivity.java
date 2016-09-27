@@ -6,7 +6,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
+import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -24,7 +26,9 @@ public class LoginActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
 
         // Configure sign-in to request the user's ID, email address, and basic
@@ -40,13 +44,25 @@ public class LoginActivity extends AppCompatActivity{
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        SignInButton signInButton = (SignInButton) findViewById(R.id.googleSignInButton);
+        SignInButton signInButton = new SignInButton(this);
+        signInButton = (SignInButton) findViewById(R.id.googleSignInButtonLogin);
+        Log.d("SignInButton", signInButton.toString());
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                findViewById(R.id.googleSignInButton).setOnClickListener(this);
 
                 googleSignIn();
+            }
+        });
+
+        Button createAccountButton = new Button(this);
+        createAccountButton = (Button) findViewById(R.id.CreateAccountButton);
+        createAccountButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, SignupActivity.class));
             }
         });
 

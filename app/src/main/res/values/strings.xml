@@ -30,6 +30,6 @@
     <string name="submitText">Submit</string>
     <string name="googleSignInText">Google</string>
     <string name="facebookSignInText">Facebook</string>
-    <string name="signInWithTagText">Sign in with</string>
+    <string name="signInWithTagText">Sign up with</string>
     <string name="facebook">Facebook</string>
 </resources>
