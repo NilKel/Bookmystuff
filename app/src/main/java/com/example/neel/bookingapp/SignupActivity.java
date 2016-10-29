@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -35,12 +36,14 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
         //Creates a reference for  your Firebase database
         //Add YOUR Firebase Reference URL instead of the following URL
+        Firebase.setAndroidContext(this);
         myFirebaseRef =  new Firebase("https://bookmystuff-79c2e.firebaseio.com/");
     }
+
 
     @Override
     protected void onStart() {
@@ -76,14 +79,16 @@ public class SignupActivity extends AppCompatActivity {
                         myFirebaseRef.unauth();
                         Toast.makeText(getApplicationContext(), "Your Account has been Created", Toast.LENGTH_LONG).show();
                         Toast.makeText(getApplicationContext(), "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
-                        progressBar.setVisibility(View.GONE);
+//                        progressBar = new ProgressBar(getApplicationContext());
+//                        progressBar.setVisibility(View.GONE);
                         finish();
                     }
 
                     @Override
                     public void onError(FirebaseError firebaseError) {
+                        Log.e("Firebase error", firebaseError.getMessage());
                         Toast.makeText(getApplicationContext(), "" + firebaseError.getMessage(), Toast.LENGTH_LONG).show();
-                        progressBar.setVisibility(View.GONE);
+//                        progressBar.setVisibility(View.GONE);
                     }
                 }
         );

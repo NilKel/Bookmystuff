@@ -24,6 +24,7 @@ public class LoginActivity extends AppCompatActivity{
     public final int RC_SIGN_IN = 1;
     private GoogleApiClient mGoogleApiClient;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -34,6 +35,7 @@ public class LoginActivity extends AppCompatActivity{
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.web_client_id))
                 .requestEmail()
                 .build();
 
@@ -47,14 +49,9 @@ public class LoginActivity extends AppCompatActivity{
         SignInButton signInButton = new SignInButton(this);
         signInButton = (SignInButton) findViewById(R.id.googleSignInButtonLogin);
         Log.d("SignInButton", signInButton.toString());
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                findViewById(R.id.googleSignInButton).setOnClickListener(this);
+        ClickHandler clickHandler = new ClickHandler();
 
-                googleSignIn();
-            }
-        });
+        signInButton.setOnClickListener(clickHandler);
 
         Button createAccountButton = new Button(this);
         createAccountButton = (Button) findViewById(R.id.CreateAccountButton);
@@ -69,6 +66,18 @@ public class LoginActivity extends AppCompatActivity{
 
 
 
+    }
+
+    private class ClickHandler implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.googleSignInButtonLogin:
+                    googleSignIn();
+                    break;
+            }
+        }
     }
 
     private void googleSignIn() {
