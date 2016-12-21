@@ -22,7 +22,7 @@
     <string name="add_fancy_image_button_later_footy">add fancy image button later footy</string>
     <string name="LoginUsernameTagText">Username/Email:</string>
     <string name="passwordTagText">Password:</string>
-    <string name="CreateAccountButtonText">Create Account</string>
+    <string name="CreateAccountButtonText">Sign Up</string>
     <string name="LoginButtonText">Login</string>
     <string name="nameTagText">Full Name:</string>
     <string name="emailTagText">Email:</string>
@@ -36,4 +36,5 @@
     <string name="facebookSignInText">Facebook</string>
     <string name="signInWithTagText">Sign up with</string>
     <string name="facebook">Facebook</string>
+    <string name="auth_failed">Failed authentication</string>
 </resources>

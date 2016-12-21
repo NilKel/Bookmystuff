@@ -88,6 +88,8 @@ class User {
     public void setId(String id) {
         Id = id;
     }
+
+
     public void saveUser() {
         //Add YOUR Firebase Reference URL instead of the following URL
         Firebase myFirebaseRef = new Firebase("https://bookmystuff-79c2e.firebaseio.com/");

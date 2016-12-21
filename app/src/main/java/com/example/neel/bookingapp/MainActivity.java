@@ -2,22 +2,26 @@ package com.example.neel.bookingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
+import com.google.firebase.auth.FirebaseAuth;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Added code by Sush
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        FirebaseAuth.getInstance().signOut();
+    }
+
     public void openfooty(View v){
         startActivity(new Intent(MainActivity.this, Football.class));
     }

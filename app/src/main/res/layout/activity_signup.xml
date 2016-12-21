@@ -2,97 +2,100 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="12"
-        android:hint="@string/nameHintText"
-        android:layout_alignBaseline="@+id/textView0"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@id/textView0"
-        android:layout_toEndOf="@id/textView0"
-        android:id="@+id/editText0" />
-
     <TextView
         android:text="@string/nameTagText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="75dp"
-        android:labelFor="@id/editText0"
+        android:layout_alignParentTop="true"
         android:layout_marginStart="50dp"
         android:layout_marginLeft="50dp"
-        android:id="@+id/textView0" />
+        android:id="@+id/nameTagText" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:hint="@string/nameHintText"
+        android:layout_alignBaseline="@+id/nameTagText"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/nameTagText"
+        android:layout_toEndOf="@id/nameTagText"
+        android:id="@+id/nameEditText" />
+
 
     <TextView
         android:text="@string/emailTagText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:labelFor="@+id/editText1"
-        android:layout_below="@id/editText0"
+        android:labelFor="@+id/emailEditText"
+        android:layout_below="@id/nameEditText"
         android:layout_marginTop="25dp"
-        android:layout_alignEnd="@id/textView0"
-        android:layout_alignRight="@id/textView0"
-        android:id="@+id/textView1" />
+        android:layout_alignEnd="@id/nameTagText"
+        android:layout_alignRight="@id/nameTagText"
+        android:id="@+id/emailTagText" />
 
     <EditText
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
-        android:ems="12"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:hint="@string/emailHintText"
-        android:layout_alignBaseline="@id/textView1"
-        android:layout_toRightOf="@id/textView1"
-        android:layout_toEndOf="@id/textView1"
+        android:layout_alignBaseline="@id/emailTagText"
+        android:layout_toRightOf="@id/emailTagText"
+        android:layout_toEndOf="@id/emailTagText"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
-        android:id="@+id/editText1" />
+        android:id="@+id/emailEditText" />
 
     <TextView
         android:text="@string/passwordTagText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:labelFor="@+id/editText2"
-        android:layout_alignEnd="@id/textView1"
-        android:layout_alignRight="@id/textView1"
-        android:layout_below="@id/editText1"
+        android:labelFor="@+id/passwordEditText"
+        android:layout_alignEnd="@id/emailTagText"
+        android:layout_alignRight="@id/emailTagText"
+        android:layout_below="@id/emailEditText"
         android:layout_marginTop="25dp"
-        android:id="@+id/textView2" />
+        android:id="@+id/passwordTagText" />
 
     <EditText
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:ems="12"
-        android:layout_alignBaseline="@id/textView2"
-        android:layout_alignLeft="@+id/editText1"
-        android:layout_alignStart="@+id/editText1"
-        android:id="@+id/editText2" />
+        android:layout_alignBaseline="@id/passwordTagText"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_alignLeft="@+id/emailEditText"
+        android:layout_alignStart="@+id/emailEditText"
+        android:id="@+id/passwordEditText" />
 
     <TextView
         android:text="@string/reenterPasswordTagText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/textView2"
+        android:layout_alignEnd="@id/passwordTagText"
         android:textAlignment="viewEnd"
         android:gravity="end"
-        android:layout_alignRight="@id/textView2"
-        android:layout_below="@id/editText2"
+        android:layout_alignRight="@id/passwordTagText"
+        android:layout_below="@id/passwordEditText"
         android:layout_marginTop="25dp"
-        android:id="@+id/textView3" />
+        android:id="@+id/passwodReenterTagText" />
 
     <EditText
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:ems="12"
-        android:id="@+id/editText3"
-        android:layout_alignBaseline="@id/textView3"
-        android:layout_alignLeft="@id/editText2"
-        android:layout_alignStart="@id/editText2"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp" />
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:id="@+id/passwordReenterEditText"
+        android:layout_alignBaseline="@id/passwodReenterTagText"
+        android:layout_alignLeft="@id/passwordEditText"
+        android:layout_alignStart="@id/passwordEditText" />
 
 
 
@@ -100,47 +103,49 @@
         android:text="@string/phoneNumberTagText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/textView3"
-        android:layout_alignRight="@id/textView3"
-        android:labelFor="@+id/editText4"
-        android:layout_below="@id/editText3"
+        android:layout_alignEnd="@id/passwodReenterTagText"
+        android:layout_alignRight="@id/passwodReenterTagText"
+        android:labelFor="@+id/phoneNoEditText"
+        android:layout_below="@id/passwordReenterEditText"
         android:layout_marginTop="25dp"
-        android:id="@+id/textView4" />
+        android:id="@+id/phoneNoTagText" />
 
     <EditText
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="phone"
-        android:ems="12"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:hint="9876543210"
-        android:layout_alignBaseline="@id/textView4"
-        android:layout_alignStart="@id/editText3"
-        android:layout_alignLeft="@id/editText3"
-        android:id="@+id/editText4" />
+        android:layout_alignBaseline="@id/phoneNoTagText"
+        android:layout_alignStart="@id/passwordReenterEditText"
+        android:layout_alignLeft="@id/passwordReenterEditText"
+        android:id="@+id/phoneNoEditText" />
 
 
 
     <Button
         android:text="@string/clearText"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editText4"
-        android:layout_toLeftOf="@+id/editText4"
-        android:layout_toStartOf="@+id/editText4"
+        android:layout_below="@+id/phoneNoEditText"
+        android:layout_marginStart="50dp"
+        android:onClick="clearButtonClicked"
+        android:layout_marginLeft="50dp"
         android:layout_marginTop="40dp"
-        android:id="@+id/button0" />
+        android:id="@+id/clearButton" />
 
     <Button
         android:text="@string/submitText"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/button0"
+        android:layout_alignBaseline="@id/clearButton"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:onClick="onSignUpClicked"
+        android:onClick="SignUpClicked"
         android:layout_marginEnd="50dp"
         android:layout_marginRight="50dp"
-        android:id="@+id/button1" />
+        android:id="@+id/submitButtonClicked" />
 
     <!--<Button-->
         <!--android:text="@string/googleSignInText"-->
@@ -161,7 +166,6 @@
         android:layout_centerHorizontal="true"
         android:textAllCaps="false"
         android:layout_marginTop="10dp"
-
         />
 
     <TextView
@@ -169,14 +173,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_below="@+id/button1"
+        android:layout_below="@+id/submitButtonClicked"
         android:layout_centerHorizontal="true"
         android:id="@+id/textView5" />
 
     <com.facebook.login.widget.DeviceLoginButton
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="@string/facebook"
         android:textAllCaps="false"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/googleSignInButton"

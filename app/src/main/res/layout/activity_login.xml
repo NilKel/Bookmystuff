@@ -3,92 +3,96 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:ems="10"
-        android:layout_alignTop="@+id/textView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="8dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginEnd="8dp"
-        android:id="@+id/UsernameEditText" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:layout_below="@id/UsernameEditText"
-        android:layout_alignLeft="@id/UsernameEditText"
-        android:layout_alignStart="@id/UsernameEditText"
-        android:layout_marginTop="40dp"
-        android:id="@+id/PasswordEditText" />
-
-    <Button
-        android:text="@string/CreateAccountButtonText"
-        android:layout_width="@dimen/button_width"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/PasswordEditText"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        android:layout_marginTop="38dp"
-        android:id="@+id/CreateAccountButton" />
-
-    <Button
-        android:text="@string/LoginButtonText"
-        android:layout_width="@dimen/button_width"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/CreateAccountButton"
-        android:layout_alignRight="@id/PasswordEditText"
-        android:layout_alignEnd="@id/PasswordEditText"
-        android:layout_marginRight="45dp"
-        android:layout_marginEnd="45dp"
-        android:id="@+id/LoginButton" />
 
     <TextView
         android:text="@string/LoginUsernameTagText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="185dp"
-        android:id="@+id/textView"
+        android:layout_marginTop="100dp"
+        android:id="@+id/usernameTagText"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="57dp"
-        android:layout_marginStart="57dp" />
+        android:layout_marginLeft="40dp"
+        android:layout_marginStart="40dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:layout_alignBottom="@id/usernameTagText"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_toEndOf="@id/usernameTagText"
+        android:layout_toRightOf="@id/usernameTagText"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/usernameEditText" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:layout_below="@id/usernameEditText"
+        android:layout_alignLeft="@id/usernameEditText"
+        android:layout_alignStart="@id/usernameEditText"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:id="@+id/passwordEditText" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView2"
-        android:layout_alignBaseline="@id/PasswordEditText"
+        android:id="@+id/passwordTagText"
         android:text="@string/passwordTagText"
-        android:labelFor="@id/UsernameEditText"
-        android:layout_alignBottom="@id/PasswordEditText"
-        android:layout_alignLeft="@id/LoginButton"
-        android:layout_alignStart="@id/CreateAccountButton" />
+        android:labelFor="@id/passwordEditText"
+        android:layout_alignBottom="@id/passwordEditText"
+        android:layout_alignEnd="@id/usernameTagText"
+        android:layout_alignRight="@id/usernameTagText"/>
+
+
+    <Button
+        android:text="@string/CreateAccountButtonText"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/passwordEditText"
+        android:layout_alignLeft="@+id/usernameTagText"
+        android:layout_alignStart="@+id/usernameTagText"
+        android:layout_marginTop="38dp"
+        android:id="@+id/createAccountButton" />
+
+    <Button
+        android:text="@string/LoginButtonText"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/createAccountButton"
+        android:layout_alignRight="@id/passwordEditText"
+        android:layout_alignEnd="@id/passwordEditText"
+        android:layout_marginRight="45dp"
+        android:layout_marginEnd="45dp"
+        android:id="@+id/loginButton" />
 
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/googleSignInButtonLogin"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_below="@+id/CreateAccountButton"
+        android:layout_below="@+id/createAccountButton"
         android:layout_centerHorizontal="true"
         android:textAllCaps="false"
         android:layout_marginTop="10dp"
         />
 
-    <!--<com.facebook.login.widget.DeviceLoginButton-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:text="@string/facebook"-->
-        <!--android:textAllCaps="false"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_below="@id/googleSignInButtonLogin"-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:id="@+id/loginButton" />-->
+    <com.facebook.login.widget.DeviceLoginButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/facebook"
+        android:textAllCaps="false"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/googleSignInButtonLogin"
+        android:layout_marginTop="10dp"
+        android:id="@+id/facebookLoginButton" />
 </RelativeLayout>
