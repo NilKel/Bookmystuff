@@ -3,7 +3,7 @@
     <!-- AUTH STRINGS -->
     <string name="web_client_id"> 81680596990-liak4jjs298vkcm832aoap2m52g9bn5p.apps.googleusercontent.com </string>
 
-    <string name="app_name">Bookingapp</string>
+    <string name="app_name">BOOKMYSTUFF</string>
     <string name="title_activity_football">Football</string>
     <string name="facebook_app_id">168888936886354</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -21,14 +21,14 @@
     <string name="table_tennis">Table tennis</string>
     <string name="add_fancy_image_button_later_footy">add fancy image button later footy</string>
     <string name="LoginUsernameTagText">Username/Email:</string>
-    <string name="passwordTagText">Password:</string>
+    <string name="passwordTagText">Password</string>
     <string name="CreateAccountButtonText">Sign Up</string>
-    <string name="LoginButtonText">Login</string>
+    <string name="LoginButtonText">SIGN IN</string>
     <string name="nameTagText">Full Name:</string>
-    <string name="emailTagText">Email:</string>
+    <string name="emailTagText">Email</string>
     <string name="nameHintText">John Appleseed</string>
     <string name="emailHintText">johnappleseed@email.com</string>
-    <string name="reenterPasswordTagText">Re-Enter Password:</string>
+    <string name="reenterPasswordTagText">Re-Enter Password</string>
     <string name="phoneNumberTagText">Phone number:</string>
     <string name="clearText">Clear</string>
     <string name="submitText">Submit</string>
@@ -37,4 +37,5 @@
     <string name="signInWithTagText">Sign up with</string>
     <string name="facebook">Facebook</string>
     <string name="auth_failed">Failed authentication</string>
+    <string name="sign_in_below">SIGN IN BELOW</string>
 </resources>

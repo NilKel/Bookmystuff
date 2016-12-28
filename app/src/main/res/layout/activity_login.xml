@@ -1,79 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
 
     <TextView
-        android:text="@string/LoginUsernameTagText"
+        android:text="@string/app_name"
+        android:textSize="50sp"
+        android:textColor="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:id="@+id/usernameTagText"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="40dp"
-        android:layout_marginStart="40dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="84dp"
+        android:id="@+id/appNameTextView" />
 
-    <EditText
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:srcCompat="@color/cardview_dark_background"
+        android:layout_alignBottom="@id/appNameTextView"
+        android:layout_centerInParent="true"
+        android:id="@+id/imageView" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:layout_alignBottom="@id/usernameTagText"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_toEndOf="@id/usernameTagText"
-        android:layout_toRightOf="@id/usernameTagText"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:id="@+id/usernameEditText" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/imageView"
+        android:weightSum="4">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"/>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="100dp"
+                android:text="@string/sign_in_below"
+                android:textColor="@color/white"
+                android:id="@+id/signInBelowText"
+                android:textSize="18sp"/>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:layout_below="@id/usernameEditText"
-        android:layout_alignLeft="@id/usernameEditText"
-        android:layout_alignStart="@id/usernameEditText"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:id="@+id/passwordEditText" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:hint="@string/emailTagText"
+                android:id="@+id/usernameEditText"
+                android:layout_centerHorizontal="true"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_below="@id/signInBelowText"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/passwordTagText"
-        android:text="@string/passwordTagText"
-        android:labelFor="@id/passwordEditText"
-        android:layout_alignBottom="@id/passwordEditText"
-        android:layout_alignEnd="@id/usernameTagText"
-        android:layout_alignRight="@id/usernameTagText"/>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:layout_below="@id/usernameEditText"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:hint="@string/passwordTagText"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:id="@+id/passwordEditText" />
+
+            <Button
+                android:text="@string/LoginButtonText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/loginButton"
+                android:layout_centerVertical="true"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/appGreen"/>
+
+            <Button
+                android:text="@string/CreateAccountButtonText"
+                android:layout_width="@dimen/button_width"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/passwordEditText"
+                android:layout_alignLeft="@+id/usernameTagText"
+                android:layout_alignStart="@+id/usernameTagText"
+                android:layout_marginTop="38dp"
+                android:id="@+id/createAccountButton" />
+
+        </RelativeLayout>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5" />
+    </LinearLayout>
 
 
-    <Button
-        android:text="@string/CreateAccountButtonText"
-        android:layout_width="@dimen/button_width"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/passwordEditText"
-        android:layout_alignLeft="@+id/usernameTagText"
-        android:layout_alignStart="@+id/usernameTagText"
-        android:layout_marginTop="38dp"
-        android:id="@+id/createAccountButton" />
 
-    <Button
-        android:text="@string/LoginButtonText"
-        android:layout_width="@dimen/button_width"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/createAccountButton"
-        android:layout_alignRight="@id/passwordEditText"
-        android:layout_alignEnd="@id/passwordEditText"
-        android:layout_marginRight="45dp"
-        android:layout_marginEnd="45dp"
-        android:id="@+id/loginButton" />
+
+
+
 
 
     <com.google.android.gms.common.SignInButton
@@ -95,4 +123,14 @@
         android:layout_below="@id/googleSignInButtonLogin"
         android:layout_marginTop="10dp"
         android:id="@+id/facebookLoginButton" />
+
+
+
+
+
+
+
+
+
+
 </RelativeLayout>
