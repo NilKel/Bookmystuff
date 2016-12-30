@@ -16,6 +16,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
@@ -35,6 +36,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Arrays;
+
 /**
  * Created by sushrutshringarputale on 9/20/16.
  */
@@ -48,7 +51,7 @@ public class LoginActivity extends FragmentActivity {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     private EditText username, password;
-    private LoginButton loginButton;
+    private Button loginButton;
 
     private CallbackManager callbackManager;
 
@@ -59,27 +62,27 @@ public class LoginActivity extends FragmentActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
 
-        loginButton = (LoginButton) findViewById(R.id.facebookLoginButton);
-        loginButton.setReadPermissions("email","public_profile");
-        callbackManager = CallbackManager.Factory.create();
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d("Login", "facebook:onSuccess:" + loginResult);
-                firebaseAuth(FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken()));
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d("Login", "facebook:onCancel");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.d("Login", "facebook:onError", error);
-                Toast.makeText(LoginActivity.this, "There was an error logging in. Please try again.", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        loginButton = (Button) findViewById(R.id.facebookLoginButton);
+//        loginButton.setReadPermissions("email","public_profile");
+//        callbackManager = CallbackManager.Factory.create();
+//        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//                Log.d("Login", "facebook:onSuccess:" + loginResult);
+//                firebaseAuth(FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken()));
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                Log.d("Login", "facebook:onCancel");
+//            }
+//
+//            @Override
+//            public void onError(FacebookException error) {
+//                Log.d("Login", "facebook:onError", error);
+//                Toast.makeText(LoginActivity.this, "There was an error logging in. Please try again.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         mfirebaseAuth = FirebaseAuth.getInstance();
 
@@ -138,6 +141,36 @@ public class LoginActivity extends FragmentActivity {
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
         loginButton.setOnClickListener(clickHandler);
+
+        Button facebookButton = (Button) findViewById(R.id.facebookLoginButton);
+
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d("Facebook Login", "Success");
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d("Facebook Login", "Cancelled");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.e("Facebook Login", error.getMessage());
+            }
+        });
+//        facebookButton.setBackgroundResource(R.mipmap.facebook_icon);
+//        facebookButton.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+//        facebookButton.setCompoundDrawablePadding(0);
+//        facebookButton.setPadding(0, 0, 0, 0);
+//        facebookButton.setText("");
+    }
+
+    public void fbLogin(View view) {
+        LoginManager.getInstance().logInWithReadPermissions(this,
+                Arrays.asList("user_photos", "email", "user_birthday", "public_profile"));
     }
 
 
@@ -208,6 +241,8 @@ public class LoginActivity extends FragmentActivity {
                 Toast.makeText(this, "Could not login. Please try again.", Toast.LENGTH_SHORT).show();
                 Log.e("Could not authenticate", result.toString());
             }
+        } else {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
