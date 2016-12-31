@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="sign_in_below">SIGN IN BELOW</string>
+    <string name="create_account">CREATE ACCOUNT</string>
 </resources>

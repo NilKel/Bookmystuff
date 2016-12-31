@@ -24,18 +24,18 @@
     <string name="passwordTagText">Password</string>
     <string name="CreateAccountButtonText">SIGN UP</string>
     <string name="LoginButtonText">SIGN IN</string>
-    <string name="nameTagText">Full Name:</string>
+    <string name="nameTagText">Full Name</string>
     <string name="emailTagText">Email</string>
     <string name="nameHintText">John Appleseed</string>
     <string name="emailHintText">johnappleseed@email.com</string>
     <string name="reenterPasswordTagText">Re-Enter Password</string>
-    <string name="phoneNumberTagText">Phone number:</string>
+    <string name="phoneNumberTagText">Phone number</string>
     <string name="clearText">Clear</string>
-    <string name="submitText">Submit</string>
     <string name="googleSignInText">Google</string>
     <string name="facebookSignInText">Facebook</string>
     <string name="signInWithTagText">Sign up with</string>
     <string name="facebook">Facebook</string>
     <string name="auth_failed">Failed authentication</string>
     <string name="sign_in_below">SIGN IN BELOW</string>
+    <string name="create_account">CREATE ACCOUNT</string>
 </resources>

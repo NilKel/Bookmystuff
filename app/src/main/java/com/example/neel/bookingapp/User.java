@@ -1,8 +1,17 @@
 package com.example.neel.bookingapp;
 
 import android.media.Image;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.firebase.client.Firebase;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * Created by sushrutshringarputale on 9/19/16.
@@ -92,8 +101,36 @@ class User {
 
     public void saveUser() {
         //Add YOUR Firebase Reference URL instead of the following URL
-        Firebase myFirebaseRef = new Firebase("https://bookmystuff-79c2e.firebaseio.com/");
-        myFirebaseRef = myFirebaseRef.child("users").child(getId());
-        myFirebaseRef.setValue(this);
+//        Firebase myFirebaseRef = new Firebase("https://bookmystuff-79c2e.firebaseio.com/");
+//        myFirebaseRef = myFirebaseRef.child("users").child(getId());
+//        myFirebaseRef.setValue(this);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+        db.child("users").child(this.getId()).child("email").setValue(this.getEmail());
+        db.child("users").child(this.getId()).child("name").setValue(this.getName());
+        db.child("users").child(this.getId()).child("PhNo").setValue(this.getPhNo());
+        if (user != null) {
+            db.child("users").child(this.getId()).child("ProfPic").setValue(user.getPhotoUrl());
+        }
+        db.child("users").child(this.getId()).child("id").setValue(this.getId());
+
+//        try {
+//            UserProfileChangeRequest updates = new UserProfileChangeRequest.Builder()
+//                    .setDisplayName(this.getName())
+//                    .build();
+//            user.updateProfile(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                @Override
+//                public void onComplete(@NonNull Task<Void> task) {
+//                    if (task.isSuccessful()) {
+//                        Log.d("Profile update: ", "User profile updated.");
+//                    }
+//                    else {
+//                        Log.d("Profile update", "Failed");
+//                    }
+//                }
+//            });
+//        } catch (NullPointerException e) {
+//            Log.e("User update: ", e.getMessage());
+//        }
     }
 }

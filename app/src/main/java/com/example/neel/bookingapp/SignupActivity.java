@@ -2,7 +2,9 @@ package com.example.neel.bookingapp;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -13,6 +15,10 @@ import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Map;
 
@@ -22,7 +28,7 @@ import java.util.Map;
 
 public class SignupActivity extends FragmentActivity{
 
-    private Firebase myFirebaseRef;
+    private FirebaseAuth mAuth;
     private User user;
     private EditText name;
     private EditText phoneNumber;
@@ -36,10 +42,7 @@ public class SignupActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        //Creates a reference for  your Firebase database
-        //Add YOUR Firebase Reference URL instead of the following URL
-        Firebase.setAndroidContext(this);
-        myFirebaseRef =  new Firebase("https://bookmystuff-79c2e.firebaseio.com/");
+        mAuth = FirebaseAuth.getInstance();
     }
 
 
@@ -54,11 +57,16 @@ public class SignupActivity extends FragmentActivity{
     }
 
     private boolean validate() {
+        Log.d("Validation: name", Boolean.toString(!name.getText().toString().isEmpty()));
+        Log.d("Validation: phone", Boolean.toString(!phoneNumber.getText().toString().isEmpty()));
+        Log.d("Validation: email", Boolean.toString(android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()));
+        Log.d("Validation: password", Boolean.toString(!(password.getText().toString().isEmpty() || passwordReenter.getText().toString().isEmpty())));
+        Log.d("Validation: re-entry", Boolean.toString(password.getText().toString().equals(passwordReenter.getText().toString())));
         return !(name.getText().toString().isEmpty() ||
                 phoneNumber.getText().toString().isEmpty() ||
                 !android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches() ||
                 password.getText().toString().isEmpty() || passwordReenter.getText().toString().isEmpty() ||
-                !password.getText().equals(passwordReenter.getText()));
+                !password.getText().toString().equals(passwordReenter.getText().toString()));
     }
 
     protected void setUpUser() {
@@ -100,49 +108,72 @@ public class SignupActivity extends FragmentActivity{
 //        );
 //    }
 
-    public void clearButtonClicked(View view) {
-        name.setText("");
-        email.setText("");
-        phoneNumber.setText("");
-        password.setText("");
-        passwordReenter.setText("");
-    }
 
-    public void SignUpClicked(View view) {
+    public void SignUpClicked(final View view) {
         if (validate()) {
             final ProgressDialog dialog = ProgressDialog.show(SignupActivity.this, "Processing", "Creating Account");
+            dialog.setCancelable(true);
             setUpUser();
+
+            mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            dialog.dismiss();
+                            Log.d("createUser:onComplete:", Boolean.toString(task.isSuccessful()));
+
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
+                            if (!task.isSuccessful()) {
+                                Toast.makeText(SignupActivity.this, R.string.auth_failed,
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                user.setId(task.getResult().getUser().getUid());
+                                user.saveUser();
+//                            myFirebaseRef.unauth();
+                                Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
+                                Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
+                                cancelSignup(view);
+                            }
+                        }
+                    });
+        }
             //createUser method creates a new user account with the given email and password.
             //Parameters are :
             // email - The email for the account to be created
             // password - The password for the account to be created
             // handler - A handler which is called with the result of the operation
-            myFirebaseRef.createUser(
-                    user.getEmail(),
-                    user.getPassword(),
-                    new Firebase.ValueResultHandler<Map<String, Object>>() {
-                        @Override
-                        public void onSuccess(Map<String, Object> stringObjectMap) {
-                            dialog.dismiss();
-                            user.setId(stringObjectMap.get("uid").toString());
-                            user.saveUser();
-                            myFirebaseRef.unauth();
-                            Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
-                            Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
-                            finish();
-                        }
-
-                        @Override
-                        public void onError(FirebaseError firebaseError) {
-                            dialog.dismiss();
-                            Log.e("Firebase error", firebaseError.getMessage());
-                            Toast.makeText(SignupActivity.this, "" + firebaseError.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-            );
-        }
+//            myFirebaseRef.createUser(
+//                    user.getEmail(),
+//                    user.getPassword(),
+//                    new Firebase.ValueResultHandler<Map<String, Object>>() {
+//                        @Override
+//                        public void onSuccess(Map<String, Object> stringObjectMap) {
+//                            dialog.dismiss();
+//                            user.setId(stringObjectMap.get("uid").toString());
+//                            user.saveUser();
+//                            myFirebaseRef.unauth();
+//                            Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
+//                            Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
+//                            finish();
+//                        }
+//
+//                        @Override
+//                        public void onError(FirebaseError firebaseError) {
+//                            dialog.dismiss();
+//                            Log.e("Firebase error", firebaseError.getMessage());
+//                            Toast.makeText(SignupActivity.this, "" + firebaseError.getMessage(), Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//            );
+//        }
         else{
             Toast.makeText(SignupActivity.this, "Please make sure all input is valid", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void cancelSignup(View view) {
+        startActivity(new Intent(this, LoginActivity.class));
     }
 }
