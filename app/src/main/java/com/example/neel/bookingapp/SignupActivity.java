@@ -1,6 +1,5 @@
 package com.example.neel.bookingapp;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,17 +9,13 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.Map;
 
 /**
  * Created by sushrutshringarputale on 9/21/16.
@@ -131,7 +126,6 @@ public class SignupActivity extends FragmentActivity{
                             } else {
                                 user.setId(task.getResult().getUser().getUid());
                                 user.saveUser();
-//                            myFirebaseRef.unauth();
                                 Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
                                 Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
                                 cancelSignup(view);
