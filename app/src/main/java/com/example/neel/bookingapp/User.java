@@ -24,8 +24,9 @@ class User {
     private long phNo;
     private Image profPicture;
     private String password;
+    private boolean isOwner;
 
-    public User(String email, String name, String password, long phNo) {
+    public User(String email, String name, String password, long phNo, boolean isOwner) {
         this.email = email;
         this.name = name;
         this.password = password;
@@ -113,6 +114,7 @@ class User {
             db.child("users").child(this.getId()).child("ProfPic").setValue(user.getPhotoUrl());
         }
         db.child("users").child(this.getId()).child("id").setValue(this.getId());
+        db.child("users").child(this.getId()).child("isOwner").setValue(false);
 
 //        try {
 //            UserProfileChangeRequest updates = new UserProfileChangeRequest.Builder()
@@ -132,5 +134,13 @@ class User {
 //        } catch (NullPointerException e) {
 //            Log.e("User update: ", e.getMessage());
 //        }
+    }
+
+    public boolean isOwner() {
+        return isOwner;
+    }
+
+    public void setOwner(boolean owner) {
+        isOwner = owner;
     }
 }
