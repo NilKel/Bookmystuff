@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
         // name, website
          txtName.setText(currentUser.getDisplayName());
 //        txtWebsite.setText("www.androidhive.info");
-//        imgProfile.setImageDrawable(currentUser);
 
         // loading header background image
         Glide.with(this).load(urlNavHeaderBg)
@@ -215,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Fragment getHomeFragment() {
         switch (navItemIndex) {
-            case 0:
+            case 0: // TODO: Create and add the three sports fragments here
                 // home
 //                HomeFragment homeFragment = new HomeFragment();
 //                return homeFragment;

@@ -21,4 +21,6 @@ public class BookMyStuffApp extends Application {
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
     }
+
+    //TODO: MAIN APP LEVEL: Create three fragments for the three sports that will generate the list of lobbies. Create the layout files for those as well. Cleanup all old code files and remove them from the application. git push when done.
 }

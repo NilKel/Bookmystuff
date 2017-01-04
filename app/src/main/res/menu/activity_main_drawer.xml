@@ -8,6 +8,7 @@
             android:id="@+id/action_settings"
             android:icon="@mipmap/ic_settings_black_24dp"
             />
+        <!-- TODO: Add menu items for badminton, table tennis, and football. This will trigger the fragment which needs to be loaded for those sports.-->
     </group>
     <item android:title="@string/nav_other">
         <menu>
