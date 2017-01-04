@@ -66,7 +66,7 @@ public class SignupActivity extends FragmentActivity{
 
     protected void setUpUser() {
         user = new User(email.getText().toString(), name.getText().toString(), password.getText().toString(),
-                Long.parseLong(phoneNumber.getText().toString()));
+                Long.parseLong(phoneNumber.getText().toString()), false);
     }
 
 //    public void onSignUpClicked(View view){

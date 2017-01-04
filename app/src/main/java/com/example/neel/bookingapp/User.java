@@ -113,7 +113,7 @@ class User {
         if (user != null) {
             db.child("users").child(this.getId()).child("ProfPic").setValue(user.getPhotoUrl());
         }
-        db.child("users").child(this.getId()).child("id").setValue(this.getId());
+//        db.child("users").child(this.getId()).child("id").setValue(this.getId());
         db.child("users").child(this.getId()).child("isOwner").setValue(false);
 
 //        try {
