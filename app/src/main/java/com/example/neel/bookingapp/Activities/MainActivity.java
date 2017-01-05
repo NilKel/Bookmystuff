@@ -1,6 +1,7 @@
 package com.example.neel.bookingapp.Activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -22,11 +23,9 @@ import android.support.v7.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.example.neel.bookingapp.Badminton;
-import com.example.neel.bookingapp.Football;
+import com.example.neel.bookingapp.Fragments.HomeFragment;
 import com.example.neel.bookingapp.Other.CircleTransform;
 import com.example.neel.bookingapp.R;
-import com.example.neel.bookingapp.TableTennis;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -44,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     // urls to load navigation header background image
     // and profile image
     private static final String urlNavHeaderBg = "http://api.androidhive.info/images/nav-menu-header-bg.jpg";
-    private static final String urlProfileImg = "https://lh3.googleusercontent.com/eCtE_G34M9ygdkmOpYvCag1vBARCmZwnVS6rS5t4JLzJ6QgQSBquM0nuTsCpLhYbKljoyS-txg";
 
     // index to identify current nav menu item
     public static int navItemIndex = 0;
@@ -75,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainActivity", "Started");
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         setSupportActionBar(toolbar);
 
         mHandler = new Handler();
@@ -99,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Create a new booking", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                //TODO: Create fragment/activity to launch a new lobby
             }
         });
 
@@ -115,24 +113,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        FirebaseAuth.getInstance().signOut();
-    }
-
-    public void openfooty(View v){
-        startActivity(new Intent(MainActivity.this, Football.class));
-    }
-
-    public void badmint(View v){
-        startActivity(new Intent(MainActivity.this, Badminton.class));
-    }
-
-    public void titty(View v){
-        startActivity(new Intent(MainActivity.this, TableTennis.class));
-    }
+//    public void openfooty(View v){
+//        startActivity(new Intent(MainActivity.this, Football.class));
+//    }
+//
+//    public void badmint(View v){
+//        startActivity(new Intent(MainActivity.this, Badminton.class));
+//    }
+//
+//    public void titty(View v){
+//        startActivity(new Intent(MainActivity.this, TableTennis.class));
+//    }
 
 
     /***
@@ -220,9 +211,9 @@ public class MainActivity extends AppCompatActivity {
     private Fragment getHomeFragment() {
         switch (navItemIndex) {
             case 0: // TODO: Create and add the three sports fragments here
-                // home
-//                HomeFragment homeFragment = new HomeFragment();
-//                return homeFragment;
+//                 home
+                HomeFragment homeFragment = new HomeFragment();
+                return homeFragment;
 //            case 1:
 //                // photos
 //                PhotosFragment photosFragment = new PhotosFragment();
@@ -240,9 +231,6 @@ public class MainActivity extends AppCompatActivity {
 //                // settings fragment
 //                SettingsFragment settingsFragment = new SettingsFragment();
 //                return settingsFragment;
-//            default:
-//                return new HomeFragment();
-                return new Fragment();
             default:
                 return new Fragment();
         }
@@ -267,10 +255,10 @@ public class MainActivity extends AppCompatActivity {
                 //Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
                     //Replacing the main content with ContentFragment Which is our Inbox View;
-//                    case R.id.nav_home:
-//                        navItemIndex = 0;
-//                        CURRENT_TAG = TAG_HOME;
-//                        break;
+                    case R.id.nav_home:
+                        navItemIndex = 0;
+                        CURRENT_TAG = TAG_HOME;
+                        break;
 //                    case R.id.nav_photos:
 //                        navItemIndex = 1;
 //                        CURRENT_TAG = TAG_PHOTOS;
@@ -283,20 +271,20 @@ public class MainActivity extends AppCompatActivity {
 //                        navItemIndex = 3;
 //                        CURRENT_TAG = TAG_NOTIFICATIONS;
 //                        break;
-//                    case R.id.nav_settings:
-//                        navItemIndex = 4;
-//                        CURRENT_TAG = TAG_SETTINGS;
-//                        break;
-//                    case R.id.nav_about_us:
-//                        // launch new intent instead of loading fragment
-//                        startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
-//                        drawer.closeDrawers();
-//                        return true;
-//                    case R.id.nav_privacy_policy:
-//                        // launch new intent instead of loading fragment
-//                        startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
-//                        drawer.closeDrawers();
-//                        return true;
+                    case R.id.nav_settings:
+                        navItemIndex = 4;
+                        CURRENT_TAG = TAG_SETTINGS;
+                        break;
+                    case R.id.nav_about_us:
+                        // launch new intent instead of loading fragment
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")));
+                        drawer.closeDrawers();
+                        return true;
+                    case R.id.nav_privacy_policy:
+                        // launch new intent instead of loading fragment
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")));
+                        drawer.closeDrawers();
+                        return true;
                     default:
                         navItemIndex = 0;
                 }
@@ -332,7 +320,8 @@ public class MainActivity extends AppCompatActivity {
         };
 
         //Setting the actionbarToggle to drawer layout
-        drawer.setDrawerListener(actionBarDrawerToggle);
+//        drawer.setDrawerListener(actionBarDrawerToggle);
+        drawer.addDrawerListener(actionBarDrawerToggle);
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();

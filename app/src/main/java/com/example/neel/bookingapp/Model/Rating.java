@@ -5,9 +5,9 @@ package com.example.neel.bookingapp.Model;
  */
 
 public class Rating {
-    private float rating;
+    private int rating;
 
-    public Rating(float rating) {
+    public Rating(int rating) {
         this.rating = rating;
         validate();
     }
@@ -20,7 +20,7 @@ public class Rating {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(int rating) {
         this.rating = rating;
         validate();
     }

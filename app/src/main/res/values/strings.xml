@@ -49,8 +49,9 @@
     <string name="app_title">BOOKMYSTUFF</string>
 
     <string-array name="nav_item_activity_titles">
+        <!--TODO: Update these based on the order of the menu layout -->
         <item>Home</item>
-        <item>Photos</item>
+        <item>Settings</item>
         <item>Movies</item>
         <item>Notifications</item>
         <item>Settings</item>

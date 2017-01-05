@@ -1,6 +1,10 @@
 package com.example.neel.bookingapp.Model;
 
 import android.location.Location;
+import android.util.Log;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Map;
 
@@ -15,6 +19,7 @@ public class Lobby {
     private String description;
     private Rating rating;
     private Map<String, String> attributes;
+    private String Id;
 
     public Lobby(Location location, String name, User owner, String description, Rating rating, Map<String, String> attributes) {
         this.location = location;
@@ -26,9 +31,11 @@ public class Lobby {
     }
 
     public Lobby(Location location, String name, User owner) {
-        this.location = location;
-        this.name = name;
-        this.owner = owner;
+        this(location, name, owner, "", new Rating(), null);
+    }
+
+    public Lobby() {
+        this(null, "", new User("",""));
     }
 
     public Location getLocation() {
@@ -85,6 +92,17 @@ public class Lobby {
                 "name='" + name + '\'' +
                 ", owner=" + owner +
                 '}';
+    }
+
+    public Lobby saveLobby() {
+        try {
+            DatabaseReference db = FirebaseDatabase.getInstance().getReference("lobby");
+            String key = db.push().getKey();
+            db.child(key).setValue(this);
+        } catch (NullPointerException e) {
+            Log.e("Lobby update", "Firebase uninit" + e.getMessage());
+        }
+        return this;
     }
 
 
