@@ -38,6 +38,7 @@ public class SignupActivity extends FragmentActivity{
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        Log.d("SignupActivity", "Started");
 
         mAuth = FirebaseAuth.getInstance();
     }

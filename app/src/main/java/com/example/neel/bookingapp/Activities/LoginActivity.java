@@ -71,6 +71,7 @@ public class LoginActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
+        Log.d("LoginActivity", "Started");
 
 //        loginButton = (Button) findViewById(R.id.facebookLoginButton);
 //        loginButton.setReadPermissions("email","public_profile");
@@ -100,16 +101,16 @@ public class LoginActivity extends FragmentActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-//                if (user != null) {
-//                    // User is signed in
-//                    Log.d("Firebase", "onAuthStateChanged:signed_in:" + user.getUid());
-//                    launchHomePage();
-//                    finish();
-//                } else {
-//                    // User is signed out
-//                    Log.d("Firebase", "onAuthStateChanged:signed_out");
-//                    Toast.makeText(LoginActivity.this, "Please login to start", Toast.LENGTH_SHORT).show();
-//                }
+                if (user != null) {
+                    // User is signed in
+                    Log.d("Firebase", "onAuthStateChanged:signed_in:" + user.getUid());
+                    launchHomePage();
+                    finish();
+                } else {
+                    // User is signed out
+                    Log.d("Firebase", "onAuthStateChanged:signed_out");
+                    Toast.makeText(LoginActivity.this, "Please login to start", Toast.LENGTH_SHORT).show();
+                }
             }
         };
 
@@ -325,8 +326,8 @@ public class LoginActivity extends FragmentActivity {
 //                                                    db.child("users").child(user.getUid()).child("id").setValue(object.getString("id"));
                                     db.child("users").child(user.getUid()).child("isOwner").setValue(false);
                             }
-                                launchHomePage();
-                                finish();
+//                                launchHomePage();
+//                                finish();
                             }
                         }
                 });

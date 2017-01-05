@@ -11,7 +11,7 @@ import com.google.firebase.database.FirebaseDatabase;
  * Created by sushrutshringarputale on 9/19/16.
  */
 
-class User {
+public class User {
     private String Id;
     private String name;
     private String email;
