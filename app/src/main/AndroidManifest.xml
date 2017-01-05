@@ -17,13 +17,13 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        <activity android:name=".MainActivity"
+        <activity android:name=".Activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
-        <activity android:name=".SignupActivity" />
+        <activity android:name=".Activities.SignupActivity" />
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -36,7 +36,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

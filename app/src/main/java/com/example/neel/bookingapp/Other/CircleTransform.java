@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp;
+package com.example.neel.bookingapp.Other;
 
 import android.content.Context;
 import android.graphics.Bitmap;
