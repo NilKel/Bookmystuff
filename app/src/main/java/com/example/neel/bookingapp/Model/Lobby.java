@@ -1,58 +1,50 @@
 package com.example.neel.bookingapp.Model;
 
-import android.location.Location;
-import android.util.Log;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.Map;
+import java.util.ArrayList;
 
 /**
- * Created by sushrutshringarputale on 1/5/17.
+ * Created by sushrutshringarputale on 1/6/17.
  */
 
-public class Lobby {
-    private Location location;
-    private String name;
+public class Lobby implements Parcelable{
     private User owner;
-    private String description;
-    private Rating rating;
-    private Map<String, String> attributes;
-    private String Id;
+    private int numFree;
+    private ArrayList<User> lobbyList;
 
-    public Lobby(Location location, String name, User owner, String description, Rating rating, Map<String, String> attributes) {
-        this.location = location;
-        this.name = name;
+    public Lobby(User owner, int numFree, ArrayList<User> lobbyList) {
         this.owner = owner;
-        this.description = description;
-        this.rating = rating;
-        this.attributes = attributes;
+        this.numFree = numFree;
+        this.lobbyList = lobbyList;
     }
 
-    public Lobby(Location location, String name, User owner) {
-        this(location, name, owner, "", new Rating(), null);
+    public Lobby(User owner) {
+        this.owner = owner;
+        this.lobbyList = new ArrayList<>();
+        this.lobbyList.add(owner);
     }
 
     public Lobby() {
-        this(null, "", new User("",""));
+        this(new User("", ""),0, new ArrayList<User>());
     }
 
-    public Location getLocation() {
-        return location;
+    protected Lobby(Parcel in) {
+        numFree = in.readInt();
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
+    public static final Creator<Lobby> CREATOR = new Creator<Lobby>() {
+        @Override
+        public Lobby createFromParcel(Parcel in) {
+            return new Lobby(in);
+        }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+        @Override
+        public Lobby[] newArray(int size) {
+            return new Lobby[size];
+        }
+    };
 
     public User getOwner() {
         return owner;
@@ -62,48 +54,31 @@ public class Lobby {
         this.owner = owner;
     }
 
-    public String getDescription() {
-        return description;
+    public int getNumFree() {
+        return numFree;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setNumFree(int numFree) {
+        this.numFree = numFree;
     }
 
-    public Rating getRating() {
-        return rating;
+    public ArrayList<User> getLobbyList() {
+        return lobbyList;
     }
 
-    public void setRating(Rating rating) {
-        this.rating = rating;
-    }
-
-    public Map<String, String> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(Map<String, String> attributes) {
-        this.attributes = attributes;
+    public void setLobbyList(ArrayList<User> lobbyList) {
+        this.lobbyList = lobbyList;
     }
 
     @Override
-    public String toString() {
-        return "Lobby{" +
-                "name='" + name + '\'' +
-                ", owner=" + owner +
-                '}';
+    public int describeContents() {
+        return 0;
     }
 
-    public Lobby saveLobby() {
-        try {
-            DatabaseReference db = FirebaseDatabase.getInstance().getReference("lobby");
-            String key = db.push().getKey();
-            db.child(key).setValue(this);
-        } catch (NullPointerException e) {
-            Log.e("Lobby update", "Firebase uninit" + e.getMessage());
-        }
-        return this;
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeValue(owner);
+        parcel.writeInt(numFree);
+        parcel.writeList(lobbyList);
     }
-
-
 }

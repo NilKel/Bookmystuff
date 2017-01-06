@@ -47,6 +47,7 @@
     <string name="openDrawer">open_drawer</string>
     <string name="closeDrawer">close_drawer</string>
     <string name="app_title">BOOKMYSTUFF</string>
+    <string name="lobbyViewStdText">Tap to allow users to join this slot</string>
 
     <string-array name="nav_item_activity_titles">
         <!--TODO: Update these based on the order of the menu layout -->

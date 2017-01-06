@@ -20,6 +20,13 @@ public class User {
     private String password;
     private boolean isOwner;
 
+    public User(FirebaseUser fUser) {
+        this.email = fUser.getEmail();
+        this.name = fUser.getDisplayName();
+        this.Id = fUser.getUid();
+    }
+
+
     public User(String email, String name, String password, long phNo, boolean isOwner) {
         this.email = email;
         this.name = name;
