@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Create a new booking", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Create a new lobby", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 //TODO: Create fragment/activity to launch a new lobby
             }
@@ -212,8 +212,8 @@ public class MainActivity extends AppCompatActivity {
         switch (navItemIndex) {
             case 0: // TODO: Create and add the three sports fragments here
 //                 home
-                HomeFragment homeFragment = new HomeFragment();
-                return homeFragment;
+//                HomeFragment homeFragment = new HomeFragment();
+//                return homeFragment;
 //            case 1:
 //                // photos
 //                PhotosFragment photosFragment = new PhotosFragment();
@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
 //                        CURRENT_TAG = TAG_NOTIFICATIONS;
 //                        break;
                     case R.id.nav_settings:
-                        navItemIndex = 4;
+                        navItemIndex = 1;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
                     case R.id.nav_about_us:
