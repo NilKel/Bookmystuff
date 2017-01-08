@@ -43,17 +43,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".Football" />
-        <activity android:name=".Badminton" />
-        <activity android:name=".TableTennis" />
-        <!--<activity-->
-            <!--android:name=".Flocator"-->
-            <!--android:label="@string/title_activity_flocator">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value="com.example.neel.bookingapp.Football" />-->
-        <!--</activity>-->
     </application>
+
 
 </manifest>

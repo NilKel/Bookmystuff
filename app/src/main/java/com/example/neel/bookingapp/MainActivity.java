@@ -117,17 +117,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().signOut();
     }
 
-    public void openfooty(View v){
-        startActivity(new Intent(MainActivity.this, Football.class));
-    }
 
-    public void badmint(View v){
-        startActivity(new Intent(MainActivity.this, Badminton.class));
-    }
-
-    public void titty(View v){
-        startActivity(new Intent(MainActivity.this, TableTennis.class));
-    }
 
 
     /***
@@ -242,6 +232,16 @@ public class MainActivity extends AppCompatActivity {
                 return new Fragment();
         }
     }
+//these functions change the string in the sports activity.Use them to change all text-boxes I guess
+    public void badminton(View view) {
+        ((TextView)findViewById(R.id.Sportname)).setText("Badminton");
+    }//badminton
+    public void football(View view) {
+        ((TextView)findViewById(R.id.Sportname)).setText("Football");
+    }//football
+    public void tabletennis(View view) {
+        ((TextView)findViewById(R.id.Sportname)).setText("Table-Tennis");
+    }//tabletennis
 
     private void setToolbarTitle() {
         getSupportActionBar().setTitle(activityTitles[navItemIndex]);
