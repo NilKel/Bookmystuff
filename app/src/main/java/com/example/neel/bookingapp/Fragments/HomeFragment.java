@@ -18,7 +18,7 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home, container);
+        return inflater.inflate(R.layout.fragment_home, container, false);
         //TODO: update UI and update stub
     }
 }

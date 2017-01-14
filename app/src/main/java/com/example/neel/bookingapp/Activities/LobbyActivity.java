@@ -10,11 +10,9 @@ import android.widget.TextView;
 
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.LobbyListAdapter;
+import com.example.neel.bookingapp.Other.LobbyUserListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.ArrayList;
 
 /**
  * Created by sushrutshringarputale on 1/6/17.
@@ -36,7 +34,7 @@ public class LobbyActivity extends AppCompatActivity {
 
         ListView lobbyList = (ListView) findViewById(R.id.lobbyList);
 
-        LobbyListAdapter adapter = new LobbyListAdapter(this, R.layout.lobby_list_row, lobby.getLobbyList());
+        LobbyUserListAdapter adapter = new LobbyUserListAdapter(this, R.layout.lobby_list_row, lobby.getLobbyList());
 
         lobbyList.setAdapter(adapter);
 

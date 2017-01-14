@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +23,8 @@ import android.support.v7.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.neel.bookingapp.Fragments.HomeFragment;
+import com.example.neel.bookingapp.Fragments.SettingsFragment;
+import com.example.neel.bookingapp.Fragments.SportFragment;
 import com.example.neel.bookingapp.Other.CircleTransform;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
-    private static final String TAG_PHOTOS = "photos";
-    private static final String TAG_MOVIES = "movies";
-    private static final String TAG_NOTIFICATIONS = "notifications";
+    private static final String TAG_FOOTBALL = "football";
+    private static final String TAG_BADMINTON = "badminton";
+    private static final String TAG_TABLETENNIS = "tabletennis";
     private static final String TAG_SETTINGS = "settings";
     public static String CURRENT_TAG = TAG_HOME;
 
@@ -113,18 +114,6 @@ public class MainActivity extends AppCompatActivity {
             loadHomeFragment();
         }
     }
-
-//    public void openfooty(View v){
-//        startActivity(new Intent(MainActivity.this, Football.class));
-//    }
-//
-//    public void badmint(View v){
-//        startActivity(new Intent(MainActivity.this, Badminton.class));
-//    }
-//
-//    public void titty(View v){
-//        startActivity(new Intent(MainActivity.this, TableTennis.class));
-//    }
 
 
     /***
@@ -210,28 +199,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Fragment getHomeFragment() {
+        Bundle bundle = new Bundle();
+        SportFragment sportFragment = new SportFragment();
         switch (navItemIndex) {
             case 0: // TODO: Create and add the three sports fragments here
 //                 home
-//                HomeFragment homeFragment = new HomeFragment();
-//                return homeFragment;
-//            case 1:
-//                // photos
-//                PhotosFragment photosFragment = new PhotosFragment();
-//                return photosFragment;
-//            case 2:
-//                // movies fragment
-//                MoviesFragment moviesFragment = new MoviesFragment();
-//                return moviesFragment;
-//            case 3:
-//                // notifications fragment
-//                NotificationsFragment notificationsFragment = new NotificationsFragment();
-//                return notificationsFragment;
-//
-//            case 4:
-//                // settings fragment
-//                SettingsFragment settingsFragment = new SettingsFragment();
-//                return settingsFragment;
+                return new HomeFragment();
+            case 1:
+//                // settings
+                return new SettingsFragment();
+            case 2:
+//                // football fragment
+                bundle.putInt("ARGUMENT", SportFragment.FOOTBALL);
+                sportFragment.setArguments(bundle);
+                return sportFragment;
+            case 3:
+//                // badminton fragment
+                bundle.putInt("ARGUMENT", SportFragment.BADMINTON);
+                sportFragment.setArguments(bundle);
+                return sportFragment;
+            case 4:
+//                // table tennis fragment
+                bundle.putInt("ARGUMENT", SportFragment.TABLETENNIS);
+                sportFragment.setArguments(bundle);
+                return sportFragment;
             default:
                 return new Fragment();
         }
@@ -260,18 +251,18 @@ public class MainActivity extends AppCompatActivity {
                         navItemIndex = 0;
                         CURRENT_TAG = TAG_HOME;
                         break;
-//                    case R.id.nav_photos:
-//                        navItemIndex = 1;
-//                        CURRENT_TAG = TAG_PHOTOS;
-//                        break;
-//                    case R.id.nav_movies:
-//                        navItemIndex = 2;
-//                        CURRENT_TAG = TAG_MOVIES;
-//                        break;
-//                    case R.id.nav_notifications:
-//                        navItemIndex = 3;
-//                        CURRENT_TAG = TAG_NOTIFICATIONS;
-//                        break;
+                    case R.id.nav_football:
+                        navItemIndex = 2;
+                        CURRENT_TAG = TAG_FOOTBALL;
+                        break;
+                    case R.id.nav_badminton:
+                        navItemIndex = 3;
+                        CURRENT_TAG = TAG_BADMINTON;
+                        break;
+                    case R.id.nav_table_tennis:
+                        navItemIndex = 4;
+                        CURRENT_TAG = TAG_TABLETENNIS;
+                        break;
                     case R.id.nav_settings:
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_SETTINGS;
@@ -397,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
 
     // show or hide the fab
     private void toggleFab() {
-        if (navItemIndex == 0)
+        if (navItemIndex != 1)
             fab.show();
         else
             fab.hide();
