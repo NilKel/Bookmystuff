@@ -25,10 +25,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.neel.bookingapp.Fragments.HomeFragment;
 import com.example.neel.bookingapp.Fragments.SettingsFragment;
 import com.example.neel.bookingapp.Fragments.SportFragment;
+import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.CircleTransform;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -63,13 +63,14 @@ public class MainActivity extends AppCompatActivity {
     private boolean shouldLoadHomeFragOnBackPress = true;
     private Handler mHandler;
 
-    FirebaseUser currentUser;
+    User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        currentUser = new User(FirebaseAuth.getInstance().getCurrentUser()).updateFields();
+
 
         Log.d("MainActivity", "Started");
 
@@ -79,7 +80,12 @@ public class MainActivity extends AppCompatActivity {
         mHandler = new Handler();
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        if(!currentUser.isOwner()) {
+            navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false);
+//            drawer.findViewById(R.id.manager_mode).setVisibility(View.INVISIBLE);
+        }
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
         // Navigation view header
@@ -123,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadNavHeader() {
         // name, website
-         txtName.setText(currentUser.getDisplayName());
+         txtName.setText(currentUser.getName());
 //        txtWebsite.setText("www.androidhive.info");
 
         // loading header background image
@@ -133,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 .into(imgNavHeaderBg);
 
 //        // Loading profile image
-        Glide.with(this).load(currentUser.getPhotoUrl())
+        Glide.with(this).load(currentUser.getProfPicture())
                 .crossFade()
                 .thumbnail(0.5f)
                 .bitmapTransform(new CircleTransform(this))
@@ -276,6 +282,9 @@ public class MainActivity extends AppCompatActivity {
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")));
                         drawer.closeDrawers();
+                        return true;
+                    case R.id.manager_mode:
+                        //launch manager mode
                         return true;
                     default:
                         navItemIndex = 0;

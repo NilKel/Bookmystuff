@@ -48,6 +48,7 @@
     <string name="closeDrawer">close_drawer</string>
     <string name="app_title">BOOKMYSTUFF</string>
     <string name="lobbyViewStdText">Tap to allow users to join this slot</string>
+    <string name="manager_mode">Manager</string>
 
     <string-array name="nav_item_activity_titles">
         <item>Home</item>

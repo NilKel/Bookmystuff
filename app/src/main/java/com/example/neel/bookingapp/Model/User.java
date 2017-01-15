@@ -1,11 +1,19 @@
 package com.example.neel.bookingapp.Model;
 
 import android.media.Image;
+import android.net.Uri;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import static com.facebook.internal.FacebookDialogFragment.TAG;
 
 /**
  * Created by sushrutshringarputale on 9/19/16.
@@ -16,7 +24,7 @@ public class User {
     private String name;
     private String email;
     private long phNo;
-    private Image profPicture;
+    private Uri profPic;
     private String password;
     private boolean isOwner;
 
@@ -24,8 +32,8 @@ public class User {
         this.email = fUser.getEmail();
         this.name = fUser.getDisplayName();
         this.Id = fUser.getUid();
-    }
 
+    }
 
     public User(String email, String name, String password, long phNo, boolean isOwner) {
         this.email = email;
@@ -34,11 +42,11 @@ public class User {
         this.phNo = phNo;
     }
 
-    public User(String email, String name, long phNo, Image profPicture) {
+    public User(String email, String name, long phNo, Uri profPicture) {
         this.email = email;
         this.name = name;
         this.phNo = phNo;
-        this.profPicture = profPicture;
+        this.profPic = profPicture;
     }
 
     public User(String email, String name) {
@@ -70,12 +78,12 @@ public class User {
         this.phNo = phNo;
     }
 
-    public Image getProfPicture() {
-        return profPicture;
+    public Uri getProfPicture() {
+        return profPic;
     }
 
-    public void setProfPicture(Image profPicture) {
-        this.profPicture = profPicture;
+    public void setProfPicture(Uri profPicture) {
+        this.profPic = profPicture;
     }
 
     @Override
@@ -100,6 +108,26 @@ public class User {
         Id = id;
     }
 
+    public User updateFields() {
+        final User[] user = {this};
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+        Query query = db.child("users").orderByChild("id").equalTo(this.getId());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
+                    user[0] = singleSnapshot.getValue(User.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("User data retrieval", "onCancelled", databaseError.toException());
+            }
+        });
+        return user[0];
+    }
+
 
     public void saveUser() {
         //Add YOUR Firebase Reference URL instead of the following URL
@@ -112,7 +140,7 @@ public class User {
         db.child("users").child(this.getId()).child("name").setValue(this.getName());
         db.child("users").child(this.getId()).child("PhNo").setValue(this.getPhNo());
         if (user != null) {
-            db.child("users").child(this.getId()).child("ProfPic").setValue(user.getPhotoUrl());
+            db.child("users").child(this.getId()).child("profPic").setValue(user.getPhotoUrl());
         }
 //        db.child("users").child(this.getId()).child("id").setValue(this.getId());
         db.child("users").child(this.getId()).child("isOwner").setValue(false);
