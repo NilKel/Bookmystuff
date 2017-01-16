@@ -45,7 +45,7 @@
         </activity>
 
         <activity android:name=".Activities.LobbyActivity"
-            android:theme="@style/AppTheme.PopupOverlay"/>
+            android:theme="@style/AppTheme"/>
         <!--<activity-->
             <!--android:name=".Flocator"-->
             <!--android:label="@string/title_activity_flocator">-->
