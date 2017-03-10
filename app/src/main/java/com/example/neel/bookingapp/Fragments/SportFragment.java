@@ -1,56 +1,41 @@
 package com.example.neel.bookingapp.Fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.example.neel.bookingapp.Model.Lobby;
+import com.example.neel.bookingapp.Model.LobbyRef;
+import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Other.LobbyListAdapter;
 import com.example.neel.bookingapp.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SportFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    public static final int FOOTBALL = 0, BADMINTON = 1, TABLETENNIS = 2;
-
 
     //PRIVATE VARIABLES
     private ArrayList<Lobby> lobbies = new ArrayList<>();
 
-
-
-
     public SportFragment() {
-
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        switch(getArguments().getInt("ARGUMENTS")) {
-            case FOOTBALL:
-                //Query db for live football lobbies
-                break;
-            case BADMINTON:
-                //Query db for live badminton lobbies
-                break;
-            case TABLETENNIS:
-                //Query db for live tabletennis lobbies
-                break;
-            default:
-                break;
-        }
-
+//        sport = (Sport) savedInstanceState.getSerializable("ARGUMENT");
     }
 
     /**
@@ -80,8 +65,46 @@ public class SportFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        ListView lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
-//        lobbyList.setAdapter(new LobbyListAdapter(SportFragment.this, R.layout.lobby_list_row, (List) lobbies));
+        final ListView lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
+
+        try {
+            Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
+            ref.orderByChild("sport").equalTo(sport.name())
+                    .addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            if (dataSnapshot != null) {
+                                LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
+                                lobbies.add(new Lobby().getLobbyFromRef(temp));
+                                lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies));
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+        }catch (NullPointerException e) {
+            Log.e("NPE", "While getting arguments for Sprt Fragment");
+        }
     }
 
     @Override

@@ -88,11 +88,11 @@ public class LobbyUserListAdapter extends ArrayAdapter<User> {
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }
-            Glide.with(parent.getContext()).load(i.getProfPicture())
+            Glide.with(parent.getContext()).load(i.profPic)
                     .crossFade()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(holder.profileImage);
-            holder.name.setText(i.getName());
+            holder.name.setText(i.name);
         } else {
             holder.name.setText(R.string.lobbyViewStdText);
         }

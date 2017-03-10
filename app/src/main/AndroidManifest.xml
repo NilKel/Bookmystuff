@@ -8,7 +8,9 @@
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -44,11 +46,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Football" />
-        <activity android:name=".Badminton" />
-        <activity android:name=".TableTennis" />
         <activity android:name=".Activities.LobbyActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme"/>
         <!--<activity-->
             <!--android:name=".Flocator"-->
             <!--android:label="@string/title_activity_flocator">-->

@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content" android:weightSum="2"
+    android:background="@color/cardview_dark_background">
 
     <ImageView
-        android:layout_width="@dimen/profile_height"
+        android:layout_width="0dp"
         android:layout_height="@dimen/profile_width"
         android:id="@+id/lobbyProfileImage"
-        android:contentDescription="Lobby user profile picture" />
+        android:contentDescription="Lobby user profile picture"
+        android:layout_weight="0.5"/>
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:gravity="start|top"
         android:id="@+id/lobbyProfileName"
+        android:textColor="@color/appBlue"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:layout_margin="@dimen/activity_horizontal_margin"/>
+        android:text="jasldfjlasjdf"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_weight="1.5"/>
 
 </LinearLayout>

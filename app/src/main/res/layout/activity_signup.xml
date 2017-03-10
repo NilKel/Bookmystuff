@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/com_facebook_blue">
+    android:background="@mipmap/login_screen_background">
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -15,27 +15,8 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_alignParentTop="true"
-        android:onClick="cancelSignup"/>
-
-    <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="180dp"
-        app:srcCompat="@color/cardview_dark_background"
-        android:id="@+id/imageView" />
-
-    <TextView
-        android:text="@string/create_account"
-        android:textSize="@dimen/app_title_size"
-        android:textColor="@color/white"
-        android:layout_width="wrap_content"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/imageView"
-        android:id="@+id/appNameTextView" />
+        android:onClick="cancelSignup"
+        android:id="@+id/imageButton" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -110,15 +91,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="SignUpClicked"
-                android:textColor="@color/appGreen"
+                android:textColor="@color/black"
                 android:layout_below="@id/phoneNoEditText"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:id="@+id/submitButtonClicked" />
+
             </RelativeLayout>
          <View
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.5"/>
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="@dimen/baloon_dim"
+        android:layout_height="@dimen/baloon_dim"
+        app:srcCompat="@mipmap/baloon"
+        android:id="@+id/imageView"
+        android:layout_alignTop="@+id/imageButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="52dp"
+        android:layout_marginEnd="52dp" />
+
+    <TextView
+        android:text="@string/create_account"
+        android:textSize="@dimen/app_title_size"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:id="@+id/appNameTextView"
+        android:layout_marginTop="57dp"
+        android:layout_below="@+id/imageButton"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
