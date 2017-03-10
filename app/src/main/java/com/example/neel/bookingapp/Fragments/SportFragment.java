@@ -1,26 +1,24 @@
 package com.example.neel.bookingapp.Fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.example.neel.bookingapp.Model.Lobby;
-import com.example.neel.bookingapp.Other.LobbyListAdapter;
+import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SportFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    public static final int FOOTBALL = 0, BADMINTON = 1, TABLETENNIS = 2;
+    public static Sport sport;
 
 
     //PRIVATE VARIABLES
@@ -37,20 +35,23 @@ public class SportFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        switch(getArguments().getInt("ARGUMENTS")) {
-            case FOOTBALL:
-                //Query db for live football lobbies
-                break;
-            case BADMINTON:
-                //Query db for live badminton lobbies
-                break;
-            case TABLETENNIS:
-                //Query db for live tabletennis lobbies
-                break;
-            default:
-                break;
+        try {
+            switch ((Sport) getArguments().get("ARGUMENTS")) {
+                case FOOTBALL:
+                    //Query db for live football lobbies
+                    break;
+                case BADMINTON:
+                    //Query db for live badminton lobbies
+                    break;
+                case TABLETENNIS:
+                    //Query db for live tabletennis lobbies
+                    break;
+                default:
+                    break;
+            }
+        }catch (NullPointerException e) {
+            Log.e("NPE", "While getting arguments for Sprt Fragment");
         }
-
     }
 
     /**

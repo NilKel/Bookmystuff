@@ -12,14 +12,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
@@ -39,12 +38,8 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 
@@ -72,28 +67,6 @@ public class LoginActivity extends FragmentActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
         Log.d("LoginActivity", "Started");
-
-//        loginButton = (Button) findViewById(R.id.facebookLoginButton);
-//        loginButton.setReadPermissions("email","public_profile");
-//        callbackManager = CallbackManager.Factory.create();
-//        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-//            @Override
-//            public void onSuccess(LoginResult loginResult) {
-//                Log.d("Login", "facebook:onSuccess:" + loginResult);
-//                firebaseAuth(FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken()));
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                Log.d("Login", "facebook:onCancel");
-//            }
-//
-//            @Override
-//            public void onError(FacebookException error) {
-//                Log.d("Login", "facebook:onError", error);
-//                Toast.makeText(LoginActivity.this, "There was an error logging in. Please try again.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
 
         mfirebaseAuth = FirebaseAuth.getInstance();
 
@@ -229,8 +202,6 @@ public class LoginActivity extends FragmentActivity {
                             Log.w("Sign In", "signInWithEmail:failed", task.getException());
                             Toast.makeText(LoginActivity.this, R.string.auth_failed,
                                     Toast.LENGTH_SHORT).show();
-                        } else {
-                            launchHomePage();
                         }
                     }
                 });
@@ -284,52 +255,27 @@ public class LoginActivity extends FragmentActivity {
                                     Toast.LENGTH_SHORT).show();
                         } else {
 
-                            if (token != null) { //If authentication provider was facebook, retrieve user information from facebook.
+                            if (token != null || account != null) { //If authentication provider was facebook, retrieve user information from facebook.
                                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                    GraphRequest request = GraphRequest.newMeRequest(
-                                            token,
-                                            new GraphRequest.GraphJSONObjectCallback() {
-                                                @Override
-                                                public void onCompleted(JSONObject object, GraphResponse response) {
-                                                    Log.v("LoginActivity", response.toString());
-
-                                                    // Application code
-//                                String email = object.getString("email");
-//                                String birthday = object.getString("birthday"); // 01/31/1980 format
-                                                    try {
-                                                        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-                                                        db.child("users").child(user.getUid()).child("email").setValue(object.getString("email"));
-                                                        db.child("users").child(user.getUid()).child("name").setValue(object.getString("name"));
-                                                        user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(object.getString("name")).build());
-                                                        db.child("users").child(user.getUid()).child("birthday").setValue(object.getString("birthday"));
-                                                        db.child("users").child(user.getUid()).child("ProfPic").setValue(object.getString("cover"));
-//                                                    db.child("users").child(user.getUid()).child("id").setValue(object.getString("id"));
-                                                        db.child("users").child(user.getUid()).child("isOwner").setValue(false);
-                                                    } catch (JSONException e) {
-                                                        Log.d("FaceBook Account Ret: ", "JSONException");
-                                                    } catch (NullPointerException e) {
-                                                        Log.d("FaceBook Account Ret: ", "NPR at user");
-                                                    }
-                                                }
-                                            });
-                                    Bundle parameters = new Bundle();
-                                    parameters.putString("fields", "id,name,cover,email,birthday");
-                                    request.setParameters(parameters);
-                                    request.executeAsync();
-                            } else if (account != null) {
-                                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                    DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-                                    db.child("users").child(user.getUid()).child("email").setValue(account.getEmail());
-                                    db.child("users").child(user.getUid()).child("name").setValue(account.getDisplayName());
-                                    user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(account.getDisplayName()).build());
-                                    db.child("users").child(user.getUid()).child("ProfPic").setValue(account.getPhotoUrl());
-//                                                    db.child("users").child(user.getUid()).child("id").setValue(object.getString("id"));
-                                    db.child("users").child(user.getUid()).child("isOwner").setValue(false);
-                            }
-//                                launchHomePage();
-//                                finish();
+                                DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+                                try {
+                                    User mUser = new User(user.getUid(), user.getDisplayName(), user.getEmail(), 0, user.getPhotoUrl().toString(), "", false);
+                                    db.child("users").child(user.getUid()).setValue(mUser);
+                                } catch (NullPointerException e) {
+                                    Log.e("Facebook SignIn NPE: ", e.getMessage());
+                                }
+//                            } else if (account != null) {
+//                                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//                                DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+//                                db.child("users").child(user.getUid()).child("email").setValue(account.getEmail());
+//                                db.child("users").child(user.getUid()).child("name").setValue(account.getDisplayName());
+//                                user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(account.getDisplayName()).build());
+//                                db.child("users").child(user.getUid()).child("ProfPic").setValue(account.getPhotoUrl());
+//                                db.child("users").child(user.getUid()).child("isOwner").setValue(false);
+//                            }
                             }
                         }
+                    }
                 });
     }
 

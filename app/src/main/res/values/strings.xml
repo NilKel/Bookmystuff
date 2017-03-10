@@ -57,4 +57,11 @@
         <item>Badminton</item>
         <item>Table Tennis</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_world">Hello World</string>
+    <string name="send_message">Send Message</string>
+    <string name="enter_lobby_name">Enter Lobby Name</string>
+    <string name="logout">Logout</string>
 </resources>

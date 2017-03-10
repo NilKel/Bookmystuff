@@ -113,7 +113,7 @@ public class SignupActivity extends FragmentActivity{
             dialog.setCancelable(true);
             setUpUser();
 
-            mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
+            mAuth.createUserWithEmailAndPassword(user.email,  user.password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -127,7 +127,7 @@ public class SignupActivity extends FragmentActivity{
                                 Toast.makeText(SignupActivity.this, R.string.auth_failed,
                                         Toast.LENGTH_SHORT).show();
                             } else {
-                                user.setId(task.getResult().getUser().getUid());
+                                user.id = task.getResult().getUser().getUid();
                                 user.saveUser();
                                 Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
                                 Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
