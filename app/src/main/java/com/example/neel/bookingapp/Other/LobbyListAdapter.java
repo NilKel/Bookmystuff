@@ -75,13 +75,13 @@ public class LobbyListAdapter extends ArrayAdapter<Lobby> implements View.OnClic
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 switch (lobby.getSport()) {
                 case FOOTBALL:
-                    viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.circle_profile_picture));
+                    viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.ic_football));
                     break;
                 case BADMINTON:
-                    viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.com_facebook_auth_dialog_background));
+                    viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.ic_badminton));
                     break;
                 case TABLETENNIS:
-                    viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.com_facebook_auth_dialog_cancel_background));
+                    viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.ic_table_tennis));
                     break;
                 default:
                         viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.com_facebook_button_background));
