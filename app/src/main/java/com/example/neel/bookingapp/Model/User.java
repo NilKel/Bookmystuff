@@ -49,7 +49,11 @@ public class User implements Parcelable{
         this.email = fUser.getEmail();
         this.name = fUser.getDisplayName();
         this.id = fUser.getUid();
-        this.profPic = fUser.getPhotoUrl().toString();
+        try {
+            this.profPic = fUser.getPhotoUrl().toString();
+        } catch (NullPointerException e) {
+            Log.e("Saving User", "User does not have profile picture." + e.getMessage());
+        }
     }
 
     public User() {
