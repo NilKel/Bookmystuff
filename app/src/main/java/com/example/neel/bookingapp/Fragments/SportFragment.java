@@ -1,7 +1,14 @@
 package com.example.neel.bookingapp.Fragments;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,8 +21,7 @@ import com.example.neel.bookingapp.Model.LobbyRef;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Other.LobbyListAdapter;
 import com.example.neel.bookingapp.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,6 +34,8 @@ public class SportFragment extends Fragment {
 
     //PRIVATE VARIABLES
     private ArrayList<Lobby> lobbies = new ArrayList<>();
+    public GoogleApiClient mGoogleApiClient;
+    public LocationManager locationManager;
 
     public SportFragment() {
     }
@@ -67,48 +75,143 @@ public class SportFragment extends Fragment {
         super.onStart();
         final ListView lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
 
-        try {
-            Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
-            ref.orderByChild("sport").equalTo(sport.name())
-                    .addChildEventListener(new ChildEventListener() {
-                        @Override
-                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            if (dataSnapshot != null) {
-                                LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
-                                lobbies.add(new Lobby().getLobbyFromRef(temp));
-                                lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies));
-                            }
-                        }
+        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Log.i("Location Connection", "Connected");
+                try {
+                    Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        getLobbies(sport, lobbyList);
+                    } else {
+                        getLobbies(sport, location, lobbyList);
+                    }
+                }catch (NullPointerException e) {
+                    Log.e("NPE", e.getMessage());
+                }
+                locationManager.removeUpdates(this);
+            }
 
-                        @Override
-                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.i("Location Connection", "Connected");
+                try {
+                    Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        getLobbies(sport, lobbyList);
+                    } else {
+                        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        getLobbies(sport, location, lobbyList);
+                    }
+                }catch (NullPointerException e) {
+                    Log.e("NPE", e.getMessage());
+                }
+                locationManager.removeUpdates(this);
+            }
 
-                        }
+            @Override
+            public void onProviderEnabled(String provider) {
+                Log.i("Location Connection", "provider enabled");
 
-                        @Override
-                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
 
-                        }
-
-                        @Override
-                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-        }catch (NullPointerException e) {
-            Log.e("NPE", "While getting arguments for Sprt Fragment");
-        }
+            @Override
+            public void onProviderDisabled(String provider) {
+                Log.i("Location Connection", "provider disabled");
+                try {
+                    Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || location == null) {
+                        getLobbies(sport, lobbyList);
+                    } else {
+                        getLobbies(sport, location, lobbyList);
+                    }
+                }catch (NullPointerException e) {
+                    Log.e("NPE", e.getMessage());
+                }
+                locationManager.removeUpdates(this);
+            }
+        });
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    private void getLobbies(final Sport sport, Location location, final ListView lobbyList) throws NullPointerException {
+        Log.d("Location", location.toString());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
+        ref.orderByChild("location")
+                .startAt("Location[fused "+ (location.getLatitude() - 0.5) + ", " + (location.getLongitude() - 0.5))
+                .endAt("Location[fused "+ Double.toString(location.getLatitude() + 0.5) + ", " + Double.toString(location.getLongitude() + 0.5))
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if (dataSnapshot != null) {
+                            LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
+                            if (temp.sport == sport) {
+                                lobbies.add(new Lobby().getLobbyFromRef(temp));
+                                lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    private void getLobbies(Sport sport, final ListView lobbyList) throws NullPointerException {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
+        ref.orderByChild("sport").equalTo(sport.name()).limitToFirst(20)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if (dataSnapshot != null) {
+                            LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
+                            lobbies.add(new Lobby().getLobbyFromRef(temp));
+                            lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies));
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 }
