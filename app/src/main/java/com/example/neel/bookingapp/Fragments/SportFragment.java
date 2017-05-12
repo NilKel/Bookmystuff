@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.neel.bookingapp.Model.Lobby;
@@ -36,6 +37,7 @@ public class SportFragment extends Fragment {
     private ArrayList<Lobby> lobbies = new ArrayList<>();
     public GoogleApiClient mGoogleApiClient;
     public LocationManager locationManager;
+    private ListView lobbyList;
 
     public SportFragment() {
     }
@@ -68,12 +70,20 @@ public class SportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.lobby_list, container, false);
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        final ListView lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
+        lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
+        lobbyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("Lobby clicked", lobbies.get(position).toString());
+                //NOTE: Will start LobbyFragment once that is designed and functional. This
+            }
+        });
 
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
@@ -133,6 +143,7 @@ public class SportFragment extends Fragment {
                 locationManager.removeUpdates(this);
             }
         });
+//        locationManager.requestSingleUpdate(Criteria.ACCURACY_FINE, );
     }
 
     @Override
@@ -141,8 +152,8 @@ public class SportFragment extends Fragment {
     }
 
     private void getLobbies(final Sport sport, Location location, final ListView lobbyList) throws NullPointerException {
-        Log.d("Location", location.toString());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
+        Log.d("Location", location.toString());
         ref.orderByChild("location")
                 .startAt("Location[fused "+ (location.getLatitude() - 0.5) + ", " + (location.getLongitude() - 0.5))
                 .endAt("Location[fused "+ Double.toString(location.getLatitude() + 0.5) + ", " + Double.toString(location.getLongitude() + 0.5))

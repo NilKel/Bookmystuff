@@ -3,7 +3,9 @@ package com.example.neel.bookingapp.Other;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,8 +22,14 @@ import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.R;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by sushrutshringarputale on 3/10/17.
@@ -98,6 +106,8 @@ public class NewLobbyDialogFragment extends DialogFragment {
                     }
                 })
                 .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
                 .build();
         mGoogleApiClient.connect();
 
@@ -131,8 +141,10 @@ public class NewLobbyDialogFragment extends DialogFragment {
                         // to handle the case where the user grants the permission. See the documentation
                         // for ActivityCompat#requestPermissions for more details.
                         Log.d("Created Lobby", mLobby.toString());
-                        mLobby.saveLobby();
-                        mListener.onComplete(mLobby);
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("lobby", mLobby);
+                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                        startActivityForResult(builder.build(getActivity()), 1, bundle);
                         dialog.dismiss();
                     } else {
                         mLobby.setLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
@@ -144,6 +156,10 @@ public class NewLobbyDialogFragment extends DialogFragment {
             }catch(NullPointerException e){
                     Log.e("NPE at save", e.getMessage());
                     dialog.dismiss();
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -156,4 +172,20 @@ public class NewLobbyDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                Lobby mLobby = data.getParcelableExtra("lobby");
+                Place place = PlacePicker.getPlace(getContext(), data);
+                LatLng latLng = place.getLatLng();
+                Location mLocation = new Location("");
+                mLocation.setLatitude(latLng.latitude);
+                mLocation.setLongitude(latLng.longitude);
+                mLobby.setLocation(mLocation);
+                mLobby.saveLobby();
+                mListener.onComplete(mLobby);
+            }
+        }
+    }
 }

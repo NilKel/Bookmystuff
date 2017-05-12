@@ -9,6 +9,7 @@ public class ChatMessage {
     public User sender;
     public Lobby lobby;
     public String id;
+    public String time;
 
 
     public ChatMessage() {

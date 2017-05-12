@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 /**
  * Created by sushrutshringarputale on 1/6/17.
  */
+@Deprecated
 public class LobbyActivity extends AppCompatActivity {
 
     private Lobby lobby = null;

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -62,13 +63,14 @@ public class SignupActivity extends FragmentActivity{
         Log.d("Validation: re-entry", Boolean.toString(password.getText().toString().equals(passwordReenter.getText().toString())));
         return !(name.getText().toString().isEmpty() ||
                 phoneNumber.getText().toString().isEmpty() ||
+                !Patterns.PHONE.matcher(phoneNumber.getText().toString()).matches() ||
                 !android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches() ||
                 password.getText().toString().isEmpty() || passwordReenter.getText().toString().isEmpty() ||
                 !password.getText().toString().equals(passwordReenter.getText().toString()));
     }
 
     protected void setUpUser() {
-        user = new User(email.getText().toString(), name.getText().toString(), password.getText().toString(),
+        user = new User(email.getText().toString(), name.getText().toString(),
                 Long.parseLong(phoneNumber.getText().toString()), false);
     }
 
@@ -113,7 +115,7 @@ public class SignupActivity extends FragmentActivity{
             dialog.setCancelable(true);
             setUpUser();
 
-            mAuth.createUserWithEmailAndPassword(user.email,  user.password)
+            mAuth.createUserWithEmailAndPassword(user.email,  password.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {

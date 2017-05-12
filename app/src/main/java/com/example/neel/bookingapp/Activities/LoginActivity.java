@@ -18,7 +18,6 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
@@ -56,20 +55,19 @@ public class LoginActivity extends FragmentActivity {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     private EditText username, password;
-    private Button loginButton;
 
     private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
         Log.d("LoginActivity", "Started");
 
         mfirebaseAuth = FirebaseAuth.getInstance();
 
+        //The listener for authentication. Once a user completes logging in, this will get
+        //called. This method is also called when the user logs out, which is handled appropriately.
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -148,11 +146,6 @@ public class LoginActivity extends FragmentActivity {
                 Log.e("Facebook Login", error.getMessage());
             }
         });
-//        facebookButton.setBackgroundResource(R.mipmap.facebook_icon);
-//        facebookButton.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-//        facebookButton.setCompoundDrawablePadding(0);
-//        facebookButton.setPadding(0, 0, 0, 0);
-//        facebookButton.setText("");
     }
 
     private void launchHomePage() {
@@ -190,6 +183,12 @@ public class LoginActivity extends FragmentActivity {
         startActivity(new Intent(LoginActivity.this, SignupActivity.class));
     }
 
+    /**
+     *
+     * @param username
+     * @param password
+     * This method is triggered when a user inputs their email and password manually
+     */
     private void regularLogin(String username, String password) {
         final ProgressDialog dialog = ProgressDialog.show(this, "Logging in", "Authenticating");
         mfirebaseAuth.signInWithEmailAndPassword(username, password)
@@ -198,6 +197,8 @@ public class LoginActivity extends FragmentActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         dialog.dismiss();
                         Log.d("Sign In", "signInWithEmail:Complete:" + task.isSuccessful());
+                        /*TODO: add an inspector here to find whether the profile is initialized.
+                        If it is not, ask user to pick a picture and input other details so that the user object is valid on the server.*/
                         if (!task.isSuccessful()) {
                             Log.w("Sign In", "signInWithEmail:failed", task.getException());
                             Toast.makeText(LoginActivity.this, R.string.auth_failed,
@@ -228,7 +229,6 @@ public class LoginActivity extends FragmentActivity {
                 firebaseAuth(GoogleAuthProvider.getCredential(acct.getIdToken(), null), null, acct);
             } else {
                 // Signed out, show unauthenticated UI.
-//            updateUI(false);
                 Toast.makeText(this, "Could not login. Please try again.", Toast.LENGTH_SHORT).show();
                 Log.e("Could not authenticate", result.toString());
             }
@@ -259,20 +259,11 @@ public class LoginActivity extends FragmentActivity {
                                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                 DatabaseReference db = FirebaseDatabase.getInstance().getReference();
                                 try {
-                                    User mUser = new User(user.getUid(), user.getDisplayName(), user.getEmail(), 0, user.getPhotoUrl().toString(), "", false);
+                                    User mUser = new User(user.getUid(), user.getDisplayName(), user.getEmail(), 0, user.getPhotoUrl().toString(), false);
                                     db.child("users").child(user.getUid()).setValue(mUser);
                                 } catch (NullPointerException e) {
                                     Log.e("Facebook SignIn NPE: ", e.getMessage());
                                 }
-//                            } else if (account != null) {
-//                                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//                                DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-//                                db.child("users").child(user.getUid()).child("email").setValue(account.getEmail());
-//                                db.child("users").child(user.getUid()).child("name").setValue(account.getDisplayName());
-//                                user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(account.getDisplayName()).build());
-//                                db.child("users").child(user.getUid()).child("ProfPic").setValue(account.getPhotoUrl());
-//                                db.child("users").child(user.getUid()).child("isOwner").setValue(false);
-//                            }
                             }
                         }
                     }

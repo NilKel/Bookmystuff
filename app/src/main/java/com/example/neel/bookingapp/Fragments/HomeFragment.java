@@ -53,7 +53,7 @@ public class HomeFragment extends Fragment {
                         if (dataSnapshot != null) {
                             LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
                             lobbyArrayList.add(new Lobby().getLobbyFromRef(temp));
-                            lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbyArrayList));
+                            lobbyList.setAdapter(new LobbyListAdapter(getActivity(), lobbyArrayList));
                         }
                     }
 

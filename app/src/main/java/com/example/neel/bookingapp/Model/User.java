@@ -24,7 +24,6 @@ public class User implements Parcelable{
     public String email;
     public long phNo;
     public String profPic;
-    public String password;
     public boolean isOwner;
     public Date birthday;
 
@@ -35,13 +34,12 @@ public class User implements Parcelable{
     }
 
 
-    public User(String id, String name, String email, long phNo, String profPic, String password, boolean isOwner) {
+    public User(String id, String name, String email, long phNo, String profPic, boolean isOwner) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phNo = phNo;
         this.profPic = profPic;
-        this.password = password;
         this.isOwner = isOwner;
     }
 
@@ -64,10 +62,9 @@ public class User implements Parcelable{
     }
 
 
-    public User(String email, String name, String password, long phNo, boolean isOwner) {
+    public User(String email, String name, long phNo, boolean isOwner) {
         this.email = email;
         this.name = name;
-        this.password = password;
         this.phNo = phNo;
     }
 
@@ -95,7 +92,6 @@ public class User implements Parcelable{
         email = in.readString();
         phNo = in.readLong();
         profPic = in.readString();
-        password = in.readString();
         isOwner = in.readByte() != 0;
     }
 
@@ -178,7 +174,6 @@ public class User implements Parcelable{
             this.phNo = user.phNo;
             if (this.profPic == null)
             this.profPic = user.profPic;
-            this.password = user.password;
             if (this.isOwner != user.isOwner)
             this.isOwner = user.isOwner;
             if (this.birthday==null)
@@ -199,7 +194,6 @@ public class User implements Parcelable{
         dest.writeString(this.email);
         dest.writeLong(this.phNo);
         dest.writeString(this.profPic);
-        dest.writeString(this.password);
         dest.writeByte((byte) (this.isOwner ? 1 : 0));
         dest.writeLong(this.birthday.getTime());
     }
