@@ -149,8 +149,9 @@ public class NewLobbyDialogFragment extends DialogFragment {
                     } else {
                         mLobby.setLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
                         Log.d("Created Lobby", mLobby.toString());
-                        mLobby.saveLobby();
-                        mListener.onComplete(mLobby);
+                        mLobby.saveLobby().promise().done((d) -> {
+                            mListener.onComplete(mLobby);
+                        });
                         dialog.dismiss();
                     }
             }catch(NullPointerException e){
@@ -183,8 +184,9 @@ public class NewLobbyDialogFragment extends DialogFragment {
                 mLocation.setLatitude(latLng.latitude);
                 mLocation.setLongitude(latLng.longitude);
                 mLobby.setLocation(mLocation);
-                mLobby.saveLobby();
-                mListener.onComplete(mLobby);
+                mLobby.saveLobby().promise().done((d) -> {
+                    mListener.onComplete(mLobby);
+                });
             }
         }
     }

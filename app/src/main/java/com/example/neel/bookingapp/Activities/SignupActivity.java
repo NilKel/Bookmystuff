@@ -34,6 +34,8 @@ public class SignupActivity extends FragmentActivity{
     private EditText password;
     private EditText passwordReenter;
 
+    private String TAG = "SignupActivity";
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,41 +76,7 @@ public class SignupActivity extends FragmentActivity{
                 Long.parseLong(phoneNumber.getText().toString()), false);
     }
 
-//    public void onSignUpClicked(View view){
-////        progressBar.setVisibility(View.VISIBLE);
-//        setUpUser();
-//        //createUser method creates a new user account with the given email and password.
-//        //Parameters are :
-//        // email - The email for the account to be created
-//        // password - The password for the account to be created
-//        // handler - A handler which is called with the result of the operation
-//        myFirebaseRef.createUser(
-//                user.getEmail(),
-//                user.getPassword(),
-//                new Firebase.ValueResultHandler<Map<String, Object>>() {
-//                    @Override
-//                    public void onSuccess(Map<String, Object> stringObjectMap) {
-//                        user.setId(stringObjectMap.get("uid").toString());
-//                        user.saveUser();
-//                        myFirebaseRef.unauth();
-//                        Toast.makeText(getApplicationContext(), "Your Account has been Created", Toast.LENGTH_LONG).show();
-//                        Toast.makeText(getApplicationContext(), "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
-////                        progressBar = new ProgressBar(getApplicationContext());
-////                        progressBar.setVisibility(View.GONE);
-//                        finish();
-//                    }
-//
-//                    @Override
-//                    public void onError(FirebaseError firebaseError) {
-//                        Log.e("Firebase error", firebaseError.getMessage());
-//                        Toast.makeText(getApplicationContext(), "" + firebaseError.getMessage(), Toast.LENGTH_LONG).show();
-////                        progressBar.setVisibility(View.GONE);
-//                    }
-//                }
-//        );
-//    }
-
-
+    @SuppressWarnings("unchecked")
     public void SignUpClicked(final View view) {
         if (validate()) {
             final ProgressDialog dialog = ProgressDialog.show(SignupActivity.this, "Processing", "Creating Account");
@@ -130,43 +98,17 @@ public class SignupActivity extends FragmentActivity{
                                         Toast.LENGTH_SHORT).show();
                             } else {
                                 user.id = task.getResult().getUser().getUid();
-                                user.saveUser();
-                                Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
-                                Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
-                                cancelSignup(view);
+                                user.saveUser().promise().done((d) -> {
+                                    Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
+                                    cancelSignup(view);
+                                }).fail((f) -> {
+                                    Log.e(TAG, f.toString());
+                                });
                             }
                         }
                     });
         }
-            //createUser method creates a new user account with the given email and password.
-            //Parameters are :
-            // email - The email for the account to be created
-            // password - The password for the account to be created
-            // handler - A handler which is called with the result of the operation
-//            myFirebaseRef.createUser(
-//                    user.getEmail(),
-//                    user.getPassword(),
-//                    new Firebase.ValueResultHandler<Map<String, Object>>() {
-//                        @Override
-//                        public void onSuccess(Map<String, Object> stringObjectMap) {
-//                            dialog.dismiss();
-//                            user.setId(stringObjectMap.get("uid").toString());
-//                            user.saveUser();
-//                            myFirebaseRef.unauth();
-//                            Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
-//                            Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
-//                            finish();
-//                        }
-//
-//                        @Override
-//                        public void onError(FirebaseError firebaseError) {
-//                            dialog.dismiss();
-//                            Log.e("Firebase error", firebaseError.getMessage());
-//                            Toast.makeText(SignupActivity.this, "" + firebaseError.getMessage(), Toast.LENGTH_LONG).show();
-//                        }
-//                    }
-//            );
-//        }
         else{
             Toast.makeText(SignupActivity.this, "Please make sure all input is valid", Toast.LENGTH_SHORT).show();
         }

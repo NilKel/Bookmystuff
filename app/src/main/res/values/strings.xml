@@ -6,46 +6,23 @@
     <string name="app_name">BookMyStuff</string>
     <string name="title_activity_football">Football</string>
     <string name="facebook_app_id">168888936886354</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
     <string name="title_activity_badminton">Badminton</string>
     <string name="title_activity_table_tennis">Table Tennis</string>
-    <string name="title_activity_flocator">Map</string>
-    <string name="takes_you_to_a_list_w_a_maps_option">takes you to a list w / a maps option</string>
-    <string name="browse_turfs">browse turfs</string>
-    <string name="create_a_lobby">Create a Lobby</string>
-    <string name="more_on_this_later">More on this later</string>
-    <string name="badminton">badminton</string>
-    <string name="table_tennis">Table tennis</string>
-    <string name="add_fancy_image_button_later_footy">add fancy image button later footy</string>
-    <string name="LoginUsernameTagText">Username/Email:</string>
     <string name="passwordTagText">Password</string>
     <string name="CreateAccountButtonText">SIGN UP</string>
     <string name="LoginButtonText">SIGN IN</string>
     <string name="nameTagText">Full Name</string>
     <string name="emailTagText">Email</string>
-    <string name="nameHintText">John Appleseed</string>
-    <string name="emailHintText">johnappleseed@email.com</string>
     <string name="reenterPasswordTagText">Re-Enter Password</string>
-    <string name="phoneNumberTagText">Phone number</string>
-    <string name="clearText">Clear</string>
-    <string name="googleSignInText">Google</string>
-    <string name="facebookSignInText">Facebook</string>
-    <string name="signInWithTagText">Sign up with</string>
-    <string name="facebook">Facebook</string>
     <string name="auth_failed">Failed authentication</string>
     <string name="sign_in_below">SIGN IN BELOW</string>
     <string name="create_account">CREATE ACCOUNT</string>
-    <string name="profile_picture_image">Profile Picture Image</string>
     <string name="nav_home">Home</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_about_us">About Us</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="nav_other">Other</string>
-    <string name="openDrawer">open_drawer</string>
-    <string name="closeDrawer">close_drawer</string>
     <string name="app_title">BOOKMYSTUFF</string>
     <string name="lobbyViewStdText">Tap to allow users to join this slot</string>
     <string name="manager_mode">Manager</string>
@@ -59,7 +36,6 @@
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hello_world">Hello World</string>
     <string name="send_message">Send Message</string>
     <string name="enter_lobby_name">Enter Lobby Name</string>
