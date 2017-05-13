@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by sushrutshringarputale on 1/5/17.
  */
-
+@Deprecated
 public class Turf {
     private Location location;
     private String name;

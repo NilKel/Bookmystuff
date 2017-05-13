@@ -5,8 +5,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.example.neel.bookingapp.Other.DatabaseConnector;
+
+import org.jdeferred.Deferred;
 
 import java.util.ArrayList;
 
@@ -21,14 +22,16 @@ public class Lobby implements Parcelable{
     private String name;
     private Sport sport;
     private Location location;
+    private ArrayList<ChatMessage> messages;
 
-    public Lobby(User owner, int numFree, ArrayList<User> lobbyList, String name, Sport sport, Location location) {
+    public Lobby(User owner, int numFree, ArrayList<User> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
         this.owner = owner;
         this.numFree = numFree;
         this.lobbyList = lobbyList;
         this.name = name;
         this.sport = sport;
         this.location = location;
+        this.messages = messages;
     }
 
     public Lobby(User owner, int numFree, ArrayList<User> lobbyList, String name, Sport sport) {
@@ -49,8 +52,15 @@ public class Lobby implements Parcelable{
 
     }
 
+    @SuppressWarnings("unchecked")
     protected Lobby(Parcel in) {
         numFree = in.readInt();
+        owner = in.readParcelable(User.class.getClassLoader());
+        lobbyList = in.readArrayList(Lobby.class.getClassLoader());
+        name = in.readString();
+        sport = (Sport) in.readSerializable();
+        location = in.readParcelable(LocationPlus.class.getClassLoader());
+        messages = in.readArrayList(ChatMessage.class.getClassLoader());
     }
 
     public static final Creator<Lobby> CREATOR = new Creator<Lobby>() {
@@ -64,6 +74,14 @@ public class Lobby implements Parcelable{
             return new Lobby[size];
         }
     };
+
+    public ArrayList<ChatMessage> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(ArrayList<ChatMessage> messages) {
+        this.messages = messages;
+    }
 
     public User getOwner() {
         return owner;
@@ -107,6 +125,9 @@ public class Lobby implements Parcelable{
         parcel.writeValue(owner);
         parcel.writeInt(numFree);
         parcel.writeList(lobbyList);
+        parcel.writeList(messages);
+        parcel.writeString(name);
+        parcel.writeSerializable(sport);
     }
 
     @Override
@@ -128,11 +149,8 @@ public class Lobby implements Parcelable{
         this.sport = sport;
     }
 
-    public void saveLobby() {
-        Log.d("Method: saveLobby", this.toString());
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("lobbies");
-        DatabaseReference node = ref.push();
-        node.setValue(new LobbyRef().copyData(this));
+    public Deferred saveLobby() {
+        return DatabaseConnector.saveLobby(this);
     }
 
     public Lobby getLobbyFromRef(LobbyRef ref) {
@@ -141,11 +159,14 @@ public class Lobby implements Parcelable{
             mArList.add(new User(ref.lobbyList.get("id")));
         }
         try {
-            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, mArList, ref.name, ref.sport, new Location(ref.getLocation()));
+            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, mArList, ref.name, ref.sport, LocationPlus.getLocationFromRepresentation(ref.getLocation()), new ArrayList<>());
         } catch (NullPointerException e) {
             Log.e("NPE", e.getMessage());
             return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, mArList, ref.name, ref.sport);
+        } catch (IllegalArgumentException e) {
+            Log.e("IAE", e.getMessage());
         }
+        return null;
     }
 
     public Location getLocation() {

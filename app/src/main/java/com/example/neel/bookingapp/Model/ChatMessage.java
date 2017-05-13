@@ -12,6 +12,15 @@ public class ChatMessage {
     public String time;
 
 
+    public ChatMessage(User sender, Lobby lobby, String id, String time) {
+        this.sender = sender;
+        this.lobby = lobby;
+        this.id = id;
+        this.time = time;
+    }
+
+
+
     public ChatMessage() {
     }
 

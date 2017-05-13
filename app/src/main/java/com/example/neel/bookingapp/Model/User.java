@@ -4,13 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
+import org.jdeferred.Deferred;
 
 import java.util.Date;
 
@@ -117,41 +114,9 @@ public class User implements Parcelable{
     }
 
 
-    public void updateFields(final User user) {
-        Log.i("User class", "updating fields for " + user.id);
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference("users/"+user.id);
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null) {
-                    Log.d("Retrieved user data", dataSnapshot.toString());
-                    User temp = dataSnapshot.getValue(User.class);
-                    user.copyData(temp);
-                }
-                    mUpdateInterface.onCompleteUpdate();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("User data retrieval", "onCancelled", databaseError.toException());
-            }
-        });
-    }
-
-
-    public void saveUser() {
+    public Deferred saveUser() {
         //Add YOUR Firebase Reference URL instead of the following URL
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-        db.child("users").child(this.id).child("email").setValue(this.email);
-        db.child("users").child(this.id).child("name").setValue(this.name);
-        db.child("users").child(this.id).child("PhNo").setValue(this.phNo);
-        if (user != null && user.getPhotoUrl() != null) {
-            db.child("users").child(this.id).child("profPic").setValue(user.getPhotoUrl().toString());
-        }
-//        db.child("users").child(this.getId()).child("id").setValue(this.getId());
-        db.child("users").child(this.id).child("isOwner").setValue(false);
-
+        return DatabaseConnector.saveUser(this);
     }
 
     public boolean isOwner() {
@@ -162,7 +127,7 @@ public class User implements Parcelable{
         isOwner = isOwner;
     }
 
-    private void copyData(User user) {
+    public void copyData(User user) {
         try {
             if (this.id == null)
             this.id = user.id;

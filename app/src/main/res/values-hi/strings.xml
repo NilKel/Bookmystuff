@@ -3,11 +3,9 @@
     <string name="app_name">BOOKMYSTUFF</string>
     <string name="CreateAccountButtonText">साईन अप करे</string>
     <string name="LoginButtonText">साईन ईन करे</string>
-    <string name="LoginUsernameTagText"></string>
     <string name="auth_failed"></string>
     <string name="emailTagText">ई-मेल</string>
     <string name="create_account">अकाऊंट बनाए</string>
     <string name="passwordTagText">पासवर्ड</string>
-    <string name="phoneNumberTagText">प्होन क्रमांक</string>
     <string name="reenterPasswordTagText">पासवर्ड फिर डाले</string>
 </resources>

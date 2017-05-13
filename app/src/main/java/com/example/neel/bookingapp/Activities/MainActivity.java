@@ -31,12 +31,15 @@ import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.CircleTransform;
+import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.LobbyLauncherInterface;
 import com.example.neel.bookingapp.Other.NewLobbyDialogFragment;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
 
 
-public class MainActivity extends AppCompatActivity implements NewLobbyDialogFragment.OnCompleteListener{
+public class MainActivity extends AppCompatActivity implements NewLobbyDialogFragment.OnCompleteListener, LobbyLauncherInterface {
 
     private NavigationView navigationView;
     private DrawerLayout drawer;
@@ -73,74 +76,69 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     User currentUser;
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         currentUser = new User(FirebaseAuth.getInstance().getCurrentUser());
-        currentUser.mUpdateInterface = new User.UserUpdateInterface() {
-            @Override
-            public void onCompleteUpdate() {
-                Log.d("Current user", currentUser.toString());
+        DatabaseConnector.updateUser(currentUser).promise().done((user) -> {
+            Log.d("Current user", currentUser.toString());
+            Log.d("MainActivity", "Started");
 
-                Log.d("MainActivity", "Started");
+            toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
 
-                toolbar = (Toolbar) findViewById(R.id.toolbar);
-                setSupportActionBar(toolbar);
+            mHandler = new Handler();
 
-                mHandler = new Handler();
+            drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-                drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-                navigationView = (NavigationView) findViewById(R.id.nav_view);
-                if(!currentUser.isOwner()) {
-                    navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false);
-//            drawer.findViewById(R.id.manager_mode).setVisibility(View.INVISIBLE);
-                }
-                fab = (FloatingActionButton) findViewById(R.id.fab);
-
-                // Navigation view header
-                navHeader = navigationView.getHeaderView(0);
-                txtName = (TextView) navHeader.findViewById(R.id.name);
-                txtWebsite = (TextView) navHeader.findViewById(R.id.website);
-                imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
-                imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
-
-                // load toolbar titles from string resources
-                activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
-
-                fab.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        createLobby();
-                        //TODO: Create fragment/activity to launch a new lobby
-                    }
-
-                    private void createLobby() {
-                        FragmentManager fm = getSupportFragmentManager();
-                        NewLobbyDialogFragment editNameDialogFragment = NewLobbyDialogFragment.newInstance("Create Lobby");
-                        Bundle args = new Bundle();
-                        args.putParcelable("user", currentUser);
-                        editNameDialogFragment.setArguments(args);
-//                editNameDialogFragment.setTargetFragment(MainActivity.this,0);
-                        editNameDialogFragment.show(fm, "fragment_edit_name");
-                    }
-                });
-
-                // load nav menu header data
-                loadNavHeader();
-
-                // initializing navigation menu
-                setUpNavigationView();
-
-                if (savedInstanceState == null) {
-                    navItemIndex = 0;
-                    CURRENT_TAG = TAG_HOME;
-                    loadHomeFragment();
-                }
-
+            navigationView = (NavigationView) findViewById(R.id.nav_view);
+            if (!currentUser.isOwner()) {
+                navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false);
             }
-        };
-        currentUser.updateFields(currentUser);
+            fab = (FloatingActionButton) findViewById(R.id.fab);
+
+            // Navigation view header
+            navHeader = navigationView.getHeaderView(0);
+            txtName = (TextView) navHeader.findViewById(R.id.name);
+            txtWebsite = (TextView) navHeader.findViewById(R.id.website);
+            imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
+            imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
+
+            // load toolbar titles from string resources
+            activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
+
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    createLobby();
+                    //TODO: Create fragment/activity to launch a new lobby
+                }
+
+                private void createLobby() {
+                    FragmentManager fm = getSupportFragmentManager();
+                    NewLobbyDialogFragment editNameDialogFragment = NewLobbyDialogFragment.newInstance("Create Lobby");
+                    Bundle args = new Bundle();
+                    args.putParcelable("user", currentUser);
+                    editNameDialogFragment.setArguments(args);
+                    editNameDialogFragment.show(fm, "fragment_edit_name");
+                }
+            });
+
+            // load nav menu header data
+            loadNavHeader();
+
+            // initializing navigation menu
+            setUpNavigationView();
+
+            if (savedInstanceState == null) {
+                navItemIndex = 0;
+                CURRENT_TAG = TAG_HOME;
+                loadHomeFragment();
+            }
+        }).fail((error) -> {
+            Log.e("User data retrieval", "onCancelled", ((DatabaseError) error).toException());
+        });
     }
 
 
@@ -151,8 +149,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
      */
     private void loadNavHeader() {
         // name, website
-         txtName.setText(currentUser.name);
-//        txtWebsite.setText("www.androidhive.info");
+        txtName.setText(currentUser.name);
 
         // loading header background image
         Glide.with(this).load(urlNavHeaderBg)
@@ -193,21 +190,14 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             return;
         }
 
-        // Sometimes, when fragment has huge data, screen seems hanging
-        // when switching between navigation menus
-        // So using runnable, the fragment is loaded with cross fade effect
-        // This effect can be seen in GMail app
-        Runnable mPendingRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // update the main content by replacing fragments
-                Fragment fragment = getHomeFragment();
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
-                        android.R.anim.fade_out);
-                fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
-                fragmentTransaction.commitAllowingStateLoss();
-            }
+        Runnable mPendingRunnable = () -> {
+            // update the main content by replacing fragments
+            Fragment fragment = getHomeFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
+                    android.R.anim.fade_out);
+            fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
+            fragmentTransaction.commitAllowingStateLoss();
         };
 
         // If mPendingRunnable is not null, then add to the message queue
@@ -237,24 +227,24 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         SportFragment sportFragment = new SportFragment();
         inLobby = false;
         switch (navItemIndex) {
-            case 0: // TODO: Create and add the three sports fragments here
+            case 0:
 //                 home
                 return new HomeFragment();
             case 1:
-//                // settings
+                // settings
                 return new SettingsFragment();
             case 2:
-//                // football fragment
+                // football fragment
                 bundle.putSerializable("ARGUMENT", Sport.FOOTBALL);
                 sportFragment.setArguments(bundle);
                 return sportFragment;
             case 3:
-//                // badminton fragment
+                // badminton fragment
                 bundle.putSerializable("ARGUMENT", Sport.BADMINTON);
                 sportFragment.setArguments(bundle);
                 return sportFragment;
             case 4:
-//                // table tennis fragment
+                // table tennis fragment
                 bundle.putSerializable("ARGUMENT", Sport.TABLETENNIS);
                 sportFragment.setArguments(bundle);
                 return sportFragment;
@@ -334,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         });
 
 
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.app_name, R.string.app_name) {
 
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -350,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         };
 
         //Setting the actionbarToggle to drawer layout
-//        drawer.setDrawerListener(actionBarDrawerToggle);
         drawer.addDrawerListener(actionBarDrawerToggle);
 
         //calling sync state is necessary or else your hamburger icon wont show up
@@ -369,12 +358,20 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         if (shouldLoadHomeFragOnBackPress) {
             // checking if user is on other navigation menu
             // rather than home
-            if (navItemIndex != 0) {
+            if (navItemIndex <= 0) {
                 navItemIndex = 0;
                 CURRENT_TAG = TAG_HOME;
                 loadHomeFragment();
                 return;
             }
+        }
+        int count = getFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+            super.onBackPressed();
+            //additional code
+        } else {
+            getFragmentManager().popBackStack();
         }
 
         super.onBackPressed();
@@ -434,23 +431,30 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     }
 
     @Override
-    public void onComplete(final Lobby lobby) {
+    public void onComplete(Lobby lobby) {
+        lobbyLauncherHelper(lobby);
+    }
+
+    @Override
+    public void startLobby(Lobby lobby) {
+        lobbyLauncherHelper(lobby);
+    }
+
+    public void lobbyLauncherHelper(Lobby lobby) {
         Log.d("Method: onComplete", lobby.toString());
-        Runnable mPendingRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // update the main content by replacing fragments
-                Fragment fragment = getHomeFragment(lobby);
-                CURRENT_TAG = lobby.getName();
-                inLobby = true;
-                toggleFab();
-                getSupportActionBar().setTitle(CURRENT_TAG);
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
-                        android.R.anim.fade_out);
-                fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
-                fragmentTransaction.commitAllowingStateLoss();
-            }
+        Runnable mPendingRunnable = () -> {
+            // update the main content by replacing fragments
+            Fragment fragment = getHomeFragment(lobby);
+            CURRENT_TAG = lobby.getName();
+            inLobby = true;
+            toggleFab();
+            navItemIndex = -1;
+            getSupportActionBar().setTitle(CURRENT_TAG);
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(android.R.anim.slide_in_left,
+                    android.R.anim.slide_out_right);
+            fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
+            fragmentTransaction.commitAllowingStateLoss();
         };
 
         // If mPendingRunnable is not null, then add to the message queue
@@ -458,4 +462,6 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             mHandler.post(mPendingRunnable);
         }
     }
+
+
 }

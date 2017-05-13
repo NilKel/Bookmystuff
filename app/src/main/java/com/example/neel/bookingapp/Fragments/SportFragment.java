@@ -86,6 +86,16 @@ public class SportFragment extends Fragment {
         });
 
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -97,7 +107,7 @@ public class SportFragment extends Fragment {
                     } else {
                         getLobbies(sport, location, lobbyList);
                     }
-                }catch (NullPointerException e) {
+                } catch (NullPointerException e) {
                     Log.e("NPE", e.getMessage());
                 }
                 locationManager.removeUpdates(this);
@@ -114,7 +124,7 @@ public class SportFragment extends Fragment {
                         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         getLobbies(sport, location, lobbyList);
                     }
-                }catch (NullPointerException e) {
+                } catch (NullPointerException e) {
                     Log.e("NPE", e.getMessage());
                 }
                 locationManager.removeUpdates(this);
@@ -131,13 +141,23 @@ public class SportFragment extends Fragment {
                 Log.i("Location Connection", "provider disabled");
                 try {
                     Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
                     Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || location == null) {
                         getLobbies(sport, lobbyList);
                     } else {
                         getLobbies(sport, location, lobbyList);
                     }
-                }catch (NullPointerException e) {
+                } catch (NullPointerException e) {
                     Log.e("NPE", e.getMessage());
                 }
                 locationManager.removeUpdates(this);
