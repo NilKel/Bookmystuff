@@ -3,7 +3,6 @@ package com.example.neel.bookingapp.Activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -14,9 +13,6 @@ import android.widget.Toast;
 
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -66,7 +62,7 @@ public class SignupActivity extends FragmentActivity{
         return !(name.getText().toString().isEmpty() ||
                 phoneNumber.getText().toString().isEmpty() ||
                 !Patterns.PHONE.matcher(phoneNumber.getText().toString()).matches() ||
-                !android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches() ||
+                !Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches() ||
                 password.getText().toString().isEmpty() || passwordReenter.getText().toString().isEmpty() ||
                 !password.getText().toString().equals(passwordReenter.getText().toString()));
     }
@@ -84,28 +80,25 @@ public class SignupActivity extends FragmentActivity{
             setUpUser();
 
             mAuth.createUserWithEmailAndPassword(user.email,  password.getText().toString())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            dialog.dismiss();
-                            Log.d("createUser:onComplete:", Boolean.toString(task.isSuccessful()));
+                    .addOnCompleteListener(this, task -> {
+                        dialog.dismiss();
+                        Log.d("createUser:onComplete:", Boolean.toString(task.isSuccessful()));
 
-                            // If sign in fails, display a message to the user. If sign in succeeds
-                            // the auth state listener will be notified and logic to handle the
-                            // signed in user can be handled in the listener.
-                            if (!task.isSuccessful()) {
-                                Toast.makeText(SignupActivity.this, R.string.auth_failed,
-                                        Toast.LENGTH_SHORT).show();
-                            } else {
-                                user.id = task.getResult().getUser().getUid();
-                                user.saveUser().promise().done((d) -> {
-                                    Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
-                                    Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
-                                    cancelSignup(view);
-                                }).fail((f) -> {
-                                    Log.e(TAG, f.toString());
-                                });
-                            }
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(SignupActivity.this, R.string.auth_failed,
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            user.id = task.getResult().getUser().getUid();
+                            user.saveUser().promise().done((d) -> {
+                                Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
+                                Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
+                                cancelSignup(view);
+                            }).fail((f) -> {
+                                Log.e(TAG, f.toString());
+                            });
                         }
                     });
         }

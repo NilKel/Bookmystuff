@@ -14,12 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.LobbyRef;
 import com.example.neel.bookingapp.Model.Sport;
+import com.example.neel.bookingapp.Other.LobbyLauncherInterface;
 import com.example.neel.bookingapp.Other.LobbyListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -33,11 +33,12 @@ import java.util.ArrayList;
 
 public class SportFragment extends Fragment {
 
-    //PRIVATE VARIABLES
-    private ArrayList<Lobby> lobbies = new ArrayList<>();
     public GoogleApiClient mGoogleApiClient;
     public LocationManager locationManager;
+    //PRIVATE VARIABLES
+    private ArrayList<Lobby> lobbies = new ArrayList<>();
     private ListView lobbyList;
+    private LobbyLauncherInterface lobbyLauncherInterface;
 
     public SportFragment() {
     }
@@ -45,7 +46,6 @@ public class SportFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        sport = (Sport) savedInstanceState.getSerializable("ARGUMENT");
     }
 
     /**
@@ -70,23 +70,20 @@ public class SportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.lobby_list, container, false);
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
         lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
-        lobbyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("Lobby clicked", lobbies.get(position).toString());
-                //NOTE: Will start LobbyFragment once that is designed and functional. This
-            }
+        lobbyList.setOnItemClickListener((parent, view, position, id) -> {
+            Log.d("Lobby clicked", lobbies.get(position).toString());
+            lobbyLauncherInterface.startLobby(lobbies.get(position));
         });
 
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -102,7 +99,8 @@ public class SportFragment extends Fragment {
                 Log.i("Location Connection", "Connected");
                 try {
                     Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         getLobbies(sport, lobbyList);
                     } else {
                         getLobbies(sport, location, lobbyList);
@@ -118,7 +116,8 @@ public class SportFragment extends Fragment {
                 Log.i("Location Connection", "Connected");
                 try {
                     Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         getLobbies(sport, lobbyList);
                     } else {
                         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -163,20 +162,27 @@ public class SportFragment extends Fragment {
                 locationManager.removeUpdates(this);
             }
         });
-//        locationManager.requestSingleUpdate(Criteria.ACCURACY_FINE, );
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mGoogleApiClient.disconnect();
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mGoogleApiClient.connect();
+    }
+
+    //TODO: if time, move this logic to DatabaseConnector for clean code. Separate MVC and abstract
     private void getLobbies(final Sport sport, Location location, final ListView lobbyList) throws NullPointerException {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
         Log.d("Location", location.toString());
         ref.orderByChild("location")
-                .startAt("Location[fused "+ (location.getLatitude() - 0.5) + ", " + (location.getLongitude() - 0.5))
-                .endAt("Location[fused "+ Double.toString(location.getLatitude() + 0.5) + ", " + Double.toString(location.getLongitude() + 0.5))
+                .startAt("Location[fused " + (location.getLatitude() - 0.5) + ", " + (location.getLongitude() - 0.5))
+                .endAt("Location[fused " + Double.toString(location.getLatitude() + 0.5) + ", " + Double.toString(location.getLongitude() + 0.5))
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -213,7 +219,7 @@ public class SportFragment extends Fragment {
 
     private void getLobbies(Sport sport, final ListView lobbyList) throws NullPointerException {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
-        ref.orderByChild("sport").equalTo(sport.name()).limitToFirst(20)
+        ref.orderByChild("sport").equalTo(sport.name()).limitToFirst(20) //TODO: Currently only retrieved 20 lobbies. Add functionality to retrieve more if the user explicitly asks for them
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {

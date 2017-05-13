@@ -15,7 +15,21 @@ import java.util.ArrayList;
  * Created by sushrutshringarputale on 1/6/17.
  */
 
-public class Lobby implements Parcelable{
+/**
+ * This is a model representation of a Lobby implemented in the app.
+ */
+public class Lobby implements Parcelable {
+    public static final Creator<Lobby> CREATOR = new Creator<Lobby>() {
+        @Override
+        public Lobby createFromParcel(Parcel in) {
+            return new Lobby(in);
+        }
+
+        @Override
+        public Lobby[] newArray(int size) {
+            return new Lobby[size];
+        }
+    };
     private User owner;
     private int numFree;
     private ArrayList<User> lobbyList;
@@ -24,6 +38,8 @@ public class Lobby implements Parcelable{
     private Location location;
     private ArrayList<ChatMessage> messages;
 
+
+    //Constructors
     public Lobby(User owner, int numFree, ArrayList<User> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
         this.owner = owner;
         this.numFree = numFree;
@@ -63,18 +79,7 @@ public class Lobby implements Parcelable{
         messages = in.readArrayList(ChatMessage.class.getClassLoader());
     }
 
-    public static final Creator<Lobby> CREATOR = new Creator<Lobby>() {
-        @Override
-        public Lobby createFromParcel(Parcel in) {
-            return new Lobby(in);
-        }
-
-        @Override
-        public Lobby[] newArray(int size) {
-            return new Lobby[size];
-        }
-    };
-
+    //Getters/Setters
     public ArrayList<ChatMessage> getMessages() {
         return messages;
     }
@@ -130,16 +135,6 @@ public class Lobby implements Parcelable{
         parcel.writeSerializable(sport);
     }
 
-    @Override
-    public String toString() {
-        return "Lobby{" +
-                "owner=" + owner +
-                ", numFree=" + numFree +
-                ", lobbyList=" + lobbyList.toString() +
-                ", name='" + name + '\'' +
-                ", sport=" + sport +
-                '}';
-    }
 
     public Sport getSport() {
         return sport;
@@ -153,6 +148,12 @@ public class Lobby implements Parcelable{
         return DatabaseConnector.saveLobby(this);
     }
 
+    /**
+     *
+     * @param ref {@link LobbyRef}
+     * This method takes a {@link LobbyRef} object and returns a new lobby.
+     * @return Lobby
+     */
     public Lobby getLobbyFromRef(LobbyRef ref) {
         ArrayList<User> mArList = new ArrayList<>();
         for (String id : ref.lobbyList.keySet()) {
@@ -175,5 +176,18 @@ public class Lobby implements Parcelable{
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return "Lobby{" +
+                "owner=" + owner +
+                ", numFree=" + numFree +
+                ", lobbyList=" + lobbyList +
+                ", name='" + name + '\'' +
+                ", sport=" + sport +
+                ", location=" + location +
+                ", messages=" + messages +
+                '}';
     }
 }

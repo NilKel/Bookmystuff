@@ -20,7 +20,6 @@ public class ChatMessage {
     }
 
 
-
     public ChatMessage() {
     }
 

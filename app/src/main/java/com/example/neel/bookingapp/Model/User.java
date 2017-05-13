@@ -16,6 +16,17 @@ import java.util.Date;
  */
 
 public class User implements Parcelable{
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
     public String id;
     public String name;
     public String email;
@@ -23,12 +34,8 @@ public class User implements Parcelable{
     public String profPic;
     public boolean isOwner;
     public Date birthday;
-
-    public UserUpdateInterface mUpdateInterface;
-
-    public interface UserUpdateInterface {
-        void onCompleteUpdate();
-    }
+    public boolean initialized;
+    //TODO: Add the initialized support to all methods below as well as in {DatabaseConnector} class. The initialized variable will be set to true if we have all information from a user.
 
 
     public User(String id, String name, String email, long phNo, String profPic, boolean isOwner) {
@@ -54,17 +61,11 @@ public class User implements Parcelable{
     public User() {
     }
 
-    public void setBirthday(String date) {
-        this.birthday = new Date(date);
-    }
-
-
     public User(String email, String name, long phNo, boolean isOwner) {
         this.email = email;
         this.name = name;
         this.phNo = phNo;
     }
-
 
 
     public User(String email, String name, long phNo, String profPicture) {
@@ -73,6 +74,8 @@ public class User implements Parcelable{
         this.phNo = phNo;
         this.profPic = profPicture;
     }
+
+
 
     public User(String id, String name) {
         this.id = id;
@@ -92,30 +95,20 @@ public class User implements Parcelable{
         isOwner = in.readByte() != 0;
     }
 
+    public void setBirthday(String date) {
+        this.birthday = new Date(date);
+    }
+
     public void setId(String Id) {
         return;
     }
-
-    public static final Creator<User> CREATOR = new Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel in) {
-            return new User(in);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
 
     @Override
     public String toString() {
         return "User: " + name + " " + id;
     }
 
-
     public Deferred saveUser() {
-        //Add YOUR Firebase Reference URL instead of the following URL
         return DatabaseConnector.saveUser(this);
     }
 
@@ -147,6 +140,7 @@ public class User implements Parcelable{
             Log.e("NPE: copyData", e.getMessage());
         }
     }
+
     @Override
     public int describeContents() {
         return 0;

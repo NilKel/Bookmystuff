@@ -29,9 +29,9 @@ import java.util.ArrayList;
  */
 
 public class HomeFragment extends Fragment {
+    public LobbyLauncherInterface lobbyLauncherInterface;
     private String TAG = "HomeFragment";
     private ArrayList<Lobby> lobbyArrayList;
-    public LobbyLauncherInterface lobbyLauncherInterface;
 
     @Nullable
     @Override
@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        //TODO: add the ability to show an error if lobbies could not be read
                     }
                 });
     }

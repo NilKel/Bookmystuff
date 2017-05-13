@@ -17,11 +17,6 @@ public class CircleTransform extends BitmapTransformation {
         super(context);
     }
 
-    @Override
-    protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
-        return circleCrop(pool, toTransform);
-    }
-
     private static Bitmap circleCrop(BitmapPool pool, Bitmap source) {
         if (source == null) return null;
 
@@ -43,6 +38,11 @@ public class CircleTransform extends BitmapTransformation {
         float r = size / 2f;
         canvas.drawCircle(r, r, r, paint);
         return result;
+    }
+
+    @Override
+    protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+        return circleCrop(pool, toTransform);
     }
 
     @Override

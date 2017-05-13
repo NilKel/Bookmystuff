@@ -44,24 +44,7 @@ public class NewLobbyDialogFragment extends DialogFragment {
     public Button confirmButton;
     public User user;
     public GoogleApiClient mGoogleApiClient;
-
-    public interface OnCompleteListener {
-        void onComplete(Lobby lobby);
-    }
-
     private OnCompleteListener mListener;
-
-    // make sure the Activity implemented it
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            this.mListener = (OnCompleteListener) activity;
-        } catch (final ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnCompleteListener");
-        }
-    }
-
 
     public NewLobbyDialogFragment() {
     }
@@ -72,6 +55,17 @@ public class NewLobbyDialogFragment extends DialogFragment {
         args.putString("title", title);
         frag.setArguments(args);
         return frag;
+    }
+
+    // make sure the Activity implemented it
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            this.mListener = (OnCompleteListener) activity;
+        } catch (final ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnCompleteListener");
+        }
     }
 
     @NonNull
@@ -189,5 +183,9 @@ public class NewLobbyDialogFragment extends DialogFragment {
                 });
             }
         }
+    }
+
+    public interface OnCompleteListener {
+        void onComplete(Lobby lobby);
     }
 }

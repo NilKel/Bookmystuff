@@ -11,7 +11,7 @@ import android.widget.ListView;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.R;
 
-public class LobbyFragment extends Fragment implements View.OnClickListener{
+public class LobbyFragment extends Fragment implements View.OnClickListener {
     private Lobby lobby;
     private ListView messageList;
 
@@ -23,7 +23,6 @@ public class LobbyFragment extends Fragment implements View.OnClickListener{
     }
 
     /**
-     *
      * @param {@link Lobby} lobby
      * @return new {@link Lobby}
      */

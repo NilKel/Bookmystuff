@@ -6,6 +6,8 @@ import java.util.HashMap;
  * Created by sushrutshringarputale on 3/10/17.
  * Copyright (c) Sushrut Shringarputale 2017. All rights reserved.
  * @author sushrutshringarputale
+ * This class is a representation of the {@link Lobby} class as saved in Firebase. All properties are
+ * as primitive as possible.
  */
 public class LobbyRef {
     public String ownerName;
@@ -19,6 +21,12 @@ public class LobbyRef {
     public LobbyRef() {
     }
 
+    /**
+     *
+     * @param lobby
+     * This method copies all data from a {@link Lobby} object
+     * @return LobbyRef
+     */
     public LobbyRef copyData(Lobby lobby) {
         this.ownerName = lobby.getOwner().name;
         this.ownerId = lobby.getOwner().id;
@@ -30,15 +38,14 @@ public class LobbyRef {
             this.lobbyList.put("id", user.id);
         }
         this.sport = lobby.getSport();
-        lobby.setLocation(LocationPlus.getLocationFromRepresentation(this.location));
         return this;
+    }
+
+    public String getLocation(){
+        return this.location;
     }
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public String getLocation(){
-        return this.location.toString();
     }
 }

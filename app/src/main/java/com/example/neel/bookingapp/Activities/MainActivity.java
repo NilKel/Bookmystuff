@@ -41,6 +41,18 @@ import com.google.firebase.database.DatabaseError;
 
 public class MainActivity extends AppCompatActivity implements NewLobbyDialogFragment.OnCompleteListener, LobbyLauncherInterface {
 
+    // urls to load navigation header background image
+    private static final String urlNavHeaderBg = "http://i.imgur.com/fe8SLNa.png";
+    // tags used to attach the fragments
+    private static final String TAG_HOME = "home";
+    private static final String TAG_FOOTBALL = "football";
+    private static final String TAG_BADMINTON = "badminton";
+    private static final String TAG_TABLETENNIS = "tabletennis";
+    private static final String TAG_SETTINGS = "settings";
+    // index to identify current nav menu item
+    public static int navItemIndex = 0;
+    public static String CURRENT_TAG = TAG_HOME;
+    User currentUser;
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private View navHeader;
@@ -48,32 +60,12 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     private TextView txtName, txtWebsite;
     private Toolbar toolbar;
     private FloatingActionButton fab;
-
-    // urls to load navigation header background image
-    // and profile image
-    private static final String urlNavHeaderBg = "http://i.imgur.com/fe8SLNa.png";
-
-    // index to identify current nav menu item
-    public static int navItemIndex = 0;
-
-    // tags used to attach the fragments
-    private static final String TAG_HOME = "home";
-    private static final String TAG_FOOTBALL = "football";
-    private static final String TAG_BADMINTON = "badminton";
-    private static final String TAG_TABLETENNIS = "tabletennis";
-    private static final String TAG_SETTINGS = "settings";
-    public static String CURRENT_TAG = TAG_HOME;
-
     // toolbar titles respected to selected nav menu item
     private String[] activityTitles;
-
     // flag to load home fragment when user presses back key
     private boolean shouldLoadHomeFragOnBackPress = true;
     private Handler mHandler;
-
     private boolean inLobby = false;
-
-    User currentUser;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -81,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         currentUser = new User(FirebaseAuth.getInstance().getCurrentUser());
+        //Update the on-device user object from all the data from the database
         DatabaseConnector.updateUser(currentUser).promise().done((user) -> {
             Log.d("Current user", currentUser.toString());
             Log.d("MainActivity", "Started");
@@ -112,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
                 @Override
                 public void onClick(View view) {
                     createLobby();
-                    //TODO: Create fragment/activity to launch a new lobby
                 }
 
                 private void createLobby() {
@@ -217,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
 
     private Fragment getHomeFragment(Lobby newLobby) {
         Bundle bundle = new Bundle();
-        LobbyFragment mLobby= new LobbyFragment();
+        LobbyFragment mLobby = new LobbyFragment();
         bundle.putParcelable("lobby", newLobby);
         return mLobby;
     }
@@ -263,64 +255,60 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
 
     private void setUpNavigationView() {
         //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        // This method will trigger on item Click of navigation menu
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
 
-            // This method will trigger on item Click of navigation menu
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-
-                //Check to see which item was being clicked and perform appropriate action
-                switch (menuItem.getItemId()) {
-                    //Replacing the main content with ContentFragment Which is our Inbox View;
-                    case R.id.nav_home:
-                        navItemIndex = 0;
-                        CURRENT_TAG = TAG_HOME;
-                        break;
-                    case R.id.nav_football:
-                        navItemIndex = 2;
-                        CURRENT_TAG = TAG_FOOTBALL;
-                        break;
-                    case R.id.nav_badminton:
-                        navItemIndex = 3;
-                        CURRENT_TAG = TAG_BADMINTON;
-                        break;
-                    case R.id.nav_table_tennis:
-                        navItemIndex = 4;
-                        CURRENT_TAG = TAG_TABLETENNIS;
-                        break;
-                    case R.id.nav_settings:
-                        navItemIndex = 1;
-                        CURRENT_TAG = TAG_SETTINGS;
-                        break;
-                    case R.id.nav_about_us:
-                        // launch new intent instead of loading fragment
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")));
-                        drawer.closeDrawers();
-                        return true;
-                    case R.id.nav_privacy_policy:
-                        // launch new intent instead of loading fragment
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")));
-                        drawer.closeDrawers();
-                        return true;
-                    case R.id.manager_mode:
-                        //launch manager mode
-                        return true;
-                    default:
-                        navItemIndex = 0;
-                }
-
-                //Checking if the item is in checked state or not, if not make it in checked state
-                if (menuItem.isChecked()) {
-                    menuItem.setChecked(false);
-                } else {
-                    menuItem.setChecked(true);
-                }
-                menuItem.setChecked(true);
-
-                loadHomeFragment();
-
-                return true;
+            //Check to see which item was being clicked and perform appropriate action
+            switch (menuItem.getItemId()) {
+                //Replacing the main content with ContentFragment Which is our Inbox View;
+                case R.id.nav_home:
+                    navItemIndex = 0;
+                    CURRENT_TAG = TAG_HOME;
+                    break;
+                case R.id.nav_football:
+                    navItemIndex = 2;
+                    CURRENT_TAG = TAG_FOOTBALL;
+                    break;
+                case R.id.nav_badminton:
+                    navItemIndex = 3;
+                    CURRENT_TAG = TAG_BADMINTON;
+                    break;
+                case R.id.nav_table_tennis:
+                    navItemIndex = 4;
+                    CURRENT_TAG = TAG_TABLETENNIS;
+                    break;
+                case R.id.nav_settings:
+                    navItemIndex = 1;
+                    CURRENT_TAG = TAG_SETTINGS;
+                    break;
+                case R.id.nav_about_us:
+                    // launch new intent instead of loading fragment
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")));
+                    drawer.closeDrawers();
+                    return true;
+                case R.id.nav_privacy_policy:
+                    // launch new intent instead of loading fragment
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")));
+                    drawer.closeDrawers();
+                    return true;
+                case R.id.manager_mode:
+                    //launch manager mode
+                    return true;
+                default:
+                    navItemIndex = 0;
             }
+
+            //Checking if the item is in checked state or not, if not make it in checked state
+            if (menuItem.isChecked()) {
+                menuItem.setChecked(false);
+            } else {
+                menuItem.setChecked(true);
+            }
+            menuItem.setChecked(true);
+
+            loadHomeFragment();
+
+            return true;
         });
 
 
