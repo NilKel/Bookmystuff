@@ -4,12 +4,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.Exclude;
 
 import org.jdeferred.Deferred;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by sushrutshringarputale on 9/19/16.
@@ -37,20 +39,23 @@ public class User implements Parcelable{
     public boolean initialized;
     //TODO: Add the initialized support to all methods below as well as in {DatabaseConnector} class. The initialized variable will be set to true if we have all information from a user.
 
-
-    public User(String id, String name, String email, long phNo, String profPic, boolean isOwner) {
+    public User(String id, String name, String email, long phNo, String profPic, boolean isOwner, Date birthday, boolean initialized) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phNo = phNo;
         this.profPic = profPic;
         this.isOwner = isOwner;
+        this.birthday = birthday;
+        this.initialized = initialized;
+    }
+
+    public User(String id, String name, String email, long phNo, String profPic, boolean isOwner) {
+        this(id, name, email, phNo, profPic, isOwner, new Date(), false);
     }
 
     public User(FirebaseUser fUser) {
-        this.email = fUser.getEmail();
-        this.name = fUser.getDisplayName();
-        this.id = fUser.getUid();
+        this(fUser.getUid(), fUser.getDisplayName(), fUser.getEmail(), 0, "", false, new Date(""), false);
         try {
             this.profPic = fUser.getPhotoUrl().toString();
         } catch (NullPointerException e) {
@@ -59,57 +64,53 @@ public class User implements Parcelable{
     }
 
     public User() {
+        this("", "", "", 0, "", false, new Date(""), false);
     }
 
-    public User(String email, String name, long phNo, boolean isOwner) {
-        this.email = email;
-        this.name = name;
-        this.phNo = phNo;
+    public User(String name, String email, long phNo, boolean isOwner) {
+        this("", name, email, phNo, "", isOwner, new Date(""), false);
     }
-
-
-    public User(String email, String name, long phNo, String profPicture) {
-        this.email = email;
-        this.name = name;
-        this.phNo = phNo;
-        this.profPic = profPicture;
-    }
-
-
 
     public User(String id, String name) {
-        this.id = id;
-        this.name = name;
+        this(id, name, "", 0, "", false, new Date(""), false);
     }
+
 
     public User(String id) {
-        this.id = id;
+        this(id, "", "", 0, "", false, new Date(""), false);
     }
 
-    protected User(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        email = in.readString();
-        phNo = in.readLong();
-        profPic = in.readString();
-        isOwner = in.readByte() != 0;
+    public User(Parcel in) {
+        this.id = in.readString();
+        this.name = in.readString();
+        this.email = in.readString();
+        this.phNo = in.readLong();
+        this.profPic = in.readString();
+        this.isOwner = in.readByte() == 1;
+        this.birthday = new Date(in.readLong());
+        this.initialized = in.readByte() == 1;
     }
 
     public void setBirthday(String date) {
         this.birthday = new Date(date);
     }
 
-    public void setId(String Id) {
-        return;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
     public String toString() {
-        return "User: " + name + " " + id;
-    }
-
-    public Deferred saveUser() {
-        return DatabaseConnector.saveUser(this);
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phNo=" + phNo +
+                ", profPic='" + profPic + '\'' +
+                ", isOwner=" + isOwner +
+                ", birthday=" + birthday +
+                ", initialized=" + initialized +
+                '}';
     }
 
     public boolean isOwner() {
@@ -136,6 +137,8 @@ public class User implements Parcelable{
             this.isOwner = user.isOwner;
             if (this.birthday==null)
                 this.birthday = user.birthday;
+            this.initialized = user.initialized;
+
         }catch (NullPointerException e) {
             Log.e("NPE: copyData", e.getMessage());
         }
@@ -155,5 +158,31 @@ public class User implements Parcelable{
         dest.writeString(this.profPic);
         dest.writeByte((byte) (this.isOwner ? 1 : 0));
         dest.writeLong(this.birthday.getTime());
+        dest.writeByte((byte) (this.initialized ? 1 : 0));
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", this.id);
+        result.put("name", this.name);
+        result.put("email", this.email);
+        result.put("phNo", this.phNo);
+        result.put("profPic", this.profPic);
+        result.put("isOwner", this.isOwner);
+        result.put("birthday", this.birthday.toString());
+        result.put("initialized", this.initialized);
+
+        return result;
+    }
+
+    public interface UserCrud {
+        Deferred createUser(User user);
+
+        Deferred readUser(User user);
+
+        Deferred updateUser(User user);
+
+        Deferred deleteUser(User user);
     }
 }

@@ -16,9 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.neel.bookingapp.Model.Lobby;
-import com.example.neel.bookingapp.Model.LobbyRef;
 import com.example.neel.bookingapp.Model.Sport;
+import com.example.neel.bookingapp.Model.lobby.Lobby;
+import com.example.neel.bookingapp.Model.lobby.LobbyRef;
 import com.example.neel.bookingapp.Other.LobbyLauncherInterface;
 import com.example.neel.bookingapp.Other.LobbyListAdapter;
 import com.example.neel.bookingapp.R;

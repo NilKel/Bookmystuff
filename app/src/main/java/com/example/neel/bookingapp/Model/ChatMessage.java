@@ -1,5 +1,9 @@
 package com.example.neel.bookingapp.Model;
 
+import com.example.neel.bookingapp.Model.lobby.Lobby;
+
+import org.jdeferred.Deferred;
+
 /**
  * Created by sushrutshringarputale on 3/9/17.
  * Copyright (c) Sushrut Shringarputale 2017. All rights reserved.
@@ -20,12 +24,34 @@ public class ChatMessage {
     }
 
 
+
     public ChatMessage() {
     }
+
 
     public ChatMessage(User sender, Lobby lobby, String id) {
         this.sender = sender;
         this.lobby = lobby;
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "ChatMessage{" +
+                "sender=" + sender +
+                ", lobby=" + lobby +
+                ", id='" + id + '\'' +
+                ", time='" + time + '\'' +
+                '}';
+    }
+
+    public interface ChatMessageCrud {
+        Deferred createChatMessage(ChatMessage chatMessage);
+
+        Deferred readChatMessage(ChatMessage chatMessage);
+
+        Deferred updateChatMessage(ChatMessage chatMessage);
+
+        Deferred deleteChatMessage(ChatMessage chatMessage);
     }
 }

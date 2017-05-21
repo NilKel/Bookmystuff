@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.neel.bookingapp.Model.Lobby;
+import com.example.neel.bookingapp.Model.lobby.Lobby;
 import com.example.neel.bookingapp.R;
 
 public class LobbyFragment extends Fragment implements View.OnClickListener {
@@ -36,7 +36,7 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             lobby = getArguments().getParcelable("lobby");
-//            lobby.
+
         } else {
             throw new IllegalArgumentException();
         }
@@ -58,6 +58,11 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-//        if (v.getId() == R.id.messageSendButton)
+        if (v.getId() == R.id.messageSendButton) {
+            sendMessage();
+        }
+    }
+
+    private void sendMessage() {
     }
 }

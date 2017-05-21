@@ -12,16 +12,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 
-import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
+import com.example.neel.bookingapp.Model.lobby.Lobby;
 import com.example.neel.bookingapp.R;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -93,12 +91,7 @@ public class NewLobbyDialogFragment extends DialogFragment {
 
                     }
                 })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Log.e("Location Connection", "Failed " + connectionResult.getErrorMessage());
-                    }
-                })
+                .addOnConnectionFailedListener(connectionResult -> Log.e("Location Connection", "Failed " + connectionResult.getErrorMessage()))
                 .addApi(LocationServices.API)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
@@ -106,64 +99,56 @@ public class NewLobbyDialogFragment extends DialogFragment {
         mGoogleApiClient.connect();
 
 
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    Lobby mLobby = new Lobby(user);
-                    switch (sportSelector.getCheckedRadioButtonId()) {
-                        case R.id.footballRadioButton:
-                            mLobby.setSport(Sport.FOOTBALL);
-                            break;
-                        case R.id.badmintonRadioButton:
-                            mLobby.setSport(Sport.BADMINTON);
-                            break;
-                        case R.id.tabletennisRadioButton:
-                            mLobby.setSport(Sport.TABLETENNIS);
-                            break;
-                        default:
-                            Log.d("Button", String.valueOf(sportSelector.getCheckedRadioButtonId()));
-                            break;
-                    }
-                    mLobby.setName(lobbyName.getText().toString());
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        Log.d("Created Lobby", mLobby.toString());
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable("lobby", mLobby);
-                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                        startActivityForResult(builder.build(getActivity()), 1, bundle);
-                        dialog.dismiss();
-                    } else {
-                        mLobby.setLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
-                        Log.d("Created Lobby", mLobby.toString());
-                        mLobby.saveLobby().promise().done((d) -> {
-                            mListener.onComplete(mLobby);
-                        });
-                        dialog.dismiss();
-                    }
-            }catch(NullPointerException e){
-                    Log.e("NPE at save", e.getMessage());
-                    dialog.dismiss();
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
+        confirmButton.setOnClickListener(v -> {
+            try {
+                Lobby mLobby = new Lobby(user);
+                switch (sportSelector.getCheckedRadioButtonId()) {
+                    case R.id.footballRadioButton:
+                        mLobby.setSport(Sport.FOOTBALL);
+                        break;
+                    case R.id.badmintonRadioButton:
+                        mLobby.setSport(Sport.BADMINTON);
+                        break;
+                    case R.id.tabletennisRadioButton:
+                        mLobby.setSport(Sport.TABLETENNIS);
+                        break;
+                    default:
+                        Log.d("Button", String.valueOf(sportSelector.getCheckedRadioButtonId()));
+                        break;
                 }
-            }
-        });
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                mLobby.setName(lobbyName.getText().toString());
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    Log.d("Created Lobby", mLobby.toString());
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("lobby", mLobby);
+                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                    startActivityForResult(builder.build(getActivity()), 1, bundle);
+                    dialog.dismiss();
+                } else {
+                    mLobby.setLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
+                    Log.d("Created Lobby", mLobby.toString());
+                    mLobby.saveLobby().promise().done((d) -> {
+                        mListener.onComplete(mLobby);
+                    });
+                    dialog.dismiss();
+                }
+            } catch (NullPointerException e) {
+                Log.e("NPE at save", e.getMessage());
                 dialog.dismiss();
+            } catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
             }
         });
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
         return dialog;
     }
 

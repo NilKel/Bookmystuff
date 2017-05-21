@@ -27,16 +27,15 @@ import com.example.neel.bookingapp.Fragments.HomeFragment;
 import com.example.neel.bookingapp.Fragments.LobbyFragment;
 import com.example.neel.bookingapp.Fragments.SettingsFragment;
 import com.example.neel.bookingapp.Fragments.SportFragment;
-import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
+import com.example.neel.bookingapp.Model.lobby.Lobby;
 import com.example.neel.bookingapp.Other.CircleTransform;
 import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.Other.LobbyLauncherInterface;
 import com.example.neel.bookingapp.Other.NewLobbyDialogFragment;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseError;
 
 
 public class MainActivity extends AppCompatActivity implements NewLobbyDialogFragment.OnCompleteListener, LobbyLauncherInterface {
@@ -66,15 +65,19 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     private boolean shouldLoadHomeFragOnBackPress = true;
     private Handler mHandler;
     private boolean inLobby = false;
+    private DatabaseConnector mDatabaseConnector;
 
     @Override
     @SuppressWarnings("unchecked")
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mDatabaseConnector = new DatabaseConnector();
+
+
         currentUser = new User(FirebaseAuth.getInstance().getCurrentUser());
         //Update the on-device user object from all the data from the database
-        DatabaseConnector.updateUser(currentUser).promise().done((user) -> {
+        mDatabaseConnector.readUser(currentUser).promise().done((user) -> {
             Log.d("Current user", currentUser.toString());
             Log.d("MainActivity", "Started");
 
@@ -129,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
                 loadHomeFragment();
             }
         }).fail((error) -> {
-            Log.e("User data retrieval", "onCancelled", ((DatabaseError) error).toException());
+            Log.e("User data retrieval", error.getMessage());
         });
     }
 
