@@ -10,6 +10,9 @@ import java.util.regex.Pattern;
  * Copyright (c) Sushrut Shringarputale 2017. All rights reserved.
  */
 
+/**
+ * Wrapper class for {@link Location}
+ */
 public class LocationPlus {
 
 

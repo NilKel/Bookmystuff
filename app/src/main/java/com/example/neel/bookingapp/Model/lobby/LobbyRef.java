@@ -1,6 +1,11 @@
-package com.example.neel.bookingapp.Model;
+package com.example.neel.bookingapp.Model.lobby;
+
+import com.example.neel.bookingapp.Model.Sport;
+import com.example.neel.bookingapp.Model.User;
+import com.google.firebase.database.Exclude;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by sushrutshringarputale on 3/10/17.
@@ -39,6 +44,19 @@ public class LobbyRef {
         }
         this.sport = lobby.getSport();
         return this;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("ownerName", this.ownerName);
+        map.put("ownerId", this.ownerId);
+        map.put("numFree", this.numFree);
+        map.put("lobbyList", this.lobbyList);
+        map.put("name", this.name);
+        map.put("sport", this.sport);
+        map.put("location", this.location);
+        return map;
     }
 
     public String getLocation(){

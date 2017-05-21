@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.neel.bookingapp.Model.User;
+import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -29,6 +30,7 @@ public class SignupActivity extends FragmentActivity{
     private EditText email;
     private EditText password;
     private EditText passwordReenter;
+    private DatabaseConnector databaseConnector;
 
     private String TAG = "SignupActivity";
 
@@ -38,7 +40,7 @@ public class SignupActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         Log.d("SignupActivity", "Started");
-
+        databaseConnector = new DatabaseConnector();
         mAuth = FirebaseAuth.getInstance();
     }
 
@@ -92,13 +94,11 @@ public class SignupActivity extends FragmentActivity{
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             user.id = task.getResult().getUser().getUid();
-                            user.saveUser().promise().done((d) -> {
+                            databaseConnector.saveUser(user).promise().done((d) -> {
                                 Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
                                 Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
                                 cancelSignup(view);
-                            }).fail((f) -> {
-                                Log.e(TAG, f.toString());
-                            });
+                            }).fail(f -> Log.e(TAG, f.toString()));
                         }
                     });
         }

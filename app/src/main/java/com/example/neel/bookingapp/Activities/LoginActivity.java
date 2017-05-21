@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.neel.bookingapp.Model.User;
+import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -32,8 +33,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 
@@ -43,7 +42,9 @@ import java.util.Arrays;
 
 public class LoginActivity extends FragmentActivity {
 
+    private static final String TAG = "LoginActivity";
     public final int RC_SIGN_IN = 1;
+
     private GoogleApiClient mGoogleApiClient;
 
     private FirebaseAuth mfirebaseAuth;
@@ -52,6 +53,7 @@ public class LoginActivity extends FragmentActivity {
 
     private CallbackManager callbackManager;
 
+    private DatabaseConnector mDatabaseConnector;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +61,7 @@ public class LoginActivity extends FragmentActivity {
         Log.d("LoginActivity", "Started");
 
         mfirebaseAuth = FirebaseAuth.getInstance();
+        mDatabaseConnector = new DatabaseConnector();
 
 
         username = (EditText) findViewById(R.id.usernameEditText);
@@ -91,7 +94,17 @@ public class LoginActivity extends FragmentActivity {
             if (user != null) {
                 // User is signed in
                 Log.d("Firebase", "onAuthStateChanged:signed_in:" + user.getUid());
-                launchHomePage();
+                mDatabaseConnector.readUser(new User(user)).promise().done(mUser -> {
+                    if (mUser.initialized) {
+                        launchHomePage();
+                    } else {
+                        initializeUser(mUser);
+                    }
+                }).fail(error -> {
+                    Log.e(TAG, error.getMessage());
+                    Toast.makeText(this, "Something went wrong with retrieving your information. Please contact support", Toast.LENGTH_SHORT).show();
+                    mfirebaseAuth.signOut();
+                });
                 finish();
             } else {
                 // User is signed out
@@ -134,6 +147,12 @@ public class LoginActivity extends FragmentActivity {
                 Log.e("Facebook Login", error.getMessage());
             }
         });
+    }
+
+    private void initializeUser(User mUser) {
+        Intent intent = new Intent(LoginActivity.this, OnboardingActivity.class);
+        intent.putExtra("user", mUser);
+        startActivity(intent);
     }
 
 
@@ -221,10 +240,13 @@ public class LoginActivity extends FragmentActivity {
                     } else {
                         if (token != null || account != null) { //If authentication provider was facebook, retrieve user information from facebook.
                             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            DatabaseReference db = FirebaseDatabase.getInstance().getReference();
                             try {
                                 User mUser = new User(user.getUid(), user.getDisplayName(), user.getEmail(), 0, user.getPhotoUrl().toString(), false);
-                                db.child("users").child(user.getUid()).setValue(mUser);
+                                mDatabaseConnector.createUser(mUser).promise().done(savedUser -> {
+                                    Log.d(TAG, user.toString());
+                                }).fail(error -> {
+                                    Log.e(TAG, error.getMessage());
+                                });
                             } catch (NullPointerException e) {
                                 Log.e("Facebook SignIn NPE: ", e.getMessage());
                             }

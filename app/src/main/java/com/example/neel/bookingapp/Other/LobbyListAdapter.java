@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.neel.bookingapp.Model.Lobby;
+import com.example.neel.bookingapp.Model.lobby.Lobby;
 import com.example.neel.bookingapp.R;
 
 import java.util.ArrayList;
@@ -24,8 +24,8 @@ import java.util.List;
 
 public class LobbyListAdapter extends ArrayAdapter<Lobby> implements View.OnClickListener{
 
-    private ArrayList<Lobby> lobbyList;
     Context mContext;
+    private ArrayList<Lobby> lobbyList;
 
     public LobbyListAdapter(@NonNull Context context, @NonNull List<Lobby> objects) {
         super(context, R.layout.lobby_list_row, objects);
@@ -33,28 +33,20 @@ public class LobbyListAdapter extends ArrayAdapter<Lobby> implements View.OnClic
         this.mContext = context;
     }
 
-    private static class ViewHolder {
-        ImageView sportType;
-        TextView lobbyName;
-    }
-
-
     @Override
     public void onClick(View v) {
         int position=(Integer) v.getTag();
-        Lobby lobby = (Lobby) getItem(position);
-        Snackbar.make(v, "Release date " +lobby.getName(), Snackbar.LENGTH_LONG)
+        Lobby lobby = getItem(position);
+        Snackbar.make(v, "Release date " + lobby.getName(), Snackbar.LENGTH_LONG)
                         .setAction("No action", null).show();
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Lobby lobby = (Lobby) getItem(position);
+        Lobby lobby = getItem(position);
 
         ViewHolder viewHolder;
-
-        final View result;
 
         if (convertView == null) {
             viewHolder = new ViewHolder();
@@ -63,11 +55,9 @@ public class LobbyListAdapter extends ArrayAdapter<Lobby> implements View.OnClic
             viewHolder.lobbyName = (TextView) convertView.findViewById(R.id.lobbyProfileName);
             viewHolder.sportType = (ImageView) convertView.findViewById(R.id.lobbyProfileImage);
 
-            result = convertView;
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
-            result=convertView;
         }
 
         if (lobby != null) {
@@ -84,11 +74,16 @@ public class LobbyListAdapter extends ArrayAdapter<Lobby> implements View.OnClic
                     viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.ic_table_tennis));
                     break;
                 default:
-                        viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.com_facebook_button_background));
+                    viewHolder.sportType.setImageDrawable(getContext().getDrawable(R.drawable.com_facebook_button_background));
                     break;
-            }
+                }
             }
         }
         return convertView;
+    }
+
+    private static class ViewHolder {
+        ImageView sportType;
+        TextView lobbyName;
     }
 }

@@ -1,11 +1,15 @@
-package com.example.neel.bookingapp.Model;
+package com.example.neel.bookingapp.Model.lobby;
 
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Model.ChatMessage;
+import com.example.neel.bookingapp.Model.LocationPlus;
+import com.example.neel.bookingapp.Model.Sport;
+import com.example.neel.bookingapp.Model.User;
+import com.google.firebase.database.Exclude;
 
 import org.jdeferred.Deferred;
 
@@ -37,7 +41,8 @@ public class Lobby implements Parcelable {
     private Sport sport;
     private Location location;
     private ArrayList<ChatMessage> messages;
-
+    @Exclude
+    private String key;
 
     //Constructors
     public Lobby(User owner, int numFree, ArrayList<User> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
@@ -135,17 +140,12 @@ public class Lobby implements Parcelable {
         parcel.writeSerializable(sport);
     }
 
-
     public Sport getSport() {
         return sport;
     }
 
     public void setSport(Sport sport) {
         this.sport = sport;
-    }
-
-    public Deferred saveLobby() {
-        return DatabaseConnector.saveLobby(this);
     }
 
     /**
@@ -170,6 +170,9 @@ public class Lobby implements Parcelable {
         return null;
     }
 
+
+//    public Deferred initializeLobby() { return new DatabaseConnector().createLobby(this);}
+
     public Location getLocation() {
         return location;
     }
@@ -188,6 +191,25 @@ public class Lobby implements Parcelable {
                 ", sport=" + sport +
                 ", location=" + location +
                 ", messages=" + messages +
+                ", key='" + key + '\'' +
                 '}';
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public interface LobbyCrud {
+        Deferred createLobby(Lobby lobby);
+
+        Deferred readLobby(Lobby lobby);
+
+        Deferred updateLobby(Lobby lobby);
+
+        Deferred deleteLobby(Lobby lobby);
     }
 }
