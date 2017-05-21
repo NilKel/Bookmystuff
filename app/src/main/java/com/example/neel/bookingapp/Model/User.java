@@ -55,7 +55,7 @@ public class User implements Parcelable{
     }
 
     public User(FirebaseUser fUser) {
-        this(fUser.getUid(), fUser.getDisplayName(), fUser.getEmail(), 0, "", false, new Date(""), false);
+        this(fUser.getUid(), fUser.getDisplayName(), fUser.getEmail(), 0, "", false, new Date(), false);
         try {
             this.profPic = fUser.getPhotoUrl().toString();
         } catch (NullPointerException e) {
@@ -64,7 +64,7 @@ public class User implements Parcelable{
     }
 
     public User() {
-        this("", "", "", 0, "", false, new Date(""), false);
+        this("", "", "", 0, "", false, new Date(), false);
     }
 
     public User(String name, String email, long phNo, boolean isOwner) {
@@ -72,12 +72,12 @@ public class User implements Parcelable{
     }
 
     public User(String id, String name) {
-        this(id, name, "", 0, "", false, new Date(""), false);
+        this(id, name, "", 0, "", false, new Date(), false);
     }
 
 
     public User(String id) {
-        this(id, "", "", 0, "", false, new Date(""), false);
+        this(id, "", "", 0, "", false, new Date(), false);
     }
 
     public User(Parcel in) {
@@ -172,7 +172,6 @@ public class User implements Parcelable{
         result.put("isOwner", this.isOwner);
         result.put("birthday", this.birthday.toString());
         result.put("initialized", this.initialized);
-
         return result;
     }
 

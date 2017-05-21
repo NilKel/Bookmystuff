@@ -7,6 +7,7 @@ import com.example.neel.bookingapp.Model.lobby.Lobby;
  * Copyright (c) Sushrut Shringarputale 2017. All rights reserved.
  */
 
+@Deprecated
 public interface LobbyLauncherInterface {
     void startLobby(Lobby lobby);
 }

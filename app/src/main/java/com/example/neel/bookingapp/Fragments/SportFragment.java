@@ -1,6 +1,7 @@
 package com.example.neel.bookingapp.Fragments;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -16,18 +17,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.neel.bookingapp.Activities.MainActivity;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.lobby.Lobby;
-import com.example.neel.bookingapp.Model.lobby.LobbyRef;
-import com.example.neel.bookingapp.Other.LobbyLauncherInterface;
+import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.Other.LobbyListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
 
@@ -38,7 +36,7 @@ public class SportFragment extends Fragment {
     //PRIVATE VARIABLES
     private ArrayList<Lobby> lobbies = new ArrayList<>();
     private ListView lobbyList;
-    private LobbyLauncherInterface lobbyLauncherInterface;
+    private DatabaseConnector databaseConnector;
 
     public SportFragment() {
     }
@@ -46,6 +44,24 @@ public class SportFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+                        Log.i("Location Connection", "Connected");
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+
+                    }
+                })
+                .addOnConnectionFailedListener(connectionResult -> Log.e("Location Connection", "Failed " + connectionResult.getErrorMessage()))
+                .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .build();
+        mGoogleApiClient.connect();
     }
 
     /**
@@ -78,8 +94,13 @@ public class SportFragment extends Fragment {
         lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
         lobbyList.setOnItemClickListener((parent, view, position, id) -> {
             Log.d("Lobby clicked", lobbies.get(position).toString());
-            lobbyLauncherInterface.startLobby(lobbies.get(position));
+            ((MainActivity) getActivity()).startLobby(lobbies.get(position));
         });
+
+        databaseConnector = new DatabaseConnector();
+        ProgressDialog dialog = new ProgressDialog(getContext());
+        dialog.setMessage("Loading lobbies");
+        dialog.show();
 
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -101,12 +122,19 @@ public class SportFragment extends Fragment {
                     Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
                     if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                             ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        getLobbies(sport, lobbyList);
-                    } else {
-                        getLobbies(sport, location, lobbyList);
+                        location = null;
                     }
+                    databaseConnector.getLobbiesBySport(sport, location).promise()
+                            .done(lobbies1 -> {
+                                lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                                dialog.dismiss();
+                            }).fail(error -> {
+                        Log.e("SportFragment", error.getMessage());
+                        dialog.dismiss();
+                    });
                 } catch (NullPointerException e) {
                     Log.e("NPE", e.getMessage());
+                    dialog.dismiss();
                 }
                 locationManager.removeUpdates(this);
             }
@@ -114,17 +142,24 @@ public class SportFragment extends Fragment {
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
                 Log.i("Location Connection", "Connected");
+                Location location = null;
                 try {
                     Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
                     if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                             ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        getLobbies(sport, lobbyList);
-                    } else {
-                        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        getLobbies(sport, location, lobbyList);
+                        location = null;
                     }
+                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
+                        lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                        dialog.dismiss();
+                    }).fail(error -> {
+                        Log.e("SportFragment", error.getMessage());
+                        dialog.dismiss();
+                    });
                 } catch (NullPointerException e) {
                     Log.e("NPE", e.getMessage());
+                    dialog.dismiss();
                 }
                 locationManager.removeUpdates(this);
             }
@@ -152,12 +187,18 @@ public class SportFragment extends Fragment {
                     }
                     Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || location == null) {
-                        getLobbies(sport, lobbyList);
-                    } else {
-                        getLobbies(sport, location, lobbyList);
+                        location = null;
                     }
+                    databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
+                        lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                        dialog.dismiss();
+                    }).fail(error -> {
+                        Log.e("SportFragment", error.getMessage());
+                        dialog.dismiss();
+                    });
                 } catch (NullPointerException e) {
                     Log.e("NPE", e.getMessage());
+                    dialog.dismiss();
                 }
                 locationManager.removeUpdates(this);
             }
@@ -173,82 +214,7 @@ public class SportFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mGoogleApiClient.connect();
-    }
-
-    //TODO: if time, move this logic to DatabaseConnector for clean code. Separate MVC and abstract
-    private void getLobbies(final Sport sport, Location location, final ListView lobbyList) throws NullPointerException {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
-        Log.d("Location", location.toString());
-        ref.orderByChild("location")
-                .startAt("Location[fused " + (location.getLatitude() - 0.5) + ", " + (location.getLongitude() - 0.5))
-                .endAt("Location[fused " + Double.toString(location.getLatitude() + 0.5) + ", " + Double.toString(location.getLongitude() + 0.5))
-                .addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        if (dataSnapshot != null) {
-                            LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
-                            if (temp.sport == sport) {
-                                lobbies.add(new Lobby().getLobbyFromRef(temp));
-                                lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies));
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-    }
-
-    private void getLobbies(Sport sport, final ListView lobbyList) throws NullPointerException {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
-        ref.orderByChild("sport").equalTo(sport.name()).limitToFirst(20) //TODO: Currently only retrieved 20 lobbies. Add functionality to retrieve more if the user explicitly asks for them
-                .addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        if (dataSnapshot != null) {
-                            LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
-                            lobbies.add(new Lobby().getLobbyFromRef(temp));
-                            lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies));
-                        }
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+        if (mGoogleApiClient != null)
+            mGoogleApiClient.connect();
     }
 }

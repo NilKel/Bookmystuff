@@ -36,7 +36,6 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             lobby = getArguments().getParcelable("lobby");
-
         } else {
             throw new IllegalArgumentException();
         }

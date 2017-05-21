@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 
 public class NewLobbyDialogFragment extends DialogFragment {
+    private final String TAG = "NewLobbyDialogFragment";
     public RadioGroup sportSelector;
     public EditText lobbyName;
     public Button cancelButton;
@@ -43,7 +45,7 @@ public class NewLobbyDialogFragment extends DialogFragment {
     public User user;
     public GoogleApiClient mGoogleApiClient;
     private OnCompleteListener mListener;
-
+    private DatabaseConnector databaseConnector;
     public NewLobbyDialogFragment() {
     }
 
@@ -78,6 +80,8 @@ public class NewLobbyDialogFragment extends DialogFragment {
         sportSelector = (RadioGroup) dialog.findViewById(R.id.sportSelectorRadioGroup);
         confirmButton = (Button) dialog.findViewById(R.id.confirmLobbyButton);
         cancelButton = (Button) dialog.findViewById(R.id.cancelLobbyButton);
+
+        databaseConnector = new DatabaseConnector();
 
         mGoogleApiClient = new GoogleApiClient.Builder(getContext())
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -134,8 +138,10 @@ public class NewLobbyDialogFragment extends DialogFragment {
                 } else {
                     mLobby.setLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
                     Log.d("Created Lobby", mLobby.toString());
-                    mLobby.saveLobby().promise().done((d) -> {
-                        mListener.onComplete(mLobby);
+                    databaseConnector.createLobby(mLobby).promise().done((d) -> {
+                        mListener.onComplete(d);
+                    }).fail(error -> {
+                        Log.e(TAG, error.getMessage());
                     });
                     dialog.dismiss();
                 }
@@ -163,8 +169,11 @@ public class NewLobbyDialogFragment extends DialogFragment {
                 mLocation.setLatitude(latLng.latitude);
                 mLocation.setLongitude(latLng.longitude);
                 mLobby.setLocation(mLocation);
-                mLobby.saveLobby().promise().done((d) -> {
-                    mListener.onComplete(mLobby);
+                databaseConnector.createLobby(mLobby).promise().done((d) -> {
+                    mListener.onComplete(d);
+                }).fail(error -> {
+                    Log.e(TAG, error.getMessage());
+                    Toast.makeText(getContext(), "Could not create lobby", Toast.LENGTH_SHORT).show();
                 });
             }
         }

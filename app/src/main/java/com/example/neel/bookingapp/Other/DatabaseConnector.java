@@ -1,24 +1,30 @@
 package com.example.neel.bookingapp.Other;
 
+import android.location.Location;
 import android.util.Log;
 
 import com.example.neel.bookingapp.Model.ChatMessage;
+import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Model.lobby.Lobby;
 import com.example.neel.bookingapp.Model.lobby.LobbyRef;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jdeferred.Deferred;
 import org.jdeferred.impl.DeferredObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -30,6 +36,7 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unchecked")
 public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatMessageCrud, Lobby.LobbyCrud {
     private static final String TAG = "Database connector";
+    private Map<DatabaseReference, ChildEventListener> mListenerMap = new HashMap<>();
 
     @Override
     public Deferred<Lobby, DatabaseException, Void> createLobby(Lobby lobby) {
@@ -64,14 +71,17 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
                 if (dataSnapshot != null) {
                     lobby.getLobbyFromRef(dataSnapshot.getValue(LobbyRef.class));
                     deferred.resolve(lobby);
+                    ref.removeEventListener(this);
                 } else {
                     deferred.reject(new DatabaseException("Lobby not found"));
+                    ref.removeEventListener(this);
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 deferred.reject(databaseError.toException());
+                ref.removeEventListener(this);
             }
         });
         return deferred;
@@ -167,12 +177,14 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
                 } else {
                     deferred.reject("User not found");
                 }
+                db.removeEventListener(this);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("User data retrieval", "onCancelled", databaseError.toException());
                 deferred.reject(databaseError.toException());
+                db.removeEventListener(this);
             }
         });
         return deferred;
@@ -242,9 +254,10 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
         ref.orderByChild("id").equalTo(chatMessage.id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mListenerMap.put(ref, this);
                 ChatMessage message = dataSnapshot.getValue(ChatMessage.class);
                 deferred.resolve(message);
-                ref.removeEventListener(this);
+                cleanupReferences();
             }
 
             @Override
@@ -265,7 +278,7 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 deferred.reject(databaseError.toException());
-                ref.removeEventListener(this);
+                cleanupReferences();
             }
         });
         return deferred;
@@ -325,11 +338,12 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
                     .addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            mListenerMap.put(ref, this);
                             messages.add(dataSnapshot.getValue(ChatMessage.class));
                             counter[0]++;
                             if (counter[0] >= 20) {
                                 deferred.resolve(messages);
-                                ref.removeEventListener(this);
+                                cleanupReferences();
                             }
                         }
 
@@ -351,6 +365,7 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                             deferred.reject(databaseError.toException());
+                            cleanupReferences();
                         }
                     });
         } else {
@@ -359,11 +374,12 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
                     .addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            mListenerMap.put(ref, this);
                             messages.add(dataSnapshot.getValue(ChatMessage.class));
                             counter[0]++;
                             if (counter[0] >= 20) {
                                 deferred.resolve(messages);
-                                ref.removeEventListener(this);
+                                cleanupReferences();
                             }
                         }
 
@@ -384,10 +400,138 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
+                            deferred.reject(databaseError.toException());
+                            cleanupReferences();
                         }
                     });
         }
         return deferred;
+    }
+
+    /**
+     * @param sport
+     * @param location
+     * @return
+     * @throws NullPointerException
+     */
+    public Deferred<List<Lobby>, DatabaseException, Void> getLobbiesBySport(final Sport sport, @Nullable Location location) throws NullPointerException {
+        Deferred<List<Lobby>, DatabaseException, Void> deferred = new DeferredObject<>();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
+        Log.d("Location", location.toString());
+        List<Lobby> lobbies = new ArrayList<>();
+        Query q;
+        if (location != null) {
+            q = ref.orderByChild("location")
+                    .startAt("Location[fused " + (location.getLatitude() - 0.5) + ", " + (location.getLongitude() - 0.5))
+                    .endAt("Location[fused " + Double.toString(location.getLatitude() + 0.5) + ", " + Double.toString(location.getLongitude() + 0.5));
+        } else {
+            q = ref.orderByChild("sport").equalTo(sport.name()).limitToFirst(20);
+        }
+        q.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mListenerMap.put(ref, this);
+                if (dataSnapshot != null) {
+                    LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
+                    if (temp.sport == sport) {
+                        lobbies.add(new Lobby().getLobbyFromRef(temp));
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                deferred.reject(databaseError.toException());
+                cleanupReferences();
+            }
+        });
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                deferred.resolve(lobbies);
+                cleanupReferences();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                deferred.reject(databaseError.toException());
+                cleanupReferences();
+            }
+        });
+        return deferred;
+    }
+
+    public Deferred<List<Lobby>, DatabaseException, Void> getLobbiesByUser(FirebaseUser user) {
+        Deferred<List<Lobby>, DatabaseException, Void> deferred = new DeferredObject<>();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
+        List<Lobby> lobbyArrayList = new ArrayList<>();
+        ref.orderByChild("ownerId").equalTo(user.getUid())
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        mListenerMap.put(ref, this);
+                        Log.d("Retrieved Lobby", dataSnapshot.toString());
+                        if (dataSnapshot != null) {
+                            LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
+                            lobbyArrayList.add(new Lobby().getLobbyFromRef(temp));
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        deferred.reject(databaseError.toException());
+                        cleanupReferences();
+                    }
+                });
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                deferred.resolve(lobbyArrayList);
+                cleanupReferences();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                deferred.reject(databaseError.toException());
+                cleanupReferences();
+            }
+        });
+        return deferred;
+    }
+
+    public void cleanupReferences() {
+        for (Map.Entry<DatabaseReference, ChildEventListener> entry : mListenerMap.entrySet()) {
+            entry.getKey().removeEventListener(entry.getValue());
+        }
     }
 }

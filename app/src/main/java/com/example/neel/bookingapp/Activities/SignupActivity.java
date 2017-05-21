@@ -94,7 +94,7 @@ public class SignupActivity extends FragmentActivity{
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             user.id = task.getResult().getUser().getUid();
-                            databaseConnector.saveUser(user).promise().done((d) -> {
+                            databaseConnector.createUser(user).promise().done((d) -> {
                                 Toast.makeText(SignupActivity.this, "Your Account has been Created", Toast.LENGTH_LONG).show();
                                 Toast.makeText(SignupActivity.this, "Please Login With your Email and Password", Toast.LENGTH_LONG).show();
                                 cancelSignup(view);

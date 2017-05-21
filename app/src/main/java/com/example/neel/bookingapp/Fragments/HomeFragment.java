@@ -9,18 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.neel.bookingapp.Activities.MainActivity;
 import com.example.neel.bookingapp.Model.lobby.Lobby;
-import com.example.neel.bookingapp.Model.lobby.LobbyRef;
-import com.example.neel.bookingapp.Other.LobbyLauncherInterface;
+import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.Other.LobbyListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -29,9 +23,10 @@ import java.util.ArrayList;
  */
 
 public class HomeFragment extends Fragment {
-    public LobbyLauncherInterface lobbyLauncherInterface;
+    //    public LobbyLauncherInterface lobbyLauncherInterface;
     private String TAG = "HomeFragment";
     private ArrayList<Lobby> lobbyArrayList;
+    private DatabaseConnector databaseConnector;
 
     @Nullable
     @Override
@@ -45,45 +40,20 @@ public class HomeFragment extends Fragment {
         final ListView lobbyList = (ListView) view.findViewById(R.id.lobbyListView);
         Log.d(TAG, "Loading");
 
+        databaseConnector = new DatabaseConnector();
+
         //Configure event listeners for listView
         lobbyList.setOnItemClickListener((parent, view1, position, id) -> {
-            lobbyLauncherInterface.startLobby(lobbyArrayList.get(position));
+            ((MainActivity) getActivity()).startLobby(lobbyArrayList.get(position));
         });
 
+        databaseConnector.getLobbiesByUser(FirebaseAuth.getInstance().getCurrentUser())
+                .promise().done(lobbyArrayList -> {
+            lobbyList.setAdapter(new LobbyListAdapter(getActivity(), lobbyArrayList));
+        }).fail(error -> {
+            Log.e(TAG, error.getMessage());
+        });
         //Get User's lobbies and display them in a list
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
-        ref.orderByChild("ownerId").equalTo(user.getUid())
-                .addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Log.d("Retrieved Lobby", dataSnapshot.toString());
-                        if (dataSnapshot != null) {
-                            LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
-                            lobbyArrayList.add(new Lobby().getLobbyFromRef(temp));
-                            lobbyList.setAdapter(new LobbyListAdapter(getActivity(), lobbyArrayList));
-                        }
-                    }
 
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        //TODO: add the ability to show an error if lobbies could not be read
-                    }
-                });
     }
 }

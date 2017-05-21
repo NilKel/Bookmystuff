@@ -19,10 +19,11 @@ public class LocationPlus {
     /**
      * @param stringRepresentation Given a string representation, it returns a new {@link Location}
      *                             instance that contains all the data from the string
+     * @throws IllegalArgumentException if the pattern does not match the location string
      */
     public static Location getLocationFromRepresentation(String stringRepresentation) throws IllegalArgumentException {
         Location location = new Location("");
-        Pattern p = Pattern.compile("Location\\[fused\\s(\\d*.\\d*),(\\d*.\\d*) acc=(\\d*) et=\\S*\\]");
+        Pattern p = Pattern.compile("Location\\[fused\\s(-?\\d*\\.\\d*),(-?\\d*\\.\\d*) acc=(\\d*) et=[+|-]\\S*\\]");
         Matcher m = p.matcher(stringRepresentation);
         if (m.find()) {
             location.setLatitude(Double.parseDouble(m.group(1)));
