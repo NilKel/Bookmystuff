@@ -17,7 +17,7 @@ import java.util.Map;
  * Created by sushrutshringarputale on 9/19/16.
  */
 
-public class User implements Parcelable{
+public class User implements Parcelable {
     public static final Creator<User> CREATOR = new Creator<User>() {
         @Override
         public User createFromParcel(Parcel in) {
@@ -37,7 +37,6 @@ public class User implements Parcelable{
     public boolean isOwner;
     public Date birthday;
     public boolean initialized;
-    //TODO: Add the initialized support to all methods below as well as in {DatabaseConnector} class. The initialized variable will be set to true if we have all information from a user.
 
     public User(String id, String name, String email, long phNo, String profPic, boolean isOwner, Date birthday, boolean initialized) {
         this.id = id;
@@ -118,28 +117,28 @@ public class User implements Parcelable{
     }
 
     public void setIsOwner(boolean isOwner) {
-        isOwner = isOwner;
+        this.isOwner = isOwner;
     }
 
     public void copyData(User user) {
         try {
             if (this.id == null)
-            this.id = user.id;
+                this.id = user.id;
             if (this.name == null)
-            this.name = user.name;
+                this.name = user.name;
             if (this.email == null)
-            this.email = user.email;
-            if (this.phNo < user.phNo)
-            this.phNo = user.phNo;
+                this.email = user.email;
+            if (this.phNo != user.phNo)
+                this.phNo = user.phNo;
             if (this.profPic == null)
-            this.profPic = user.profPic;
+                this.profPic = user.profPic;
             if (this.isOwner != user.isOwner)
-            this.isOwner = user.isOwner;
-            if (this.birthday==null)
+                this.isOwner = user.isOwner;
+            if (this.birthday == null)
                 this.birthday = user.birthday;
             this.initialized = user.initialized;
 
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             Log.e("NPE: copyData", e.getMessage());
         }
     }

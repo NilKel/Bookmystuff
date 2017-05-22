@@ -1,5 +1,6 @@
 package com.example.neel.bookingapp.Activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,33 +26,37 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.neel.bookingapp.Fragments.HomeFragment;
 import com.example.neel.bookingapp.Fragments.LobbyFragment;
-import com.example.neel.bookingapp.Fragments.SettingsFragment;
 import com.example.neel.bookingapp.Fragments.SportFragment;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Model.lobby.Lobby;
 import com.example.neel.bookingapp.Other.CircleTransform;
 import com.example.neel.bookingapp.Other.DatabaseConnector;
-import com.example.neel.bookingapp.Other.LobbyLauncherInterface;
 import com.example.neel.bookingapp.Other.NewLobbyDialogFragment;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class MainActivity extends AppCompatActivity implements NewLobbyDialogFragment.OnCompleteListener, LobbyLauncherInterface {
+public class MainActivity extends AppCompatActivity implements NewLobbyDialogFragment.OnCompleteListener {
 
     // urls to load navigation header background image
     private static final String urlNavHeaderBg = "http://i.imgur.com/fe8SLNa.png";
+
+
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
     private static final String TAG_FOOTBALL = "football";
     private static final String TAG_BADMINTON = "badminton";
     private static final String TAG_TABLETENNIS = "tabletennis";
     private static final String TAG_SETTINGS = "settings";
+
+
     // index to identify current nav menu item
     public static int navItemIndex = 0;
     public static String CURRENT_TAG = TAG_HOME;
-    User currentUser;
+    public User currentUser;
+
+    //UI elements
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private View navHeader;
@@ -59,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     private TextView txtName, txtWebsite;
     private Toolbar toolbar;
     private FloatingActionButton fab;
+
+
     // toolbar titles respected to selected nav menu item
     private String[] activityTitles;
     // flag to load home fragment when user presses back key
@@ -74,32 +81,42 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         setContentView(R.layout.activity_main);
         mDatabaseConnector = new DatabaseConnector();
 
+        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+        dialog.setMessage("Initializing");
+        dialog.show();
+
 
         currentUser = new User(FirebaseAuth.getInstance().getCurrentUser());
         //Update the on-device user object from all the data from the database
         mDatabaseConnector.readUser(currentUser).promise().done((user) -> {
             Log.d("Current user", currentUser.toString());
             Log.d("MainActivity", "Started");
+            dialog.dismiss();
 
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
-
             mHandler = new Handler();
-
             drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
             navigationView = (NavigationView) findViewById(R.id.nav_view);
-            if (!currentUser.isOwner()) {
-                navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false);
-            }
             fab = (FloatingActionButton) findViewById(R.id.fab);
-
-            // Navigation view header
-            navHeader = navigationView.getHeaderView(0);
             txtName = (TextView) navHeader.findViewById(R.id.name);
             txtWebsite = (TextView) navHeader.findViewById(R.id.website);
             imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
             imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
+
+            imgProfile.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("user", user);
+                startActivity(new Intent(MainActivity.this, UserEditActivity.class), bundle);
+            });
+
+
+            if (!currentUser.isOwner()) {
+                navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false);
+            }
+
+            // Navigation view header
+            navHeader = navigationView.getHeaderView(0);
 
             // load toolbar titles from string resources
             activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
@@ -227,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
                 return new HomeFragment();
             case 1:
                 // settings
-                return new SettingsFragment();
+                return new Fragment();
             case 2:
                 // football fragment
                 bundle.putSerializable("ARGUMENT", Sport.FOOTBALL);
@@ -309,7 +326,11 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             }
             menuItem.setChecked(true);
 
-            loadHomeFragment();
+            if (menuItem.getItemId() == R.id.nav_settings) {
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            } else {
+                loadHomeFragment();
+            }
 
             return true;
         });
@@ -421,12 +442,17 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             fab.hide();
     }
 
+    /**
+     * OnComplete method that is called after newLobbyDialogFragment finishes.
+     *
+     * @param lobby
+     */
     @Override
     public void onComplete(Lobby lobby) {
         lobbyLauncherHelper(lobby);
     }
 
-    @Override
+
     public void startLobby(Lobby lobby) {
         lobbyLauncherHelper(lobby);
     }

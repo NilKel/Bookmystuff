@@ -4,10 +4,10 @@ android {
     signingConfigs {
     }
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.example.neel.bookingapp"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -28,7 +28,6 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    compile group: 'com.pubnub', name: 'pubnub-gson', version: '4.5.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
@@ -46,7 +45,8 @@ dependencies {
     compile 'com.google.code.findbugs:jsr305:2.0.1'
     testCompile 'junit:junit:4.12'
     compile 'org.jdeferred:jdeferred-core:1.2.5'
-    compile project(path: ':backend', configuration: 'android-endpoints')
+//    compile project(path: ':backend', configuration: 'android-endpoints')
+    compile 'com.android.support:support-vector-drawable:25.3.1'
 }
 android {
     packagingOptions {
@@ -60,6 +60,11 @@ android {
         exclude 'META-INF/license.txt'
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
+    }
+}
+android {
+    defaultConfig {
+        vectorDrawables.useSupportLibrary = true
     }
 }
 apply plugin: 'com.google.gms.google-services'

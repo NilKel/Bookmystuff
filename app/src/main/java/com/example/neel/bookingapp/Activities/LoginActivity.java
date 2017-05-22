@@ -179,8 +179,6 @@ public class LoginActivity extends FragmentActivity {
                 .addOnCompleteListener(this, task -> {
                     dialog.dismiss();
                     Log.d("Sign In", "signInWithEmail:Complete:" + task.isSuccessful());
-                    /*TODO: add an inspector here to find whether the profile is initialized.
-                    If it is not, ask user to pick a picture and input other details so that the user object is valid on the server.*/
                     if (!task.isSuccessful()) {
                         Log.w("Sign In", "signInWithEmail:failed", task.getException());
                         Toast.makeText(LoginActivity.this, R.string.auth_failed,

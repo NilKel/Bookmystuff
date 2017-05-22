@@ -53,7 +53,7 @@ public class SportFragment extends Fragment {
 
                     @Override
                     public void onConnectionSuspended(int i) {
-
+                        Log.i("Location Connection", "suspended. Code: " + i);
                     }
                 })
                 .addOnConnectionFailedListener(connectionResult -> Log.e("Location Connection", "Failed " + connectionResult.getErrorMessage()))
@@ -112,97 +112,108 @@ public class SportFragment extends Fragment {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            return;
+            databaseConnector.getLobbiesBySport((Sport) getArguments().getSerializable("ARGUMENT"), null)
+                    .promise().done(lobbies1 -> {
+                lobbies = (ArrayList<Lobby>) lobbies1;
+                lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                dialog.dismiss();
+            }).fail(error -> {
+                Log.e("SportFragment", error.getMessage());
+            });
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    Log.i("Location Connection", "Connected");
+                    try {
+                        Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
+                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            location = null;
+                        }
+                        databaseConnector.getLobbiesBySport(sport, location).promise()
+                                .done(lobbies1 -> {
+                                    lobbies = (ArrayList<Lobby>) lobbies1;
+                                    lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                                    dialog.dismiss();
+                                }).fail(error -> {
+                            Log.e("SportFragment", error.getMessage());
+                            dialog.dismiss();
+                        });
+                    } catch (NullPointerException e) {
+                        Log.e("NPE", e.getMessage());
+                        dialog.dismiss();
+                    }
+                    locationManager.removeUpdates(this);
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                    Log.i("Location Connection", "Connected. method: onStatusChanged");
+                    Location location = null;
+                    try {
+                        Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
+                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            location = null;
+                        }
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
+                            lobbies = (ArrayList<Lobby>) lobbies1;
+                            lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                            dialog.dismiss();
+                        }).fail(error -> {
+                            Log.e("SportFragment", error.getMessage());
+                            dialog.dismiss();
+                        });
+                    } catch (NullPointerException e) {
+                        Log.e("NPE", e.getMessage());
+                        dialog.dismiss();
+                    }
+                    locationManager.removeUpdates(this);
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+                    Log.i("Location Connection", "provider enabled");
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+                    Log.i("Location Connection", "provider disabled");
+                    try {
+                        Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
+                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
+                        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || location == null) {
+                            location = null;
+                        }
+                        databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
+                            lobbies = (ArrayList<Lobby>) lobbies1;
+                            lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                            dialog.dismiss();
+                        }).fail(error -> {
+                            Log.e("SportFragment", error.getMessage());
+                            dialog.dismiss();
+                        });
+                    } catch (NullPointerException e) {
+                        Log.e("NPE", e.getMessage());
+                        dialog.dismiss();
+                    }
+                    locationManager.removeUpdates(this);
+                }
+            });
         }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.i("Location Connection", "Connected");
-                try {
-                    Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        location = null;
-                    }
-                    databaseConnector.getLobbiesBySport(sport, location).promise()
-                            .done(lobbies1 -> {
-                                lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
-                                dialog.dismiss();
-                            }).fail(error -> {
-                        Log.e("SportFragment", error.getMessage());
-                        dialog.dismiss();
-                    });
-                } catch (NullPointerException e) {
-                    Log.e("NPE", e.getMessage());
-                    dialog.dismiss();
-                }
-                locationManager.removeUpdates(this);
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.i("Location Connection", "Connected");
-                Location location = null;
-                try {
-                    Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        location = null;
-                    }
-                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
-                        lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
-                        dialog.dismiss();
-                    }).fail(error -> {
-                        Log.e("SportFragment", error.getMessage());
-                        dialog.dismiss();
-                    });
-                } catch (NullPointerException e) {
-                    Log.e("NPE", e.getMessage());
-                    dialog.dismiss();
-                }
-                locationManager.removeUpdates(this);
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                Log.i("Location Connection", "provider enabled");
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-                Log.i("Location Connection", "provider disabled");
-                try {
-                    Sport sport = (Sport) getArguments().getSerializable("ARGUMENT");
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
-                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || location == null) {
-                        location = null;
-                    }
-                    databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
-                        lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
-                        dialog.dismiss();
-                    }).fail(error -> {
-                        Log.e("SportFragment", error.getMessage());
-                        dialog.dismiss();
-                    });
-                } catch (NullPointerException e) {
-                    Log.e("NPE", e.getMessage());
-                    dialog.dismiss();
-                }
-                locationManager.removeUpdates(this);
-            }
-        });
     }
 
     @Override

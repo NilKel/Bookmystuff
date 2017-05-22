@@ -26,45 +26,6 @@ package com.example.sushrutshringarputale.myapplication.backend.messaging;
 @SuppressWarnings("javadoc")
 public abstract class MessagingRequest<T> extends com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest<T> {
 
-    /**
-     * Data format for the response.
-     */
-    @com.google.api.client.util.Key
-    private java.lang.String alt;
-    /**
-     * Selector specifying which fields to include in a partial response.
-     */
-    @com.google.api.client.util.Key
-    private java.lang.String fields;
-    /**
-     * API key. Your API key identifies your project and provides you with API access, quota, and
-     * reports. Required unless you provide an OAuth 2.0 token.
-     */
-    @com.google.api.client.util.Key
-    private java.lang.String key;
-    /**
-     * OAuth 2.0 token for the current user.
-     */
-    @com.google.api.client.util.Key("oauth_token")
-    private java.lang.String oauthToken;
-    /**
-     * Returns response with indentations and line breaks.
-     */
-    @com.google.api.client.util.Key
-    private java.lang.Boolean prettyPrint;
-    /**
-     * Available to use for quota purposes for server-side applications. Can be any arbitrary string
-     * assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-     */
-    @com.google.api.client.util.Key
-    private java.lang.String quotaUser;
-    /**
-     * IP address of the site where the request originates. Use this if you want to enforce per-user
-     * limits.
-     */
-    @com.google.api.client.util.Key
-    private java.lang.String userIp;
-
   /**
    * @param client Google client
    * @param method HTTP Method
@@ -85,6 +46,10 @@ public abstract class MessagingRequest<T> extends com.google.api.client.googleap
         responseClass);
   }
 
+  /** Data format for the response. */
+  @com.google.api.client.util.Key
+  private java.lang.String alt;
+
   /**
    * Data format for the response. [default: json]
    */
@@ -97,6 +62,10 @@ public abstract class MessagingRequest<T> extends com.google.api.client.googleap
     this.alt = alt;
     return this;
   }
+
+  /** Selector specifying which fields to include in a partial response. */
+  @com.google.api.client.util.Key
+  private java.lang.String fields;
 
   /**
    * Selector specifying which fields to include in a partial response.
@@ -115,6 +84,13 @@ public abstract class MessagingRequest<T> extends com.google.api.client.googleap
    * API key. Your API key identifies your project and provides you with API access, quota, and
    * reports. Required unless you provide an OAuth 2.0 token.
    */
+  @com.google.api.client.util.Key
+  private java.lang.String key;
+
+  /**
+   * API key. Your API key identifies your project and provides you with API access, quota, and
+   * reports. Required unless you provide an OAuth 2.0 token.
+   */
   public java.lang.String getKey() {
     return key;
   }
@@ -128,6 +104,10 @@ public abstract class MessagingRequest<T> extends com.google.api.client.googleap
     return this;
   }
 
+  /** OAuth 2.0 token for the current user. */
+  @com.google.api.client.util.Key("oauth_token")
+  private java.lang.String oauthToken;
+
   /**
    * OAuth 2.0 token for the current user.
    */
@@ -140,6 +120,10 @@ public abstract class MessagingRequest<T> extends com.google.api.client.googleap
     this.oauthToken = oauthToken;
     return this;
   }
+
+  /** Returns response with indentations and line breaks. */
+  @com.google.api.client.util.Key
+  private java.lang.Boolean prettyPrint;
 
   /**
    * Returns response with indentations and line breaks. [default: true]
@@ -158,6 +142,13 @@ public abstract class MessagingRequest<T> extends com.google.api.client.googleap
    * Available to use for quota purposes for server-side applications. Can be any arbitrary string
    * assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
    */
+  @com.google.api.client.util.Key
+  private java.lang.String quotaUser;
+
+  /**
+   * Available to use for quota purposes for server-side applications. Can be any arbitrary string
+   * assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+   */
   public java.lang.String getQuotaUser() {
     return quotaUser;
   }
@@ -170,6 +161,13 @@ public abstract class MessagingRequest<T> extends com.google.api.client.googleap
     this.quotaUser = quotaUser;
     return this;
   }
+
+  /**
+   * IP address of the site where the request originates. Use this if you want to enforce per-user
+   * limits.
+   */
+  @com.google.api.client.util.Key
+  private java.lang.String userIp;
 
   /**
    * IP address of the site where the request originates. Use this if you want to enforce per-user

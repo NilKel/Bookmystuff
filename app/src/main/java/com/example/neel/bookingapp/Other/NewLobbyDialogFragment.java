@@ -3,6 +3,7 @@ package com.example.neel.bookingapp.Other;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -59,12 +60,12 @@ public class NewLobbyDialogFragment extends DialogFragment {
 
     // make sure the Activity implemented it
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) throws ClassCastException {
+        super.onAttach(context);
         try {
-            this.mListener = (OnCompleteListener) activity;
+            this.mListener = (OnCompleteListener) context;
         } catch (final ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnCompleteListener");
+            throw new ClassCastException(context.toString() + " must implement OnCompleteListener");
         }
     }
 
@@ -80,6 +81,7 @@ public class NewLobbyDialogFragment extends DialogFragment {
         sportSelector = (RadioGroup) dialog.findViewById(R.id.sportSelectorRadioGroup);
         confirmButton = (Button) dialog.findViewById(R.id.confirmLobbyButton);
         cancelButton = (Button) dialog.findViewById(R.id.cancelLobbyButton);
+
 
         databaseConnector = new DatabaseConnector();
 
@@ -139,6 +141,7 @@ public class NewLobbyDialogFragment extends DialogFragment {
                     mLobby.setLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
                     Log.d("Created Lobby", mLobby.toString());
                     databaseConnector.createLobby(mLobby).promise().done((d) -> {
+                        dialog.dismiss();
                         mListener.onComplete(d);
                     }).fail(error -> {
                         Log.e(TAG, error.getMessage());

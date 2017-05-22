@@ -3,8 +3,6 @@ package com.example.neel.bookingapp.Activities;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,15 +37,12 @@ public class LobbyActivity extends AppCompatActivity {
 
         lobbyList.setAdapter(adapter);
 
-        lobbyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                TextView name = (TextView) adapterView.getChildAt(1);
-                if ((name.getText().toString().equals(getResources().getString(R.string.lobbyViewStdText)))){
-                    lobby.setNumFree(lobby.getNumFree()+1);
-                    name.setText("Searching");
-                    view.setClickable(false);
-                }
+        lobbyList.setOnItemClickListener((adapterView, view, i, l) -> {
+            TextView name = (TextView) adapterView.getChildAt(1);
+            if ((name.getText().toString().equals(getResources().getString(R.string.lobbyViewStdText)))) {
+                lobby.setNumFree(lobby.getNumFree() + 1);
+                name.setText("Searching");
+                view.setClickable(false);
             }
         });
     }
