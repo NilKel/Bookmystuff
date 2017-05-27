@@ -8,6 +8,7 @@ import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Model.lobby.Lobby;
 import com.example.neel.bookingapp.Model.lobby.LobbyRef;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -17,16 +18,28 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
+import org.apache.commons.codec.binary.Hex;
 import org.jdeferred.Deferred;
 import org.jdeferred.impl.DeferredObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by sushrutshringarputale on 5/13/17.
@@ -532,6 +545,81 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
     public void cleanupReferences() {
         for (Map.Entry<DatabaseReference, ChildEventListener> entry : mListenerMap.entrySet()) {
             entry.getKey().removeEventListener(entry.getValue());
+        }
+    }
+
+    public Deferred<JSONArray, Exception, Void> getFriends(User user) {
+        Deferred<JSONArray, Exception, Void> deferred = new DeferredObject<>();
+        Map<String, String> map = new HashMap<>();
+        FirebaseAuth.getInstance().getCurrentUser().getToken(true)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        map.put("token", task.getResult().getToken());
+                        ExpressRestClient.get("/friends" + user.id,
+                                new RequestParams(),
+                                map,
+                                new JsonHttpResponseHandler() {
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                                        Log.d(TAG, "Status code: " + statusCode);
+                                        deferred.resolve(response);
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                        deferred.reject((Exception) throwable);
+                                        Log.d(TAG, errorResponse.toString());
+                                    }
+                                });
+                    }
+                });
+        return deferred;
+    }
+
+    public Deferred<JSONObject, Exception, Void> newFriendRequest(User user1, User user2) {
+        Deferred<JSONObject, Exception, Void> deferred = new DeferredObject<>();
+        Map<String, String> map = new HashMap<>();
+        RequestParams requestParams = new RequestParams();
+        requestParams.add("status", "new");
+        FirebaseAuth.getInstance().getCurrentUser().getToken(true)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        map.put("token", task.getResult().getToken());
+                        ExpressRestClient.post("/friends/" + user1.id + "/" + user2.id,
+                                requestParams,
+                                map, new JsonHttpResponseHandler() {
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                        deferred.resolve(response);
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                        deferred.reject((Exception) throwable);
+                                    }
+                                });
+                    } else {
+                        deferred.reject(task.getException());
+                    }
+                });
+        return deferred;
+    }
+
+    private String getDigest(String string) {
+        try {
+            Mac sha256_hmac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(("nodejsistherealprogramminglanguage").getBytes("UTF-8"), "HmacSHA256");
+            sha256_hmac.init(secret_key);
+            return Hex.encodeHexString(sha256_hmac.doFinal(string.getBytes("UTF-8")));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return e.getMessage();
         }
     }
 }
