@@ -3,6 +3,7 @@ package com.example.neel.bookingapp.Other;
 import android.location.Location;
 import android.util.Log;
 
+import com.example.neel.bookingapp.Model.Booking;
 import com.example.neel.bookingapp.Model.ChatMessage;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
@@ -48,7 +49,10 @@ import cz.msebera.android.httpclient.Header;
  */
 
 @SuppressWarnings("unchecked")
-public final class DatabaseConnector implements User.IUserCrud, ChatMessage.IChatMessageCrud, Lobby.ILobbyCrud, Turf.ITurfCrud {
+public final class DatabaseConnector implements User.IUserCrud, ChatMessage.IChatMessageCrud,
+        Lobby.ILobbyCrud, Turf.ITurfCrud, Booking.IBookingCrud {
+
+
     private static final String TAG = "Database connector";
     private Map<DatabaseReference, ChildEventListener> mListenerMap = new HashMap<>();
 
@@ -624,28 +628,135 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         }
     }
 
-    //TODO: Implement
     @Override
-    public Deferred createTurf(Turf user) {
-        return null;
+    public Deferred<Turf, DatabaseException, Void> createTurf(Turf turf) {
+        Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
+        turf.setId(FirebaseDatabase.getInstance().getReference("turfs").push().getKey());
+        FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId()).setValue(turf).addOnSuccessListener(aVoid -> {
+            deferred.resolve(turf);
+        }).addOnFailureListener(f -> deferred.reject((DatabaseException) f));
+        return deferred;
     }
 
     @Override
-    public Deferred readTurf(Turf user) {
-        return null;
+    public Deferred<Turf, DatabaseException, Void> readTurf(Turf turf) {
+        Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
+        FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Turf.getTurfFromRef(dataSnapshot.getValue(Turf.TurfRef.class))
+                                .promise().done(deferred::resolve).fail(deferred::reject);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        deferred.reject(databaseError.toException());
+                    }
+                });
+        return deferred;
     }
 
     @Override
-    public Deferred<Turf, Exception, Void> updateTurf(Turf user) {
-        return null;
+    public Deferred<Turf, DatabaseException, Void> updateTurf(Turf turf) {
+        Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
+        FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId())
+                .updateChildren(new Turf.TurfRef().copyData(turf).toMap())
+                .addOnSuccessListener(aVoid -> deferred.resolve(turf))
+                .addOnFailureListener(f -> deferred.reject((DatabaseException) f));
+        return deferred;
     }
 
     @Override
-    public Deferred deleteTurf(Turf user) {
-        return null;
+    public Deferred deleteTurf(Turf turf) {
+        Deferred<Void, DatabaseException, Void> deferred = new DeferredObject<>();
+        Log.d(TAG, "deleting turf" + turf.toString());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("turfs/" + turf.getId());
+        ref.removeValue((databaseError, databaseReference) -> {
+            if (databaseError == null) {
+                deferred.resolve(null);
+            } else {
+                deferred.reject(databaseError.toException());
+            }
+        });
+        return deferred;
     }
 
     public Deferred<HashMap<Long, String>, DatabaseException, Void> getAvailabilityForLobby(Turf turf, Date date) {
-        return null;
+        Deferred<HashMap<Long, String>, DatabaseException, Void> deferred = new DeferredObject<>();
+        FirebaseDatabase.getInstance().getReference("turfs")
+                .child(turf.getId()).child("availability").child(Long.toString(date.getTime()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        deferred.resolve(dataSnapshot.getValue(HashMap.class));
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        deferred.reject(databaseError.toException());
+                    }
+                });
+        return deferred;
+    }
+
+    @Override
+    public Deferred<Booking, DatabaseException, Void> createBooking(Booking booking) {
+        Deferred<Booking, DatabaseException, Void> deferred = new DeferredObject<>();
+        booking.id = FirebaseDatabase.getInstance().getReference("bookings").push().getKey();
+        FirebaseDatabase.getInstance().getReference("bookings")
+                .child(booking.id).setValue(new Booking.BookingRef(booking))
+                .addOnSuccessListener(aVoid -> deferred.resolve(booking))
+                .addOnFailureListener(f -> deferred.reject((DatabaseException) f));
+        return deferred;
+    }
+
+    @Override
+    public Deferred<Booking, DatabaseException, Void> readBooking(Booking booking) {
+        Deferred<Booking, DatabaseException, Void> deferred = new DeferredObject<>();
+        FirebaseDatabase.getInstance().getReference("bookings").child(booking.id)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Booking.getBookingFromRef(dataSnapshot.getValue(Booking.BookingRef.class))
+                                .promise().done(deferred::resolve).fail(deferred::reject);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        deferred.reject(databaseError.toException());
+                    }
+                });
+        return deferred;
+    }
+
+    @Override
+    public Deferred<Booking, DatabaseException, Void> updateBooking(Booking booking) {
+        Deferred<Booking, DatabaseException, Void> deferred = new DeferredObject<>();
+        FirebaseDatabase.getInstance().getReference("bookings").child(booking.id)
+                .updateChildren(new Booking.BookingRef(booking).toMap())
+                .addOnSuccessListener(aVoid -> deferred.resolve(booking))
+                .addOnFailureListener(f -> deferred.reject((DatabaseException) f));
+        return deferred;
+    }
+
+    /**
+     * @param booking
+     * @return
+     * @apiNote Generally do not use if you want to keep a history of bookings
+     */
+    @Override
+    public Deferred<Void, DatabaseException, Void> deleteBooking(Booking booking) {
+        Deferred<Void, DatabaseException, Void> deferred = new DeferredObject<>();
+        Log.d(TAG, "deleting booking" + booking.toString());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("bookings/" + booking.id);
+        ref.removeValue((databaseError, databaseReference) -> {
+            if (databaseError == null) {
+                deferred.resolve(null);
+            } else {
+                deferred.reject(databaseError.toException());
+            }
+        });
+        return deferred;
     }
 }

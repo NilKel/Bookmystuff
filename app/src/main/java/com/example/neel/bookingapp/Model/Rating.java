@@ -19,9 +19,9 @@ public class Rating implements Parcelable {
             return new Rating[size];
         }
     };
-    private int rating;
+    private float rating;
 
-    public Rating(int rating) {
+    public Rating(float rating) {
         this.rating = rating;
     }
 
@@ -37,7 +37,7 @@ public class Rating implements Parcelable {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 
@@ -73,7 +73,7 @@ public class Rating implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(rating);
+        dest.writeFloat(rating);
     }
 }
 

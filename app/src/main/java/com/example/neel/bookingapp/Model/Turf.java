@@ -74,6 +74,23 @@ public class Turf implements Parcelable {
         attributes = in.readHashMap(Map.class.getClassLoader());
     }
 
+    public static Deferred<Turf, DatabaseException, Void> getTurfFromRef(TurfRef ref) {
+        Turf turf = new Turf();
+        Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
+        turf.location = LocationPlus.getLocationFromRepresentation(ref.location);
+        turf.name = ref.name;
+        turf.description = ref.description;
+        turf.rating = new Rating(ref.rating);
+        turf.attributes = ref.attributes;
+        turf.id = ref.id;
+        new DatabaseConnector().readUser(new User(ref.ownerId))
+                .promise().done(user -> {
+            turf.owner = user;
+            deferred.resolve(turf);
+        }).fail(deferred::reject);
+        return deferred;
+    }
+
     public Location getLocation() {
         return location;
     }
@@ -171,6 +188,7 @@ public class Turf implements Parcelable {
         return deferred;
     }
 
+
     public interface ITurfCrud {
         Deferred createTurf(Turf user);
 
@@ -179,6 +197,55 @@ public class Turf implements Parcelable {
         Deferred updateTurf(Turf user);
 
         Deferred deleteTurf(Turf user);
+    }
+
+    public static class TurfRef {
+        public String location;
+        public String name;
+        public String ownerId;
+        public String description;
+        public float rating;
+        public HashMap<String, String> attributes;
+        public String id;
+
+        public TurfRef(String location, String name, String ownerId, String description, int rating, HashMap<String, String> attributes, String id) {
+            this.location = location;
+            this.name = name;
+            this.ownerId = ownerId;
+            this.description = description;
+            this.rating = rating;
+            this.attributes = attributes;
+            this.id = id;
+        }
+
+        public TurfRef() {
+        }
+
+        public TurfRef copyData(Turf turf) {
+            TurfRef ref = new TurfRef();
+            ref.attributes = turf.attributes;
+            ref.description = turf.description;
+            ref.id = turf.id;
+            ref.location = turf.location.toString();
+            ref.rating = turf.rating.getRating();
+            ref.name = turf.name;
+            ref.ownerId = turf.owner.id;
+            return ref;
+        }
+
+        @Exclude
+        public Map<String, Object> toMap() {
+            Map<String, Object> map = new HashMap<>();
+            map.put("location", location);
+            map.put("name", name);
+            map.put("ownerId", ownerId);
+            map.put("description", description);
+            map.put("rating", rating);
+            map.put("attributes", attributes);
+            map.put("id", id);
+            return map;
+        }
+
     }
 
 }
