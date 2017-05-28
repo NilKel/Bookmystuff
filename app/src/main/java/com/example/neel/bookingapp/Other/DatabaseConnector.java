@@ -52,6 +52,7 @@ import cz.msebera.android.httpclient.Header;
 public final class DatabaseConnector implements User.IUserCrud, ChatMessage.IChatMessageCrud,
         Lobby.ILobbyCrud, Turf.ITurfCrud, Booking.IBookingCrud {
 
+    //TODO: Setup cleanup with listenerMap for Turf and Booking Cruds
 
     private static final String TAG = "Database connector";
     private Map<DatabaseReference, ChildEventListener> mListenerMap = new HashMap<>();
