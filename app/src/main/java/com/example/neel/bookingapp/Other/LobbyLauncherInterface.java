@@ -1,6 +1,6 @@
 package com.example.neel.bookingapp.Other;
 
-import com.example.neel.bookingapp.Model.lobby.Lobby;
+import com.example.neel.bookingapp.Model.Lobby;
 
 /**
  * Created by sushrutshringarputale on 5/13/17.

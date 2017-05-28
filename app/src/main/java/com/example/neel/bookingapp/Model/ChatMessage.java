@@ -1,7 +1,5 @@
 package com.example.neel.bookingapp.Model;
 
-import com.example.neel.bookingapp.Model.lobby.Lobby;
-
 import org.jdeferred.Deferred;
 
 /**
@@ -45,7 +43,7 @@ public class ChatMessage {
                 '}';
     }
 
-    public interface ChatMessageCrud {
+    public interface IChatMessageCrud {
         Deferred createChatMessage(ChatMessage chatMessage);
 
         Deferred readChatMessage(ChatMessage chatMessage);

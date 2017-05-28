@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Model.lobby.Lobby;
 import com.example.neel.bookingapp.Other.LobbyUserListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;

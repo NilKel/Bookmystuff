@@ -67,7 +67,7 @@ public class User implements Parcelable {
     }
 
     public User(String name, String email, long phNo, boolean isOwner) {
-        this("", name, email, phNo, "", isOwner, new Date(""), false);
+        this("", name, email, phNo, "", isOwner, new Date(), false);
     }
 
     public User(String id, String name) {
@@ -174,7 +174,7 @@ public class User implements Parcelable {
         return result;
     }
 
-    public interface UserCrud {
+    public interface IUserCrud {
         Deferred createUser(User user);
 
         Deferred readUser(User user);

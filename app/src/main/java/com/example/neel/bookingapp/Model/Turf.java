@@ -1,42 +1,77 @@
 package com.example.neel.bookingapp.Model;
 
 import android.location.Location;
-import android.util.Log;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.google.firebase.database.DatabaseException;
+import com.google.firebase.database.Exclude;
 
+import org.jdeferred.Deferred;
+import org.jdeferred.impl.DeferredObject;
+
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by sushrutshringarputale on 1/5/17.
  */
-@Deprecated
-public class Turf {
+public class Turf implements Parcelable {
+    public static final Creator<Turf> CREATOR = new Creator<Turf>() {
+        @Override
+        public Turf createFromParcel(Parcel in) {
+            return new Turf(in);
+        }
+
+        @Override
+        public Turf[] newArray(int size) {
+            return new Turf[size];
+        }
+    };
+    @Exclude
+    public HashMap<Long, HashMap<Long, String>> availability;
     private Location location;
     private String name;
     private User owner;
     private String description;
     private Rating rating;
-    private Map<String, String> attributes;
-    private String Id;
-    private int numFree;
+    private HashMap<String, String> attributes;
+    private String id;
 
-    public Turf(Location location, String name, User owner, String description, Rating rating, Map<String, String> attributes) {
+    public Turf(Location location, String name, User owner, String description, Rating rating, HashMap<String, String> attributes, String id) {
         this.location = location;
         this.name = name;
         this.owner = owner;
         this.description = description;
         this.rating = rating;
         this.attributes = attributes;
+        this.id = id;
     }
 
     public Turf(Location location, String name, User owner) {
-        this(location, name, owner, "", new Rating(), null);
+        this(location, name, owner, "", new Rating(), null, null);
     }
 
     public Turf() {
-        this(null, "", new User("",""));
+        this(null, "", new User("", ""));
+    }
+
+
+    public Turf(String id) {
+        this.id = id;
+    }
+
+
+    protected Turf(Parcel in) {
+        location = in.readParcelable(Location.class.getClassLoader());
+        name = in.readString();
+        owner = in.readParcelable(User.class.getClassLoader());
+        description = in.readString();
+        id = in.readString();
+        rating = in.readParcelable(Rating.class.getClassLoader());
+        attributes = in.readHashMap(Map.class.getClassLoader());
     }
 
     public Location getLocation() {
@@ -79,39 +114,71 @@ public class Turf {
         this.rating = rating;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public Map<String, String> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Map<String, String> attributes) {
+    public void setAttributes(HashMap<String, String> attributes) {
         this.attributes = attributes;
     }
 
+    /**
+     * Describe the kinds of special objects contained in this Parcelable
+     * instance's marshaled representation. For example, if the object will
+     * include a file descriptor in the output of {@link #writeToParcel(Parcel, int)},
+     * the return value of this method must include the
+     * {@link #CONTENTS_FILE_DESCRIPTOR} bit.
+     *
+     * @return a bitmask indicating the set of special object types marshaled
+     * by this Parcelable object instance.
+     * @see #CONTENTS_FILE_DESCRIPTOR
+     */
     @Override
-    public String toString() {
-        return "Turf{" +
-                "name='" + name + '\'' +
-                ", owner=" + owner +
-                '}';
+    public int describeContents() {
+        return 0;
     }
 
-    public Turf saveLobby() {
-        try {
-            DatabaseReference db = FirebaseDatabase.getInstance().getReference("turf");
-            String key = db.push().getKey();
-            db.child(key).setValue(this);
-        } catch (NullPointerException e) {
-            Log.e("Turf update", "Firebase uninit" + e.getMessage());
-        }
-        return this;
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(location, flags);
+        dest.writeString(name);
+        dest.writeParcelable(owner, flags);
+        dest.writeParcelable(rating, flags);
+        dest.writeString(description);
+        dest.writeString(id);
+        dest.writeMap(this.attributes);
     }
 
-
-    public int getNumFree() {
-        return numFree;
+    public Deferred<HashMap<Long, String>, DatabaseException, Void> getAvailibility(Date date) {
+        Deferred<HashMap<Long, String>, DatabaseException, Void> deferred = new DeferredObject<>();
+        new DatabaseConnector().getAvailabilityForLobby(this, date).promise()
+                .done(deferred::resolve).fail(deferred::reject);
+        return deferred;
     }
 
-    public void setNumFree(int numFree) {
-        this.numFree = numFree;
+    public interface ITurfCrud {
+        Deferred createTurf(Turf user);
+
+        Deferred readTurf(Turf user);
+
+        Deferred updateTurf(Turf user);
+
+        Deferred deleteTurf(Turf user);
     }
+
 }

@@ -4,10 +4,10 @@ import android.location.Location;
 import android.util.Log;
 
 import com.example.neel.bookingapp.Model.ChatMessage;
+import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
+import com.example.neel.bookingapp.Model.Turf;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Model.lobby.Lobby;
-import com.example.neel.bookingapp.Model.lobby.LobbyRef;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ import cz.msebera.android.httpclient.Header;
  */
 
 @SuppressWarnings("unchecked")
-public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatMessageCrud, Lobby.LobbyCrud {
+public final class DatabaseConnector implements User.IUserCrud, ChatMessage.IChatMessageCrud, Lobby.ILobbyCrud, Turf.ITurfCrud {
     private static final String TAG = "Database connector";
     private Map<DatabaseReference, ChildEventListener> mListenerMap = new HashMap<>();
 
@@ -57,7 +58,7 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
         Log.d(TAG, "Creating lobby" + lobby.toString());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("lobbies");
         DatabaseReference node = ref.push();
-        node.setValue(new LobbyRef().copyData(lobby)).addOnCompleteListener(task -> {
+        node.setValue(new Lobby.LobbyRef().copyData(lobby)).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 lobby.setKey(node.getKey());
                 deferred.resolve(lobby);
@@ -82,7 +83,7 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null) {
-                    lobby.getLobbyFromRef(dataSnapshot.getValue(LobbyRef.class));
+                    lobby.getLobbyFromRef(dataSnapshot.getValue(Lobby.LobbyRef.class));
                     deferred.resolve(lobby);
                     ref.removeEventListener(this);
                 } else {
@@ -114,7 +115,7 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
         Deferred<Lobby, DatabaseException, Void> deferred = new DeferredObject<>();
         Log.d(TAG, "updating lobby" + lobby.toString());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + lobby.getKey());
-        ref.updateChildren(new LobbyRef().copyData(lobby).toMap(), (databaseError, databaseReference) -> {
+        ref.updateChildren(new Lobby.LobbyRef().copyData(lobby).toMap(), (databaseError, databaseReference) -> {
             if (databaseError == null) {
                 deferred.resolve(lobby);
             } else {
@@ -445,7 +446,7 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 mListenerMap.put(ref, this);
                 if (dataSnapshot != null) {
-                    LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
+                    Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
                     if (temp.sport == sport) {
                         lobbies.add(new Lobby().getLobbyFromRef(temp));
                     }
@@ -500,7 +501,7 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
                         mListenerMap.put(ref, this);
                         Log.d("Retrieved Lobby", dataSnapshot.toString());
                         if (dataSnapshot != null) {
-                            LobbyRef temp = dataSnapshot.getValue(LobbyRef.class);
+                            Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
                             lobbyArrayList.add(new Lobby().getLobbyFromRef(temp));
                         }
                     }
@@ -542,7 +543,7 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
         return deferred;
     }
 
-    public void cleanupReferences() {
+    private void cleanupReferences() {
         for (Map.Entry<DatabaseReference, ChildEventListener> entry : mListenerMap.entrySet()) {
             entry.getKey().removeEventListener(entry.getValue());
         }
@@ -621,5 +622,30 @@ public final class DatabaseConnector implements User.UserCrud, ChatMessage.ChatM
             e.printStackTrace();
             return e.getMessage();
         }
+    }
+
+    //TODO: Implement
+    @Override
+    public Deferred createTurf(Turf user) {
+        return null;
+    }
+
+    @Override
+    public Deferred readTurf(Turf user) {
+        return null;
+    }
+
+    @Override
+    public Deferred<Turf, Exception, Void> updateTurf(Turf user) {
+        return null;
+    }
+
+    @Override
+    public Deferred deleteTurf(Turf user) {
+        return null;
+    }
+
+    public Deferred<HashMap<Long, String>, DatabaseException, Void> getAvailabilityForLobby(Turf turf, Date date) {
+        return null;
     }
 }

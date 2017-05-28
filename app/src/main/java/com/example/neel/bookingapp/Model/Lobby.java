@@ -1,19 +1,17 @@
-package com.example.neel.bookingapp.Model.lobby;
+package com.example.neel.bookingapp.Model;
 
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.example.neel.bookingapp.Model.ChatMessage;
-import com.example.neel.bookingapp.Model.LocationPlus;
-import com.example.neel.bookingapp.Model.Sport;
-import com.example.neel.bookingapp.Model.User;
 import com.google.firebase.database.Exclude;
 
 import org.jdeferred.Deferred;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by sushrutshringarputale on 1/6/17.
@@ -21,6 +19,7 @@ import java.util.ArrayList;
 
 /**
  * This is a model representation of a Lobby implemented in the app.
+ *
  */
 public class Lobby implements Parcelable {
     public static final Creator<Lobby> CREATOR = new Creator<Lobby>() {
@@ -71,6 +70,10 @@ public class Lobby implements Parcelable {
 
     public Lobby() {
 
+    }
+
+    public Lobby(String key) {
+        this.key = key;
     }
 
     @SuppressWarnings("unchecked")
@@ -203,7 +206,7 @@ public class Lobby implements Parcelable {
         this.key = key;
     }
 
-    public interface LobbyCrud {
+    public interface ILobbyCrud {
         Deferred createLobby(Lobby lobby);
 
         Deferred readLobby(Lobby lobby);
@@ -211,5 +214,65 @@ public class Lobby implements Parcelable {
         Deferred updateLobby(Lobby lobby);
 
         Deferred deleteLobby(Lobby lobby);
+    }
+
+    /**
+     * Created by sushrutshringarputale on 3/10/17.
+     * Copyright (c) Sushrut Shringarputale 2017. All rights reserved.
+     *
+     * @author sushrutshringarputale
+     *         This class is a representation of the {@link Lobby} class as saved in Firebase. All properties are
+     *         as primitive as possible.
+     */
+    public static class LobbyRef {
+        public String ownerName;
+        public String ownerId;
+        public int numFree;
+        public HashMap<String, String> lobbyList;
+        public String name;
+        public Sport sport;
+        private String location;
+
+        public LobbyRef() {
+        }
+
+        /**
+         * @param lobby This method copies all data from a {@link Lobby} object
+         * @return LobbyRef
+         */
+        public LobbyRef copyData(Lobby lobby) {
+            this.ownerName = lobby.getOwner().name;
+            this.ownerId = lobby.getOwner().id;
+            this.numFree = lobby.getNumFree();
+            this.lobbyList = new HashMap<>();
+            this.location = lobby.getLocation().toString();
+            this.name = lobby.getName();
+            for (User user : lobby.getLobbyList()) {
+                this.lobbyList.put("id", user.id);
+            }
+            this.sport = lobby.getSport();
+            return this;
+        }
+
+        @Exclude
+        public Map<String, Object> toMap() {
+            Map<String, Object> map = new HashMap<>();
+            map.put("ownerName", this.ownerName);
+            map.put("ownerId", this.ownerId);
+            map.put("numFree", this.numFree);
+            map.put("lobbyList", this.lobbyList);
+            map.put("name", this.name);
+            map.put("sport", this.sport);
+            map.put("location", this.location);
+            return map;
+        }
+
+        public String getLocation() {
+            return this.location;
+        }
+
+        public void setLocation(String location) {
+            this.location = location;
+        }
     }
 }

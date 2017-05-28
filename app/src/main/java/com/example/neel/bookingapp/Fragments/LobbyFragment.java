@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.neel.bookingapp.Model.lobby.Lobby;
+import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.R;
 
 public class LobbyFragment extends Fragment implements View.OnClickListener {

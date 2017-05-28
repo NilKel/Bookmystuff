@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.neel.bookingapp.Model.lobby.Lobby;
+import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.R;
 
 import java.util.ArrayList;
