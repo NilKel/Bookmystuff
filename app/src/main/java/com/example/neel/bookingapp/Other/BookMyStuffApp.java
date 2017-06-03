@@ -4,8 +4,8 @@ import android.app.Application;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.soloader.SoLoader;
 import com.firebase.client.Firebase;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Created by sushrutshringarputale on 12/21/16.
@@ -20,6 +20,8 @@ public class BookMyStuffApp extends Application {
 
         Firebase.setAndroidContext(this);
         Firebase myFirebaseRef =  new Firebase("https://bookmystuff-79c2e.firebaseio.com/");
+
+        SoLoader.init(this, false);
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
