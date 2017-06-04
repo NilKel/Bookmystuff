@@ -11,14 +11,16 @@ public class ChatMessage {
     public User sender;
     public Lobby lobby;
     public String id;
-    public String time;
+    public Long time;
+    public String message;
 
 
-    public ChatMessage(User sender, Lobby lobby, String id, String time) {
+    public ChatMessage(User sender, Lobby lobby, String id, Long time, String message) {
         this.sender = sender;
         this.lobby = lobby;
         this.id = id;
         this.time = time;
+        this.message = message;
     }
 
 
@@ -35,11 +37,11 @@ public class ChatMessage {
 
     @Override
     public String toString() {
-        return "ChatMessage{" +
-                "sender=" + sender +
+        return "ChatMessage{" + "sender=" + sender +
                 ", lobby=" + lobby +
                 ", id='" + id + '\'' +
-                ", time='" + time + '\'' +
+                ", time=" + time +
+                ", message='" + message + '\'' +
                 '}';
     }
 

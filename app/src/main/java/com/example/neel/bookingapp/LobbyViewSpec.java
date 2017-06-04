@@ -2,6 +2,7 @@ package com.example.neel.bookingapp;
 
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import com.example.neel.bookingapp.Model.ChatMessage;
@@ -26,6 +27,7 @@ import com.facebook.litho.widget.RecyclerBinder;
 import com.facebook.yoga.YogaEdge;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by sushrutshringarputale on 6/3/17.
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 public class LobbyViewSpec {
 
     private static RecyclerBinder recyclerBinder;
+    private static ComponentContext cc;
 
     @OnCreateLayout
     static ComponentLayout onCreateLayout(
@@ -43,6 +46,7 @@ public class LobbyViewSpec {
             @State ArrayList<ChatMessage> messages
     ) {
 
+        cc = c;
         recyclerBinder = new RecyclerBinder(c);
         return Column.create(c)
                 .widthPercent(100)
@@ -113,9 +117,11 @@ public class LobbyViewSpec {
             StateValue<ArrayList<ChatMessage>> messages,
             @Param ArrayList<ChatMessage> newMessages
     ) {
+        for (ChatMessage m : newMessages) {
+            recyclerBinder.insertItemAt(recyclerBinder.getItemCount(), ChatMessageView.create(cc).date(new Date(m.time)).senderName(m.sender.name).text(m.message).build());
+        }
         newMessages.addAll(messages.get());
         messages.set(newMessages);
-        //TODO: Create new message views and commit to recyclerBinder
     }
 
     @OnUpdateState
@@ -123,6 +129,12 @@ public class LobbyViewSpec {
             StateValue<ArrayList<ChatMessage>> messages,
             @Param ChatMessage newMessage
     ) {
+        recyclerBinder.insertItemAt(recyclerBinder.getItemCount(), ChatMessageView.create(cc)
+                .text(newMessage.message)
+                .senderName(newMessage.sender.name)
+                .date(new Date(newMessage.time))
+                .build()
+        );
         ArrayList<ChatMessage> temp = messages.get();
         temp.add(newMessage);
         messages.set(temp);
@@ -135,6 +147,7 @@ public class LobbyViewSpec {
             @Prop String message
     ) {
         //TODO: Handle message send
+        Log.d("Send button click", view.toString() + " " + message);
     }
 
 

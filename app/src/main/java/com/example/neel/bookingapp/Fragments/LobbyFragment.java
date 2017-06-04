@@ -8,8 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.neel.bookingapp.LobbyView;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.R;
+import com.facebook.litho.ComponentContext;
+import com.facebook.litho.LithoView;
+
+import java.util.ArrayList;
 
 public class LobbyFragment extends Fragment implements View.OnClickListener {
     private Lobby lobby;
@@ -45,8 +50,11 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        messageList = (ListView) container.findViewById(R.id.msgListView);
-        return inflater.inflate(R.layout.fragment_lobby, container, false);
+        final ComponentContext c = new ComponentContext(getContext());
+//        messageList = (ListView) container.findViewById(R.id.msgListView);
+        //TODO: DEBUG
+        return LithoView.create(getContext(), LobbyView.create(c).initMessages(new ArrayList<>()).build());
+//        return inflater.inflate(, container, false);
     }
 
 
