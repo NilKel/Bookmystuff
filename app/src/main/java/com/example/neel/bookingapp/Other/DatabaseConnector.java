@@ -196,14 +196,12 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                 } else {
                     deferred.reject("User not found");
                 }
-                db.removeEventListener(this);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("User data retrieval", "onCancelled", databaseError.toException());
                 deferred.reject(databaseError.toException());
-                db.removeEventListener(this);
             }
         });
         return deferred;
@@ -436,7 +434,6 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
     public Deferred<List<Lobby>, DatabaseException, Void> getLobbiesBySport(final Sport sport, @Nullable Location location) throws NullPointerException {
         Deferred<List<Lobby>, DatabaseException, Void> deferred = new DeferredObject<>();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
-        Log.d("Location", location.toString());
         List<Lobby> lobbies = new ArrayList<>();
         Query q;
         if (location != null) {
@@ -452,7 +449,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                 mListenerMap.put(ref, this);
                 if (dataSnapshot != null) {
                     Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
-                    if (temp.sport == sport) {
+                    if (temp.sport == sport && temp.numFree > 0) {
                         lobbies.add(new Lobby().getLobbyFromRef(temp));
                     }
                 }
@@ -499,7 +496,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         Deferred<List<Lobby>, DatabaseException, Void> deferred = new DeferredObject<>();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
         List<Lobby> lobbyArrayList = new ArrayList<>();
-        ref.orderByChild("ownerId").equalTo(user.getUid())
+        ref.orderByChild("lobbyList/id").equalTo(user.getUid())
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {

@@ -94,6 +94,16 @@ public class SportFragment extends Fragment {
         lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
         lobbyList.setOnItemClickListener((parent, view, position, id) -> {
             Log.d("Lobby clicked", lobbies.get(position).toString());
+            //TODO: Configure this to add the user to the lobby if the user is not already a part of it.
+            //PSEUDOCODE:
+            /**
+             * dabaconn.readLobby(lobby).then(
+             *      if currentuser.id is not in lobby.list
+             *              add user to lobby
+             *      launchLobby()
+             * )
+             *
+             */
             ((MainActivity) getActivity()).startLobby(lobbies.get(position));
         });
 

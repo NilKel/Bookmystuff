@@ -46,10 +46,10 @@ public class HomeFragment extends Fragment {
         lobbyList.setOnItemClickListener((parent, view1, position, id) -> {
             ((MainActivity) getActivity()).startLobby(lobbyArrayList.get(position));
         });
-
         databaseConnector.getLobbiesByUser(FirebaseAuth.getInstance().getCurrentUser())
                 .promise().done(lobbyArrayList -> {
             lobbyList.setAdapter(new LobbyListAdapter(getActivity(), lobbyArrayList));
+            this.lobbyArrayList = (ArrayList<Lobby>) lobbyArrayList;
         }).fail(error -> {
             Log.e(TAG, error.getMessage());
         });

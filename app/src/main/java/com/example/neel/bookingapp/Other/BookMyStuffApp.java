@@ -25,8 +25,5 @@ public class BookMyStuffApp extends Application {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
-
-
-
     }
 }

@@ -6,19 +6,23 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.example.neel.bookingapp.LobbyView;
 import com.example.neel.bookingapp.Model.Lobby;
-import com.example.neel.bookingapp.R;
 import com.facebook.litho.ComponentContext;
 import com.facebook.litho.LithoView;
 
 import java.util.ArrayList;
 
-public class LobbyFragment extends Fragment implements View.OnClickListener {
+public class LobbyFragment extends Fragment {
+    private static final String TAG = "LOBBY_FRAGMENT";
     private Lobby lobby;
     private ListView messageList;
+    private ComponentContext c;
+    private EditText messageSendEditText;
+    private LithoView lithoView;
 
 
 //    private OnFragmentInteractionListener mListener;
@@ -50,11 +54,9 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final ComponentContext c = new ComponentContext(getContext());
-//        messageList = (ListView) container.findViewById(R.id.msgListView);
-        //TODO: DEBUG
-        return LithoView.create(getContext(), LobbyView.create(c).initMessages(new ArrayList<>()).build());
-//        return inflater.inflate(, container, false);
+        c = new ComponentContext(getContext());
+        lithoView = LithoView.create(getContext(), LobbyView.create(c).lobbyName(lobby.getName()).initMessages(new ArrayList<>()).build());
+        return lithoView;
     }
 
 
@@ -63,13 +65,8 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.messageSendButton) {
-            sendMessage();
-        }
-    }
 
-    private void sendMessage() {
+    public void sendMessage() {
+
     }
 }

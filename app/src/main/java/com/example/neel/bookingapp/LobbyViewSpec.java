@@ -1,10 +1,12 @@
 package com.example.neel.bookingapp;
 
 import android.os.Build;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
+import com.example.neel.bookingapp.Fragments.LobbyFragment;
 import com.example.neel.bookingapp.Model.ChatMessage;
 import com.facebook.litho.ClickEvent;
 import com.facebook.litho.Column;
@@ -36,7 +38,7 @@ import java.util.Date;
 
 @LayoutSpec
 public class LobbyViewSpec {
-
+    //TODO: Only include recycler view. Inject the Litho recylable view for messages and keep the Edittext and Send button separate.
     private static RecyclerBinder recyclerBinder;
     private static ComponentContext cc;
 
@@ -55,7 +57,7 @@ public class LobbyViewSpec {
                 .backgroundColor(0xe1e1e1)
                 .child(
                         Row.create(c)
-                                .flexGrow(9)
+                                .flexGrow(6)
                                 .child(
                                         Recycler.create(c)
                                                 .binder(recyclerBinder)
@@ -86,11 +88,13 @@ public class LobbyViewSpec {
                                 .child(
                                         Column.create(c)
                                                 .flexGrow(4)
+                                                .heightPercent(100)
                                                 .background(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? c.getDrawable(R.drawable.message_edittext_drawable) : null)
                                                 .child(
                                                         EditText.create(c)
                                                                 .maxLines(8)
                                                                 .editable(true)
+                                                                .textSizeSp(18)
                                                                 .build()
                                                 ).build()
                                 ).child(
@@ -144,10 +148,13 @@ public class LobbyViewSpec {
     static void onSendButtonClick(
             ComponentContext c,
             @FromEvent View view,
-            @Prop String message
+            @Prop String lobbyName
     ) {
         //TODO: Handle message send
-        Log.d("Send button click", view.toString() + " " + message);
+//        Log.d("Send button click", view.toString() + " " + message);
+        FragmentManager fm = ((FragmentActivity) c.getBaseContext()).getSupportFragmentManager();
+        LobbyFragment lf = (LobbyFragment) fm.findFragmentByTag(lobbyName);
+        lf.sendMessage();
     }
 
 

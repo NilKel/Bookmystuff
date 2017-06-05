@@ -99,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             navigationView = (NavigationView) findViewById(R.id.nav_view);
             fab = (FloatingActionButton) findViewById(R.id.fab);
+            // Navigation view header
+            navHeader = navigationView.getHeaderView(0);
             txtName = (TextView) navHeader.findViewById(R.id.name);
             txtWebsite = (TextView) navHeader.findViewById(R.id.website);
             imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
@@ -114,9 +116,6 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             if (!currentUser.isOwner()) {
                 navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false);
             }
-
-            // Navigation view header
-            navHeader = navigationView.getHeaderView(0);
 
             // load toolbar titles from string resources
             activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
@@ -462,6 +461,9 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         Runnable mPendingRunnable = () -> {
             // update the main content by replacing fragments
             Fragment fragment = getHomeFragment(lobby);
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("lobby", lobby);
+            fragment.setArguments(bundle);
             CURRENT_TAG = lobby.getName();
             inLobby = true;
             toggleFab();

@@ -33,6 +33,9 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseException;
+
+import org.jdeferred.Promise;
 
 import java.util.Arrays;
 
@@ -54,6 +57,9 @@ public class LoginActivity extends FragmentActivity {
     private CallbackManager callbackManager;
 
     private DatabaseConnector mDatabaseConnector;
+
+
+    private ProgressDialog dialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +69,7 @@ public class LoginActivity extends FragmentActivity {
         mfirebaseAuth = FirebaseAuth.getInstance();
         mDatabaseConnector = new DatabaseConnector();
 
+        dialog = new ProgressDialog(this);
 
         username = (EditText) findViewById(R.id.usernameEditText);
         password = (EditText) findViewById(R.id.passwordEditText);
@@ -93,7 +100,11 @@ public class LoginActivity extends FragmentActivity {
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user != null) {
                 // User is signed in
-                Log.d("Firebase", "onAuthStateChanged:signed_in:" + user.getUid());
+                runOnUiThread(() -> {
+                    dialog.setTitle("Logging in");
+                    dialog.show();
+                });
+                Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 mDatabaseConnector.readUser(new User(user)).promise().done(mUser -> {
                     if (mUser.initialized) {
                         launchHomePage();
@@ -104,8 +115,12 @@ public class LoginActivity extends FragmentActivity {
                     Log.e(TAG, error.getMessage());
                     Toast.makeText(this, "Something went wrong with retrieving your information. Please contact support", Toast.LENGTH_SHORT).show();
                     mfirebaseAuth.signOut();
+                }).always((Promise.State state, User user1, DatabaseException e) -> {
+                    runOnUiThread(() -> {
+                        dialog.dismiss();
+                    });
+                    finish();
                 });
-                finish();
             } else {
                 // User is signed out
                 Log.d("Firebase", "onAuthStateChanged:signed_out");

@@ -35,10 +35,10 @@ public class User implements Parcelable {
     public long phNo;
     public String profPic;
     public boolean isOwner;
-    public Date birthday;
+    public Long birthday;
     public boolean initialized;
 
-    public User(String id, String name, String email, long phNo, String profPic, boolean isOwner, Date birthday, boolean initialized) {
+    public User(String id, String name, String email, long phNo, String profPic, boolean isOwner, Long birthday, boolean initialized) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -50,11 +50,11 @@ public class User implements Parcelable {
     }
 
     public User(String id, String name, String email, long phNo, String profPic, boolean isOwner) {
-        this(id, name, email, phNo, profPic, isOwner, new Date(), false);
+        this(id, name, email, phNo, profPic, isOwner, new Date().getTime(), false);
     }
 
     public User(FirebaseUser fUser) {
-        this(fUser.getUid(), fUser.getDisplayName(), fUser.getEmail(), 0, "", false, new Date(), false);
+        this(fUser.getUid(), fUser.getDisplayName(), fUser.getEmail(), 0, "", false, new Date().getTime(), false);
         try {
             this.profPic = fUser.getPhotoUrl().toString();
         } catch (NullPointerException e) {
@@ -63,20 +63,20 @@ public class User implements Parcelable {
     }
 
     public User() {
-        this("", "", "", 0, "", false, new Date(), false);
+        this("", "", "", 0, "", false, new Date().getTime(), false);
     }
 
     public User(String name, String email, long phNo, boolean isOwner) {
-        this("", name, email, phNo, "", isOwner, new Date(), false);
+        this("", name, email, phNo, "", isOwner, new Date().getTime(), false);
     }
 
     public User(String id, String name) {
-        this(id, name, "", 0, "", false, new Date(), false);
+        this(id, name, "", 0, "", false, new Date().getTime(), false);
     }
 
 
     public User(String id) {
-        this(id, "", "", 0, "", false, new Date(), false);
+        this(id, "", "", 0, "", false, new Date().getTime(), false);
     }
 
     public User(Parcel in) {
@@ -86,12 +86,12 @@ public class User implements Parcelable {
         this.phNo = in.readLong();
         this.profPic = in.readString();
         this.isOwner = in.readByte() == 1;
-        this.birthday = new Date(in.readLong());
+        this.birthday = in.readLong();
         this.initialized = in.readByte() == 1;
     }
 
-    public void setBirthday(String date) {
-        this.birthday = new Date(date);
+    public void setBirthday(Long date) {
+        this.birthday = date;
     }
 
     public void setId(String id) {
@@ -122,19 +122,18 @@ public class User implements Parcelable {
 
     public void copyData(User user) {
         try {
-            if (this.id == null)
+            if (user.id != null)
                 this.id = user.id;
-            if (this.name == null)
+            if (user.name != null)
                 this.name = user.name;
-            if (this.email == null)
+            if (user.email != null)
                 this.email = user.email;
             if (this.phNo != user.phNo)
                 this.phNo = user.phNo;
-            if (this.profPic == null)
+            if (user.profPic != null)
                 this.profPic = user.profPic;
-            if (this.isOwner != user.isOwner)
-                this.isOwner = user.isOwner;
-            if (this.birthday == null)
+            this.isOwner = user.isOwner;
+            if (user.birthday != null)
                 this.birthday = user.birthday;
             this.initialized = user.initialized;
 
@@ -156,7 +155,7 @@ public class User implements Parcelable {
         dest.writeLong(this.phNo);
         dest.writeString(this.profPic);
         dest.writeByte((byte) (this.isOwner ? 1 : 0));
-        dest.writeLong(this.birthday.getTime());
+        dest.writeLong(this.birthday);
         dest.writeByte((byte) (this.initialized ? 1 : 0));
     }
 
