@@ -73,7 +73,7 @@ public class NewLobbyDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Dialog dialog = new Dialog(getActivity());
-
+        //TODO: DEBUG view or create a fragment to handle this instead
         dialog.setTitle("Create New Lobby");
         dialog.setContentView(R.layout.fragment_new_lobby_dialog);
         lobbyName = (EditText) dialog.findViewById(R.id.lobbyNameEditText);
