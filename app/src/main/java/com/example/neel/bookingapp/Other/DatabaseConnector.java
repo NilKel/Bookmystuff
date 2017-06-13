@@ -540,6 +540,8 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
             public void onCancelled(DatabaseError databaseError) {
                 deferred.reject(databaseError.toException());
                 cleanupReferences();
+
+                //TODO: OnLogout reference cleanup deferred already rejected/resolved
             }
         });
         return deferred;

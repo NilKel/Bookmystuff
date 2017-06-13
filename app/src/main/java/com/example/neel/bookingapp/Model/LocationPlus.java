@@ -23,7 +23,7 @@ public class LocationPlus {
      */
     public static Location getLocationFromRepresentation(String stringRepresentation) throws IllegalArgumentException {
         Location location = new Location("");
-        Pattern p = Pattern.compile("Location\\[fused\\s(-?\\d*\\.\\d*),(-?\\d*\\.\\d*) acc=(\\d*) et=[+|-]\\S*\\]");
+        Pattern p = Pattern.compile("Location\\[fused\\s(-?\\d*\\.\\d*),(-?\\d*\\.\\d*) acc=(\\d*) et=[+|-]\\S*.*\\]");
         Matcher m = p.matcher(stringRepresentation);
         if (m.find()) {
             location.setLatitude(Double.parseDouble(m.group(1)));
