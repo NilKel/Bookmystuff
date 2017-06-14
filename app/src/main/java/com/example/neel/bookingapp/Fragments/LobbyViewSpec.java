@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp;
+package com.example.neel.bookingapp.Fragments;
 
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
@@ -6,8 +6,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.example.neel.bookingapp.Fragments.LobbyFragment;
+import com.example.neel.bookingapp.ChatMessageView;
 import com.example.neel.bookingapp.Model.ChatMessage;
+import com.example.neel.bookingapp.R;
 import com.facebook.litho.ClickEvent;
 import com.facebook.litho.Column;
 import com.facebook.litho.ComponentContext;
@@ -128,8 +129,9 @@ public class LobbyViewSpec {
         messages.set(newMessages);
     }
 
+
     @OnUpdateState
-    static void addMessage(
+    public static void addMessage(
             StateValue<ArrayList<ChatMessage>> messages,
             @Param ChatMessage newMessage
     ) {

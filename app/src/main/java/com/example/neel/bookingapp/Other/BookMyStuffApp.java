@@ -18,6 +18,7 @@ public class BookMyStuffApp extends Application {
     public void onCreate() {
         super.onCreate();
 
+        //TODO: APP LEVEL: Configure all onFails to route to Error Handler
         Firebase.setAndroidContext(this);
         Firebase myFirebaseRef =  new Firebase("https://bookmystuff-79c2e.firebaseio.com/");
 

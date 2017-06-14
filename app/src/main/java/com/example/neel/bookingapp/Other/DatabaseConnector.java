@@ -425,6 +425,37 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         return deferred;
     }
 
+    public void listenForMessages(final Lobby lobby, MessageListener mMessageListener) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + lobby.getKey() + "/messages");
+        ref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mMessageListener.onNewMessage(dataSnapshot.getValue(ChatMessage.class));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                mMessageListener.onError(databaseError.toException());
+            }
+        });
+
+    }
+
     /**
      * @param sport
      * @param location
@@ -758,5 +789,11 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
             }
         });
         return deferred;
+    }
+
+    public interface MessageListener {
+        void onNewMessage(ChatMessage message);
+
+        void onError(Exception e);
     }
 }

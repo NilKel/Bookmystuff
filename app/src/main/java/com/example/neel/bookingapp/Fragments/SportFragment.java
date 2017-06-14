@@ -3,6 +3,7 @@ package com.example.neel.bookingapp.Fragments;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,15 +18,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.neel.bookingapp.Activities.LoginActivity;
 import com.example.neel.bookingapp.Activities.MainActivity;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
+import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.ERROR_CODES;
+import com.example.neel.bookingapp.Other.ErrorHandler;
 import com.example.neel.bookingapp.Other.LobbyListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 
@@ -92,10 +99,33 @@ public class SportFragment extends Fragment {
     public void onStart() {
         super.onStart();
         lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
+        databaseConnector = new DatabaseConnector();
+
         lobbyList.setOnItemClickListener((parent, view, position, id) -> {
             Log.d("Lobby clicked", lobbies.get(position).toString());
+
             //TODO: Configure this to add the user to the lobby if the user is not already a part of it.
             //PSEUDOCODE:
+            databaseConnector.readLobby(lobbies.get(position)).promise()
+                    .done(lobby -> {
+                        try {
+                            User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            if (!lobby.getLobbyList().contains(user) && lobby.getNumFree() > 0) {
+                                lobby.getLobbyList().add(user);
+                                lobby.setNumFree(lobby.getNumFree() - 1);
+                                FirebaseMessaging.getInstance().subscribeToTopic(lobby.getKey());
+                                databaseConnector.updateLobby(lobby).promise().fail(e -> {
+                                    ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOBBY_ADD_FAILED);
+                                }).done(lobby1 -> {
+                                    ((MainActivity) getActivity()).lobbyLauncherHelper(lobby1);
+                                });
+                            }
+                        } catch (NullPointerException e) {
+                            FirebaseAuth.getInstance().signOut();
+                            ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOGIN_FAIL);
+                            startActivity(new Intent(getActivity(), LoginActivity.class));
+                        }
+                    }).fail(e -> ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOBBY_READ_FAILED));
             /**
              * dabaconn.readLobby(lobby).then(
              *      if currentuser.id is not in lobby.list
@@ -107,7 +137,7 @@ public class SportFragment extends Fragment {
             ((MainActivity) getActivity()).startLobby(lobbies.get(position));
         });
 
-        databaseConnector = new DatabaseConnector();
+        //V2.0 Change Inline ProgressDialogs to Activity level progress dialogs through a central showProgress(bool) method
         ProgressDialog dialog = new ProgressDialog(getContext());
         dialog.setMessage("Loading lobbies");
         dialog.show();
