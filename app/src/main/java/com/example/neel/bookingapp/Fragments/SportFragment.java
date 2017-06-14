@@ -116,9 +116,7 @@ public class SportFragment extends Fragment {
                                 FirebaseMessaging.getInstance().subscribeToTopic(lobby.getKey());
                                 databaseConnector.updateLobby(lobby).promise().fail(e -> {
                                     ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOBBY_ADD_FAILED);
-                                }).done(lobby1 -> {
-                                    ((MainActivity) getActivity()).lobbyLauncherHelper(lobby1);
-                                });
+                                }).done(lobby1 -> ((MainActivity) getActivity()).startLobby(lobby1));
                             }
                         } catch (NullPointerException e) {
                             FirebaseAuth.getInstance().signOut();

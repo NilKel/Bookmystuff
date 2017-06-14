@@ -323,6 +323,18 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             } else {
                 menuItem.setChecked(true);
             }
+            //TODO: Integrate friends and update to MySQL DB on first login CODE BELOW. Preferably run async
+//            AsyncTask.execute(() -> {
+//                for (UserInfo info : FirebaseAuth.getInstance().getCurrentUser().getProviderData()) {
+//                if (info.getProviderId() == FacebookAuthProvider.PROVIDER_ID) {
+//                    info.getUid();
+//                    new GraphRequest(AccessToken.getCurrentAccessToken(), info.getUid()+"/friends")
+//                            .setCallback(graphResponse -> {
+//                                graphResponse.getJSONArray()
+//                            });
+//                }
+//            }
+//            });
             menuItem.setChecked(true);
 
             if (menuItem.getItemId() == R.id.nav_settings) {
@@ -456,13 +468,14 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         lobbyLauncherHelper(lobby);
     }
 
-    public void lobbyLauncherHelper(Lobby lobby) {
+    private void lobbyLauncherHelper(Lobby lobby) {
         Log.d("Method: onComplete", lobby.toString());
         Runnable mPendingRunnable = () -> {
             // update the main content by replacing fragments
             Fragment fragment = getHomeFragment(lobby);
             Bundle bundle = new Bundle();
             bundle.putParcelable("lobby", lobby);
+            bundle.putParcelable("user", currentUser);
             fragment.setArguments(bundle);
             CURRENT_TAG = lobby.getName();
             inLobby = true;

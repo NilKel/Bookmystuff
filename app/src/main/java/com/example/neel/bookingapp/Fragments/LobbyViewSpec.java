@@ -1,30 +1,26 @@
 package com.example.neel.bookingapp.Fragments;
 
 import android.os.Build;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
+import android.widget.LinearLayout;
 
 import com.example.neel.bookingapp.ChatMessageView;
 import com.example.neel.bookingapp.Model.ChatMessage;
 import com.example.neel.bookingapp.R;
-import com.facebook.litho.ClickEvent;
 import com.facebook.litho.Column;
 import com.facebook.litho.ComponentContext;
 import com.facebook.litho.ComponentLayout;
 import com.facebook.litho.Row;
 import com.facebook.litho.StateValue;
-import com.facebook.litho.annotations.FromEvent;
 import com.facebook.litho.annotations.LayoutSpec;
 import com.facebook.litho.annotations.OnCreateInitialState;
 import com.facebook.litho.annotations.OnCreateLayout;
-import com.facebook.litho.annotations.OnEvent;
 import com.facebook.litho.annotations.OnUpdateState;
 import com.facebook.litho.annotations.Param;
 import com.facebook.litho.annotations.Prop;
 import com.facebook.litho.annotations.State;
 import com.facebook.litho.widget.EditText;
+import com.facebook.litho.widget.LinearLayoutInfo;
 import com.facebook.litho.widget.Recycler;
 import com.facebook.litho.widget.RecyclerBinder;
 import com.facebook.yoga.YogaEdge;
@@ -39,7 +35,6 @@ import java.util.Date;
 
 @LayoutSpec
 public class LobbyViewSpec {
-    //TODO: Only include recycler view. Inject the Litho recylable view for messages and keep the Edittext and Send button separate.
     private static RecyclerBinder recyclerBinder;
     private static ComponentContext cc;
 
@@ -48,9 +43,11 @@ public class LobbyViewSpec {
             ComponentContext c,
             @State ArrayList<ChatMessage> messages
     ) {
-
         cc = c;
-        recyclerBinder = new RecyclerBinder(c);
+        recyclerBinder = new RecyclerBinder(c, new LinearLayoutInfo(c.getBaseContext(), LinearLayout.VERTICAL, true));
+        for (ChatMessage m : messages) {
+            recyclerBinder.insertItemAt(0, ChatMessageView.create(cc).date(new Date(m.time)).senderName(m.sender.name).text(m.message).build());
+        }
         return Column.create(c)
                 .widthPercent(100)
                 .heightPercent(100)
@@ -77,6 +74,12 @@ public class LobbyViewSpec {
                                                     @Override
                                                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                                                         super.onScrolled(recyclerView, dx, dy);
+                                                        //TODO: get more messages
+                                                        //Pseudocode
+//                                                         if (nearTop of list)
+//                                                        dabaconn.getNextChatMessages(recyclerView.getChildAt(0/recyclerView.getChildCount()//Depending on how it lays out)).id)
+//                                                                .then(addToRecycleView)
+
                                                     }
                                                 }).build()
                                 )
@@ -135,7 +138,7 @@ public class LobbyViewSpec {
             StateValue<ArrayList<ChatMessage>> messages,
             @Param ChatMessage newMessage
     ) {
-        recyclerBinder.insertItemAt(recyclerBinder.getItemCount(), ChatMessageView.create(cc)
+        recyclerBinder.insertItemAt(0, ChatMessageView.create(cc)
                 .text(newMessage.message)
                 .senderName(newMessage.sender.name)
                 .date(new Date(newMessage.time))
@@ -145,19 +148,4 @@ public class LobbyViewSpec {
         temp.add(newMessage);
         messages.set(temp);
     }
-
-    @OnEvent(ClickEvent.class)
-    static void onSendButtonClick(
-            ComponentContext c,
-            @FromEvent View view,
-            @Prop String lobbyName
-    ) {
-        //TODO: Handle message send
-//        Log.d("Send button click", view.toString() + " " + message);
-        FragmentManager fm = ((FragmentActivity) c.getBaseContext()).getSupportFragmentManager();
-        LobbyFragment lf = (LobbyFragment) fm.findFragmentByTag(lobbyName);
-        lf.sendMessage();
-    }
-
-
 }

@@ -357,11 +357,6 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             mListenerMap.put(ref, this);
                             messages.add(dataSnapshot.getValue(ChatMessage.class));
-                            counter[0]++;
-                            if (counter[0] >= 20) {
-                                deferred.resolve(messages);
-                                cleanupReferences();
-                            }
                         }
 
                         @Override
@@ -385,6 +380,18 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                             cleanupReferences();
                         }
                     });
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    deferred.resolve(messages);
+                    cleanupReferences();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    deferred.reject(databaseError.toException());
+                }
+            });
         } else {
             final int[] counter = {0};
             ref.orderByKey().startAt(lastChatID).limitToFirst(20)
@@ -469,7 +476,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         Query q;
         if (location != null) {
             q = ref.orderByChild("location")
-                    .startAt("Location[fused " + (location.getLatitude() - 0.5) + ", " + (location.getLongitude() - 0.5))
+                    .startAt("Location[fused " + Double.toString(location.getLatitude() - 0.5) + ", " + Double.toString(location.getLongitude() - 0.5))
                     .endAt("Location[fused " + Double.toString(location.getLatitude() + 0.5) + ", " + Double.toString(location.getLongitude() + 0.5));
         } else {
             q = ref.orderByChild("sport").equalTo(sport.name()).limitToFirst(20);
@@ -571,7 +578,6 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
             public void onCancelled(DatabaseError databaseError) {
                 deferred.reject(databaseError.toException());
                 cleanupReferences();
-
                 //TODO: OnLogout reference cleanup deferred already rejected/resolved
             }
         });
@@ -587,7 +593,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
     public Deferred<JSONArray, Exception, Void> getFriends(User user) {
         Deferred<JSONArray, Exception, Void> deferred = new DeferredObject<>();
         Map<String, String> map = new HashMap<>();
-        FirebaseAuth.getInstance().getCurrentUser().getToken(true)
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         map.put("token", task.getResult().getToken());
@@ -617,7 +623,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         Map<String, String> map = new HashMap<>();
         RequestParams requestParams = new RequestParams();
         requestParams.add("status", "new");
-        FirebaseAuth.getInstance().getCurrentUser().getToken(true)
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         map.put("token", task.getResult().getToken());

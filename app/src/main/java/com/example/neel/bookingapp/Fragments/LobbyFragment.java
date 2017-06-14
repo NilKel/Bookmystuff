@@ -7,23 +7,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 
 import com.example.neel.bookingapp.Model.ChatMessage;
 import com.example.neel.bookingapp.Model.Lobby;
+import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.Other.ERROR_CODES;
 import com.example.neel.bookingapp.Other.ErrorHandler;
+import com.example.neel.bookingapp.R;
 import com.facebook.litho.ComponentContext;
-import com.facebook.litho.EventHandler;
 import com.facebook.litho.LithoView;
 
 import java.util.ArrayList;
+import java.util.Date;
 
-public class LobbyFragment extends Fragment {
+public class LobbyFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "LOBBY_FRAGMENT";
+
+
     private Lobby lobby;
-    private ListView messageList;
+    private User user;
+
     private ComponentContext c;
     private EditText messageSendEditText;
     private LithoView lithoView;
@@ -31,8 +36,6 @@ public class LobbyFragment extends Fragment {
     private DatabaseConnector mDatabaseConnector;
 
     private ArrayList<ChatMessage> messages;
-
-    private EventHandler messageReceivedEventHandler;
 
     public LobbyFragment() {
         // Required empty public constructor
@@ -54,6 +57,7 @@ public class LobbyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             lobby = getArguments().getParcelable("lobby");
+            user = getArguments().getParcelable("user");
         } else {
             throw new IllegalArgumentException();
         }
@@ -88,7 +92,11 @@ public class LobbyFragment extends Fragment {
                 ErrorHandler.handleError(getContext(), e, ERROR_CODES.MESSAGE_RECEIVE_FAILED);
             }
         });
-        return lithoView;
+        View view = inflater.inflate(R.layout.fragment_lobby, container);
+        LinearLayout layout = (LinearLayout) view.findViewById(R.id.msgListView);
+        layout.addView(lithoView);
+        messageSendEditText = (EditText) view.findViewById(R.id.messageEditText);
+        return view;
     }
 
 
@@ -98,7 +106,18 @@ public class LobbyFragment extends Fragment {
     }
 
 
-    public void sendMessage() {
-
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.messageSendButton && messageSendEditText.getText() != null) {
+            ChatMessage message = new ChatMessage(user, lobby, "", new Date().getTime(), messageSendEditText.getText().toString());
+            LobbyView.addMessage(c, message);
+            //TODO: PROD: add sending animation to the message itself and update that once the message is successfully written. Or add an error message
+            mDatabaseConnector.createChatMessage(message);
+        }
     }
 }

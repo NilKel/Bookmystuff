@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp;
+package com.example.neel.bookingapp.Fragments;
 
 import android.graphics.Typeface;
 import android.text.Layout;
