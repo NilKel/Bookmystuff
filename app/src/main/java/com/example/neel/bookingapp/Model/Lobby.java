@@ -4,7 +4,7 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-
+import com.example.neel.bookingapp.Model.Slot_state;
 import com.google.firebase.database.Exclude;
 
 import org.jdeferred.Deferred;
@@ -35,7 +35,8 @@ public class Lobby implements Parcelable {
     };
     private User owner;
     private int numFree;
-    private ArrayList<User> lobbyList;
+    private int state;
+    private HashMap<Integer,Object> lobbyList;
     private String name;
     private Sport sport;
     private Location location;
@@ -44,9 +45,10 @@ public class Lobby implements Parcelable {
     private String key;
 
     //Constructors
-    public Lobby(User owner, int numFree, ArrayList<User> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
+    public Lobby(User owner, int numFree, int state, HashMap<Integer,Object> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
         this.owner = owner;
         this.numFree = numFree;
+        this.state= state;
         this.lobbyList = lobbyList;
         this.name = name;
         this.sport = sport;
@@ -54,9 +56,10 @@ public class Lobby implements Parcelable {
         this.messages = messages;
     }
 
-    public Lobby(User owner, int numFree, ArrayList<User> lobbyList, String name, Sport sport) {
+    public Lobby(User owner, int numFree, HashMap<Integer,Object> lobbyList, String name, Sport sport) {
         this.owner = owner;
         this.numFree = numFree;
+        this.state= state;
         this.lobbyList = lobbyList;
         this.name = name;
         this.sport = sport;
@@ -64,7 +67,7 @@ public class Lobby implements Parcelable {
 
     public Lobby(User owner) {
         this.owner = owner;
-        this.lobbyList = new ArrayList<>();
+        this.lobbyList = new HashMap<>();
         this.lobbyList.add(owner);
     }
 
@@ -79,8 +82,9 @@ public class Lobby implements Parcelable {
     @SuppressWarnings("unchecked")
     protected Lobby(Parcel in) {
         numFree = in.readInt();
+        state= in.readInt();
         owner = in.readParcelable(User.class.getClassLoader());
-        lobbyList = in.readArrayList(Lobby.class.getClassLoader());
+        lobbyList = in.readHashMap(Lobby.class.getClassLoader());
         name = in.readString();
         sport = (Sport) in.readSerializable();
         location = in.readParcelable(LocationPlus.class.getClassLoader());
@@ -107,16 +111,19 @@ public class Lobby implements Parcelable {
     public int getNumFree() {
         return numFree;
     }
+    public int getstate() {
+        return state;
+    }
 
     public void setNumFree(int numFree) {
         this.numFree = numFree;
     }
 
-    public ArrayList<User> getLobbyList() {
+    public HashMap<Integer,Object> getLobbyList() {
         return lobbyList;
     }
 
-    public void setLobbyList(ArrayList<User> lobbyList) {
+    public void setLobbyList(HashMap<Integer,Object> lobbyList) {
         this.lobbyList = lobbyList;
     }
 
@@ -137,7 +144,8 @@ public class Lobby implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeValue(owner);
         parcel.writeInt(numFree);
-        parcel.writeList(lobbyList);
+        parcel.writeInt(state);
+        parcel.writeMap(lobbyList);
         parcel.writeList(messages);
         parcel.writeString(name);
         parcel.writeSerializable(sport);
@@ -158,15 +166,18 @@ public class Lobby implements Parcelable {
      * @return Lobby
      */
     public Lobby getLobbyFromRef(LobbyRef ref) {
-        ArrayList<User> mArList = new ArrayList<>();
-        for (String id : ref.lobbyList.keySet()) {
-            mArList.add(new User(ref.lobbyList.get("id")));
+        HashMap<Integer,Object> mArList = new HashMap<>();
+        for (Integer id : ref.lobbyList.keySet()) {
+            if(ref.lobbyList.get(id) instanceof String)
+            {
+                ref.lobbyList.put(id, new User(ref.lobbyList.get(id)));
+            }
         }
         try {
-            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, mArList, ref.name, ref.sport, LocationPlus.getLocationFromRepresentation(ref.getLocation()), new ArrayList<>());
+            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, ref.state, lobbyList, ref.name, ref.sport, LocationPlus.getLocationFromRepresentation(ref.getLocation()), new HashMap<>());
         } catch (NullPointerException e) {
             Log.e("NPE", e.getMessage());
-            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, mArList, ref.name, ref.sport);
+            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport);
         } catch (IllegalArgumentException e) {
             Log.e("IAE", e.getMessage());
         }
@@ -189,6 +200,7 @@ public class Lobby implements Parcelable {
         return "Lobby{" +
                 "owner=" + owner +
                 ", numFree=" + numFree +
+                ", state=" + state +
                 ", lobbyList=" + lobbyList +
                 ", name='" + name + '\'' +
                 ", sport=" + sport +
@@ -228,7 +240,8 @@ public class Lobby implements Parcelable {
         public String ownerName;
         public String ownerId;
         public int numFree;
-        public HashMap<String, String> lobbyList;
+        public int state;
+        public HashMap<Integer, Object> lobbyList;
         public String name;
         public Sport sport;
         private String location;
@@ -244,6 +257,7 @@ public class Lobby implements Parcelable {
             this.ownerName = lobby.getOwner().name;
             this.ownerId = lobby.getOwner().id;
             this.numFree = lobby.getNumFree();
+            this.state = lobby.getstate();
             this.lobbyList = new HashMap<>();
             this.location = lobby.getLocation().toString();
             this.name = lobby.getName();
@@ -260,6 +274,7 @@ public class Lobby implements Parcelable {
             map.put("ownerName", this.ownerName);
             map.put("ownerId", this.ownerId);
             map.put("numFree", this.numFree);
+            map.put("state", this.state);
             map.put("lobbyList", this.lobbyList);
             map.put("name", this.name);
             map.put("sport", this.sport);
