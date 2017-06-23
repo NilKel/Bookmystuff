@@ -12,6 +12,8 @@ import com.example.neel.bookingapp.Other.LobbyUserListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
+
 /**
  * Created by sushrutshringarputale on 1/6/17.
  */
@@ -33,7 +35,7 @@ public class LobbyActivity extends AppCompatActivity {
 
         ListView lobbyList = (ListView) findViewById(R.id.lobbyList);
 
-        LobbyUserListAdapter adapter = new LobbyUserListAdapter(this, R.layout.lobby_list_row, lobby.getLobbyList());
+        LobbyUserListAdapter adapter = new LobbyUserListAdapter(this, R.layout.lobby_list_row, new ArrayList<>(lobby.getLobbyList().values()));
 
         lobbyList.setAdapter(adapter);
 

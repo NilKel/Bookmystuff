@@ -247,9 +247,10 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         Deferred<ChatMessage, DatabaseException, Void> deferred = new DeferredObject<>();
         Log.d(TAG, "creating message: " + chatMessage.toString());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + chatMessage.lobby.getKey() + "/messages");
-        ref.push().setValue(chatMessage, (databaseError, databaseReference) -> {
+        ref.push().setValue(chatMessage.toRef(), (databaseError, databaseReference) -> {
             if (databaseError == null) {
                 chatMessage.id = databaseReference.getKey();
+                ref.child(chatMessage.id + "/id").setValue(chatMessage.id);
                 deferred.resolve(chatMessage);
             } else {
                 deferred.reject(databaseError.toException());
@@ -272,8 +273,12 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 mListenerMap.put(ref, this);
-                ChatMessage message = dataSnapshot.getValue(ChatMessage.class);
-                deferred.resolve(message);
+                ChatMessage.ChatMessageRef m = dataSnapshot.getValue(ChatMessage.ChatMessageRef.class);
+                if (m != null) {
+                    m.getChatMessageFromRef().promise().done(deferred::resolve).fail(deferred::reject);
+                } else {
+                    deferred.reject(new DatabaseException("Chat message not found"));
+                }
                 cleanupReferences();
             }
 

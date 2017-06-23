@@ -21,6 +21,7 @@ import android.widget.ListView;
 import com.example.neel.bookingapp.Activities.LoginActivity;
 import com.example.neel.bookingapp.Activities.MainActivity;
 import com.example.neel.bookingapp.Model.Lobby;
+import com.example.neel.bookingapp.Model.LobbySlot;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.DatabaseConnector;
@@ -110,8 +111,8 @@ public class SportFragment extends Fragment {
                     .done(lobby -> {
                         try {
                             User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                            if (!lobby.getLobbyList().contains(user) && lobby.getNumFree() > 0) {
-                                lobby.getLobbyList().add(user);
+                            if (!lobby.getLobbyList().containsValue(user) && lobby.getNumFree() > 0) {
+                                lobby.getLobbyList().put(lobby.getLobbyList().size(), (LobbySlot) user);
                                 lobby.setNumFree(lobby.getNumFree() - 1);
                                 FirebaseMessaging.getInstance().subscribeToTopic(lobby.getKey());
                                 databaseConnector.updateLobby(lobby).promise().fail(e -> {
@@ -124,14 +125,6 @@ public class SportFragment extends Fragment {
                             startActivity(new Intent(getActivity(), LoginActivity.class));
                         }
                     }).fail(e -> ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOBBY_READ_FAILED));
-            /**
-             * dabaconn.readLobby(lobby).then(
-             *      if currentuser.id is not in lobby.list
-             *              add user to lobby
-             *      launchLobby()
-             * )
-             *
-             */
             ((MainActivity) getActivity()).startLobby(lobbies.get(position));
         });
 

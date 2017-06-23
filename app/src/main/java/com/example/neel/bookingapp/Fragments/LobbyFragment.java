@@ -18,6 +18,8 @@ import com.example.neel.bookingapp.Other.ErrorHandler;
 import com.example.neel.bookingapp.R;
 import com.facebook.litho.ComponentContext;
 import com.facebook.litho.LithoView;
+import com.facebook.litho.widget.LinearLayoutInfo;
+import com.facebook.litho.widget.RecyclerBinder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +38,8 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     private DatabaseConnector mDatabaseConnector;
 
     private ArrayList<ChatMessage> messages;
+
+    private RecyclerBinder binder;
 
     public LobbyFragment() {
         // Required empty public constructor
@@ -69,22 +73,23 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         c = new ComponentContext(getContext());
+        binder = new RecyclerBinder(c, new LinearLayoutInfo(c.getBaseContext(), LinearLayout.VERTICAL, true));
         lithoView = LithoView.create(
                 getContext(),
-                LobbyView.
-                        create(c)
-                        .lobbyName(lobby.getName())
-                        .initMessages(new ArrayList<>())
+                LobbyView.create(c)
+                        .binder(binder)
                         .build());
         mDatabaseConnector.getNextChatMessages(lobby, null)
                 .promise().done(chatMessages -> {
-            LobbyView.updateMessagesListAsync(c, new ArrayList<>(chatMessages));
+            for (ChatMessage message : chatMessages) {
+                binder.insertItemAt(0, ChatMessageView.create(c).date(new Date(message.time)).senderName(message.sender.name).own(message.sender.id == user.id).build());
+            }
         }).fail(e -> ErrorHandler.handleError(getContext(), e, ERROR_CODES.MESSAGE_RECEIVE_FAILED));
 
         mDatabaseConnector.listenForMessages(lobby, new DatabaseConnector.MessageListener() {
             @Override
             public void onNewMessage(ChatMessage message) {
-                LobbyView.addMessageAsync(c, message);
+                binder.insertItemAt(0, ChatMessageView.create(c).date(new Date(message.time)).senderName(message.sender.name).own(user.id.equals(message.sender.id)).text(message.message).build());
             }
 
             @Override
@@ -115,7 +120,7 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.messageSendButton && messageSendEditText.getText() != null) {
             ChatMessage message = new ChatMessage(user, lobby, "", new Date().getTime(), messageSendEditText.getText().toString());
-            LobbyView.addMessage(c, message);
+            binder.insertItemAt(0, ChatMessageView.create(c).text(message.message).senderName(user.name).date(new Date(message.time)).own(true).build());
             //TODO: PROD: add sending animation to the message itself and update that once the message is successfully written. Or add an error message
             mDatabaseConnector.createChatMessage(message);
         }

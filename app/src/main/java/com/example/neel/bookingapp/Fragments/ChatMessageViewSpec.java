@@ -3,18 +3,23 @@ package com.example.neel.bookingapp.Fragments;
 import android.graphics.Typeface;
 import android.text.Layout;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.facebook.litho.ClickEvent;
 import com.facebook.litho.Column;
 import com.facebook.litho.ComponentContext;
 import com.facebook.litho.ComponentLayout;
 import com.facebook.litho.Row;
 import com.facebook.litho.annotations.LayoutSpec;
 import com.facebook.litho.annotations.OnCreateLayout;
+import com.facebook.litho.annotations.OnEvent;
 import com.facebook.litho.annotations.Prop;
 import com.facebook.litho.annotations.ResType;
 import com.facebook.litho.widget.Text;
+import com.facebook.yoga.YogaAlign;
 import com.facebook.yoga.YogaEdge;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.Random;
 
@@ -36,11 +41,14 @@ public class ChatMessageViewSpec {
             ComponentContext c,
             @Prop(resType = ResType.STRING) String text,
             @Prop Date date,
-            @Prop String senderName
+            @Prop String senderName,
+            @Prop boolean own
     ) {
         return Column.create(c)
-                .backgroundColor(BACKGROUND_COLOR)
-                .maxWidthDip(150)
+                .backgroundColor(own ? 0x98FFB3 : BACKGROUND_COLOR)
+                .clickHandler(ChatMessageView.onClick(c))
+                .maxWidthDip(100)
+                .alignSelf(own ? YogaAlign.FLEX_END : YogaAlign.FLEX_START)
                 .paddingDip(YogaEdge.ALL, 16)
                 .marginDip(YogaEdge.ALL, 16)
                 .child(
@@ -76,11 +84,18 @@ public class ChatMessageViewSpec {
                                 .marginDip(YogaEdge.TOP, 8)
                                 .child(
                                         Text.create(c)
-                                                .text(date.toString())
+                                                .text(DateFormat.getDateInstance().format(date))
                                                 .textAlignment(Layout.Alignment.ALIGN_OPPOSITE)
                                                 .build()
                                 ).build()
                 )
                 .build();
+    }
+
+    @OnEvent(ClickEvent.class)
+    static void onClick(
+            ComponentContext c
+    ) {
+        Log.d("Message clicked", "Yay");
     }
 }

@@ -49,6 +49,7 @@ public class User implements Parcelable {
         this.initialized = initialized;
     }
 
+
     public User(String id, String name, String email, long phNo, String profPic, boolean isOwner) {
         this(id, name, email, phNo, profPic, isOwner, new Date().getTime(), false);
     }
@@ -120,7 +121,7 @@ public class User implements Parcelable {
         this.isOwner = isOwner;
     }
 
-    public void copyData(User user) {
+    public User copyData(User user) {
         try {
             if (user.id != null)
                 this.id = user.id;
@@ -140,6 +141,7 @@ public class User implements Parcelable {
         } catch (NullPointerException e) {
             Log.e("NPE: copyData", e.getMessage());
         }
+        return this;
     }
 
     @Override

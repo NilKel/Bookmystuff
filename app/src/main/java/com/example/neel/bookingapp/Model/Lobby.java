@@ -4,7 +4,7 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import com.example.neel.bookingapp.Model.Slot_state;
+
 import com.google.firebase.database.Exclude;
 
 import org.jdeferred.Deferred;
@@ -35,8 +35,7 @@ public class Lobby implements Parcelable {
     };
     private User owner;
     private int numFree;
-    private int state;
-    private HashMap<Integer,Object> lobbyList;
+    private Map<Integer, LobbySlot> lobbyList;
     private String name;
     private Sport sport;
     private Location location;
@@ -45,10 +44,9 @@ public class Lobby implements Parcelable {
     private String key;
 
     //Constructors
-    public Lobby(User owner, int numFree, int state, HashMap<Integer,Object> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
+    public Lobby(User owner, int numFree, Map<Integer, LobbySlot> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
         this.owner = owner;
         this.numFree = numFree;
-        this.state= state;
         this.lobbyList = lobbyList;
         this.name = name;
         this.sport = sport;
@@ -56,10 +54,9 @@ public class Lobby implements Parcelable {
         this.messages = messages;
     }
 
-    public Lobby(User owner, int numFree, HashMap<Integer,Object> lobbyList, String name, Sport sport) {
+    public Lobby(User owner, int numFree, Map<Integer, LobbySlot> lobbyList, String name, Sport sport) {
         this.owner = owner;
         this.numFree = numFree;
-        this.state= state;
         this.lobbyList = lobbyList;
         this.name = name;
         this.sport = sport;
@@ -68,7 +65,7 @@ public class Lobby implements Parcelable {
     public Lobby(User owner) {
         this.owner = owner;
         this.lobbyList = new HashMap<>();
-        this.lobbyList.add(owner);
+        this.lobbyList.put(1, (LobbySlot) owner);
     }
 
     public Lobby() {
@@ -82,9 +79,8 @@ public class Lobby implements Parcelable {
     @SuppressWarnings("unchecked")
     protected Lobby(Parcel in) {
         numFree = in.readInt();
-        state= in.readInt();
         owner = in.readParcelable(User.class.getClassLoader());
-        lobbyList = in.readHashMap(Lobby.class.getClassLoader());
+        lobbyList = in.readHashMap(LobbySlot.class.getClassLoader());
         name = in.readString();
         sport = (Sport) in.readSerializable();
         location = in.readParcelable(LocationPlus.class.getClassLoader());
@@ -111,19 +107,16 @@ public class Lobby implements Parcelable {
     public int getNumFree() {
         return numFree;
     }
-    public int getstate() {
-        return state;
-    }
 
     public void setNumFree(int numFree) {
         this.numFree = numFree;
     }
 
-    public HashMap<Integer,Object> getLobbyList() {
+    public Map<Integer, LobbySlot> getLobbyList() {
         return lobbyList;
     }
 
-    public void setLobbyList(HashMap<Integer,Object> lobbyList) {
+    public void setLobbyList(Map<Integer, LobbySlot> lobbyList) {
         this.lobbyList = lobbyList;
     }
 
@@ -144,7 +137,6 @@ public class Lobby implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeValue(owner);
         parcel.writeInt(numFree);
-        parcel.writeInt(state);
         parcel.writeMap(lobbyList);
         parcel.writeList(messages);
         parcel.writeString(name);
@@ -166,15 +158,15 @@ public class Lobby implements Parcelable {
      * @return Lobby
      */
     public Lobby getLobbyFromRef(LobbyRef ref) {
-        HashMap<Integer,Object> mArList = new HashMap<>();
+        Map<Integer, LobbySlot> lobbyList = new HashMap<>();
         for (Integer id : ref.lobbyList.keySet()) {
-            if(ref.lobbyList.get(id) instanceof String)
+            if (new LobbySlot(ref.lobbyList.get(id)).isUser())
             {
-                ref.lobbyList.put(id, new User(ref.lobbyList.get(id)));
+                lobbyList.put(id, (LobbySlot) new User(ref.lobbyList.get(id)));
             }
         }
         try {
-            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, ref.state, lobbyList, ref.name, ref.sport, LocationPlus.getLocationFromRepresentation(ref.getLocation()), new HashMap<>());
+            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport, LocationPlus.getLocationFromRepresentation(ref.getLocation()), new ArrayList<>());
         } catch (NullPointerException e) {
             Log.e("NPE", e.getMessage());
             return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport);
@@ -200,7 +192,6 @@ public class Lobby implements Parcelable {
         return "Lobby{" +
                 "owner=" + owner +
                 ", numFree=" + numFree +
-                ", state=" + state +
                 ", lobbyList=" + lobbyList +
                 ", name='" + name + '\'' +
                 ", sport=" + sport +
@@ -240,11 +231,10 @@ public class Lobby implements Parcelable {
         public String ownerName;
         public String ownerId;
         public int numFree;
-        public int state;
-        public HashMap<Integer, Object> lobbyList;
+        public HashMap<Integer, String> lobbyList;
         public String name;
         public Sport sport;
-        private String location;
+        public String location;
 
         public LobbyRef() {
         }
@@ -257,12 +247,11 @@ public class Lobby implements Parcelable {
             this.ownerName = lobby.getOwner().name;
             this.ownerId = lobby.getOwner().id;
             this.numFree = lobby.getNumFree();
-            this.state = lobby.getstate();
             this.lobbyList = new HashMap<>();
             this.location = lobby.getLocation().toString();
             this.name = lobby.getName();
-            for (User user : lobby.getLobbyList()) {
-                this.lobbyList.put("id", user.id);
+            for (Integer index : lobby.getLobbyList().keySet()) {
+                this.lobbyList.put(index, lobby.getLobbyList().get(index).id);
             }
             this.sport = lobby.getSport();
             return this;
@@ -274,11 +263,11 @@ public class Lobby implements Parcelable {
             map.put("ownerName", this.ownerName);
             map.put("ownerId", this.ownerId);
             map.put("numFree", this.numFree);
-            map.put("state", this.state);
             map.put("lobbyList", this.lobbyList);
             map.put("name", this.name);
             map.put("sport", this.sport);
             map.put("location", this.location);
+            map.put("lobbyList", this.lobbyList);
             return map;
         }
 
