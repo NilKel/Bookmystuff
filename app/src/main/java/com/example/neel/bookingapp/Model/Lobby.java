@@ -10,6 +10,7 @@ import com.google.firebase.database.Exclude;
 import org.jdeferred.Deferred;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class Lobby implements Parcelable {
     };
     private User owner;
     private int numFree;
-    private Map<Integer, LobbySlot> lobbyList;
+    private Map<String, LobbySlot> lobbyList;
     private String name;
     private Sport sport;
     private Location location;
@@ -44,7 +45,7 @@ public class Lobby implements Parcelable {
     private String key;
 
     //Constructors
-    public Lobby(User owner, int numFree, Map<Integer, LobbySlot> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
+    public Lobby(User owner, int numFree, Map<String, LobbySlot> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
         this.owner = owner;
         this.numFree = numFree;
         this.lobbyList = lobbyList;
@@ -54,7 +55,7 @@ public class Lobby implements Parcelable {
         this.messages = messages;
     }
 
-    public Lobby(User owner, int numFree, Map<Integer, LobbySlot> lobbyList, String name, Sport sport) {
+    public Lobby(User owner, int numFree, Map<String, LobbySlot> lobbyList, String name, Sport sport) {
         this.owner = owner;
         this.numFree = numFree;
         this.lobbyList = lobbyList;
@@ -65,7 +66,7 @@ public class Lobby implements Parcelable {
     public Lobby(User owner) {
         this.owner = owner;
         this.lobbyList = new HashMap<>();
-        this.lobbyList.put(1, (LobbySlot) owner);
+        this.lobbyList.put(Integer.toString(1), (LobbySlot) owner);
     }
 
     public Lobby() {
@@ -112,11 +113,11 @@ public class Lobby implements Parcelable {
         this.numFree = numFree;
     }
 
-    public Map<Integer, LobbySlot> getLobbyList() {
+    public Map<String, LobbySlot> getLobbyList() {
         return lobbyList;
     }
 
-    public void setLobbyList(Map<Integer, LobbySlot> lobbyList) {
+    public void setLobbyList(Map<String, LobbySlot> lobbyList) {
         this.lobbyList = lobbyList;
     }
 
@@ -158,11 +159,13 @@ public class Lobby implements Parcelable {
      * @return Lobby
      */
     public Lobby getLobbyFromRef(LobbyRef ref) {
-        Map<Integer, LobbySlot> lobbyList = new HashMap<>();
-        for (Integer id : ref.lobbyList.keySet()) {
-            if (new LobbySlot(ref.lobbyList.get(id)).isUser())
-            {
-                lobbyList.put(id, (LobbySlot) new User(ref.lobbyList.get(id)));
+        Map<String, LobbySlot> lobbyList = new HashMap<>();
+        for (String id : ref.lobbyList.keySet()) {
+            LobbySlot slot = new LobbySlot(ref.lobbyList.get(id));
+            if (slot.isUser()) {
+                lobbyList.put(id, slot);
+            } else {
+                lobbyList.put(id, new LobbySlot().setString(ref.lobbyList.get(id)));
             }
         }
         try {
@@ -231,7 +234,7 @@ public class Lobby implements Parcelable {
         public String ownerName;
         public String ownerId;
         public int numFree;
-        public HashMap<Integer, String> lobbyList;
+        public HashMap<String, String> lobbyList;
         public String name;
         public Sport sport;
         public String location;
@@ -250,7 +253,7 @@ public class Lobby implements Parcelable {
             this.lobbyList = new HashMap<>();
             this.location = lobby.getLocation().toString();
             this.name = lobby.getName();
-            for (Integer index : lobby.getLobbyList().keySet()) {
+            for (String index : lobby.getLobbyList().keySet()) {
                 this.lobbyList.put(index, lobby.getLobbyList().get(index).id);
             }
             this.sport = lobby.getSport();
@@ -278,5 +281,45 @@ public class Lobby implements Parcelable {
         public void setLocation(String location) {
             this.location = location;
         }
+    }
+
+    /**
+     * Created by sushrutshringarputale on 6/22/17.
+     * Copyright (c) Sushrut Shringarputale 2017. All rights reserved.
+     */
+
+    public static class LobbySlot extends User {
+
+        private String storedString;
+
+        public LobbySlot(String id) {
+            super(id);
+        }
+
+        public LobbySlot() {
+        }
+
+        public LobbySlot setString(String s) {
+            this.storedString = s;
+            return this;
+        }
+
+        public boolean isUser() {
+            return !(Arrays.asList(SlotState.values()).contains(storedString));
+        }
+
+        public User getUser() {
+            return isUser() ? this : null;
+        }
+
+        public SlotState getSlotState() {
+            return isUser() ? null : SlotState.valueOf(storedString);
+        }
+
+        public enum SlotState {
+            OPEN, CLOSED, FRIEND
+        }
+
+
     }
 }

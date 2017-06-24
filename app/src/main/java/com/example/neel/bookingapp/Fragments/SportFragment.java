@@ -21,7 +21,6 @@ import android.widget.ListView;
 import com.example.neel.bookingapp.Activities.LoginActivity;
 import com.example.neel.bookingapp.Activities.MainActivity;
 import com.example.neel.bookingapp.Model.Lobby;
-import com.example.neel.bookingapp.Model.LobbySlot;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.DatabaseConnector;
@@ -104,15 +103,12 @@ public class SportFragment extends Fragment {
 
         lobbyList.setOnItemClickListener((parent, view, position, id) -> {
             Log.d("Lobby clicked", lobbies.get(position).toString());
-
-            //TODO: Configure this to add the user to the lobby if the user is not already a part of it.
-            //PSEUDOCODE:
             databaseConnector.readLobby(lobbies.get(position)).promise()
                     .done(lobby -> {
                         try {
                             User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid());
                             if (!lobby.getLobbyList().containsValue(user) && lobby.getNumFree() > 0) {
-                                lobby.getLobbyList().put(lobby.getLobbyList().size(), (LobbySlot) user);
+                                lobby.getLobbyList().put(Integer.toString(lobby.getLobbyList().size()), (Lobby.LobbySlot) user);
                                 lobby.setNumFree(lobby.getNumFree() - 1);
                                 FirebaseMessaging.getInstance().subscribeToTopic(lobby.getKey());
                                 databaseConnector.updateLobby(lobby).promise().fail(e -> {
