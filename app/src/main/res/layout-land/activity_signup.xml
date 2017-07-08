@@ -7,35 +7,35 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_arrow_back_black_24dp"
-        android:backgroundTint="@color/white"
-        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:background="@drawable/ic_arrow_back_black_24dp"
+        android:backgroundTint="@color/white"
         android:onClick="cancelSignup"/>
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        app:srcCompat="@color/cardview_dark_background"
-        android:id="@+id/imageView" />
+        app:srcCompat="@color/cardview_dark_background" />
 
     <TextView
-        android:text="@string/create_account"
-        android:textSize="50sp"
-        android:textColor="@color/white"
+        android:id="@+id/appNameTextView"
         android:layout_width="wrap_content"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/imageView"
-        android:id="@+id/appNameTextView" />
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="@string/create_account"
+        android:textColor="@color/white"
+        android:textSize="50sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,69 +51,69 @@
             android:layout_height="match_parent"
             android:layout_weight="3">
             <EditText
+                android:id="@+id/nameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:hint="@string/nameTagText"
-                android:textColorHint="@color/white"
+                android:inputType="textPersonName"
                 android:textColor="@color/white"
-                android:id="@+id/nameEditText" />
+                android:textColorHint="@color/white" />
 
             <EditText
+                android:id="@+id/emailEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:hint="@string/emailTagText"
                 android:layout_below="@id/nameEditText"
-                android:textColorHint="@color/white"
-                android:textColor="@color/white"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:id="@+id/emailEditText" />
+                android:hint="@string/emailTagText"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
 
             <EditText
+                android:id="@+id/passwordEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
                 android:layout_below="@id/emailEditText"
-                android:hint="@string/passwordTagText"
-                android:textColorHint="@color/white"
-                android:textColor="@color/white"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:id="@+id/passwordEditText" />
+                android:hint="@string/passwordTagText"
+                android:inputType="textPassword"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
 
             <EditText
+                android:id="@+id/passwordReenterEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
                 android:layout_below="@id/passwordEditText"
-                android:textColorHint="@color/white"
-                android:textColor="@color/white"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:hint="@string/reenterPasswordTagText"
-                android:id="@+id/passwordReenterEditText"
+                android:inputType="textPassword"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
                 />
 
             <EditText
+                android:id="@+id/phoneNoEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="phone"
-                android:hint="Phone Number"
-                android:textColorHint="@color/white"
-                android:textColor="@color/white"
                 android:layout_below="@id/passwordReenterEditText"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:id="@+id/phoneNoEditText" />
+                android:hint="Phone Number"
+                android:inputType="phone"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
 
             <Button
-                android:text="@string/CreateAccountButtonText"
+                android:id="@+id/submitButtonClicked"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="SignUpClicked"
-                android:textColor="@color/appGreen"
                 android:layout_below="@id/phoneNoEditText"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:id="@+id/submitButtonClicked" />
+                android:onClick="SignUpClicked"
+                android:text="@string/CreateAccountButtonText"
+                android:textColor="@color/colorPrimaryLight" />
             </RelativeLayout>
          <View
         android:layout_width="0dp"

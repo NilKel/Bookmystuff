@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.neel.bookingapp.Deprecated.LoginActivity2;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.R;
@@ -108,6 +109,6 @@ public class SignupActivity extends FragmentActivity{
     }
 
     public void cancelSignup(View view) {
-        startActivity(new Intent(this, LoginActivity.class));
+        startActivity(new Intent(this, LoginActivity2.class));
     }
 }

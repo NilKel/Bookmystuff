@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.firebase.geofire.GeoFire;
 import com.google.firebase.database.Exclude;
 
 import org.jdeferred.Deferred;
@@ -39,13 +40,14 @@ public class Lobby implements Parcelable {
     private Map<String, LobbySlot> lobbyList;
     private String name;
     private Sport sport;
-    private Location location;
+    private Location location; //TODO: Change to GeoFire
+    private GeoFire geoFire;
     private ArrayList<ChatMessage> messages;
     @Exclude
     private String key;
 
     //Constructors
-    public Lobby(User owner, int numFree, Map<String, LobbySlot> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages) {
+    public Lobby(User owner, int numFree, Map<String, LobbySlot> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages, String key) {
         this.owner = owner;
         this.numFree = numFree;
         this.lobbyList = lobbyList;
@@ -53,14 +55,16 @@ public class Lobby implements Parcelable {
         this.sport = sport;
         this.location = location;
         this.messages = messages;
+        this.key = key;
     }
 
-    public Lobby(User owner, int numFree, Map<String, LobbySlot> lobbyList, String name, Sport sport) {
+    public Lobby(User owner, int numFree, Map<String, LobbySlot> lobbyList, String name, Sport sport, String key) {
         this.owner = owner;
         this.numFree = numFree;
         this.lobbyList = lobbyList;
         this.name = name;
         this.sport = sport;
+        this.key = key;
     }
 
     public Lobby(User owner) {
@@ -79,13 +83,13 @@ public class Lobby implements Parcelable {
 
     @SuppressWarnings("unchecked")
     protected Lobby(Parcel in) {
-        numFree = in.readInt();
         owner = in.readParcelable(User.class.getClassLoader());
+        numFree = in.readInt();
         lobbyList = in.readHashMap(LobbySlot.class.getClassLoader());
+        messages = in.readArrayList(ChatMessage.class.getClassLoader());
         name = in.readString();
         sport = (Sport) in.readSerializable();
-        location = in.readParcelable(LocationPlus.class.getClassLoader());
-        messages = in.readArrayList(ChatMessage.class.getClassLoader());
+        key = in.readString();
     }
 
     //Getters/Setters
@@ -142,6 +146,7 @@ public class Lobby implements Parcelable {
         parcel.writeList(messages);
         parcel.writeString(name);
         parcel.writeSerializable(sport);
+        parcel.writeString(key);
     }
 
     public Sport getSport() {
@@ -162,17 +167,17 @@ public class Lobby implements Parcelable {
         Map<String, LobbySlot> lobbyList = new HashMap<>();
         for (String id : ref.lobbyList.keySet()) {
             LobbySlot slot = new LobbySlot(ref.lobbyList.get(id));
-            if (slot.isUser()) {
+            if (slot.checkIsUser()) {
                 lobbyList.put(id, slot);
             } else {
                 lobbyList.put(id, new LobbySlot().setString(ref.lobbyList.get(id)));
             }
         }
         try {
-            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport, LocationPlus.getLocationFromRepresentation(ref.getLocation()), new ArrayList<>());
+            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport, LocationPlus.getLocationFromRepresentation(ref.getLocation()), new ArrayList<>(), ref.key);
         } catch (NullPointerException e) {
             Log.e("NPE", e.getMessage());
-            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport);
+            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport, ref.key);
         } catch (IllegalArgumentException e) {
             Log.e("IAE", e.getMessage());
         }
@@ -238,6 +243,8 @@ public class Lobby implements Parcelable {
         public String name;
         public Sport sport;
         public String location;
+        @Exclude
+        public String key;
 
         public LobbyRef() {
         }
@@ -257,6 +264,7 @@ public class Lobby implements Parcelable {
                 this.lobbyList.put(index, lobby.getLobbyList().get(index).id);
             }
             this.sport = lobby.getSport();
+            this.key = lobby.key;
             return this;
         }
 
@@ -304,16 +312,16 @@ public class Lobby implements Parcelable {
             return this;
         }
 
-        public boolean isUser() {
+        public boolean checkIsUser() {
             return !(Arrays.asList(SlotState.values()).contains(storedString));
         }
 
         public User getUser() {
-            return isUser() ? this : null;
+            return checkIsUser() ? this : null;
         }
 
-        public SlotState getSlotState() {
-            return isUser() ? null : SlotState.valueOf(storedString);
+        public SlotState slotState() {
+            return checkIsUser() ? null : SlotState.valueOf(storedString);
         }
 
         public enum SlotState {

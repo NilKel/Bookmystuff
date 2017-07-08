@@ -2,9 +2,9 @@ package com.example.neel.bookingapp.Other;
 
 import android.app.Application;
 
-import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.soloader.SoLoader;
+import com.facebook.stetho.Stetho;
 import com.firebase.client.Firebase;
 
 /**
@@ -21,10 +21,8 @@ public class BookMyStuffApp extends Application {
         //TODO: APP LEVEL: Configure all onFails to route to Error Handler
         Firebase.setAndroidContext(this);
         Firebase myFirebaseRef =  new Firebase("https://bookmystuff-79c2e.firebaseio.com/");
-
         SoLoader.init(this, false);
-
-        FacebookSdk.sdkInitialize(getApplicationContext());
+        Stetho.initializeWithDefaults(this);
         AppEventsLogger.activateApp(this);
     }
 }

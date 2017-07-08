@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Deprecated;
 
 import com.example.neel.bookingapp.Model.Lobby;
 

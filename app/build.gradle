@@ -14,7 +14,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -34,24 +34,25 @@ dependencies {
     compile 'com.android.support:design:25.4.0'
 
 
-    compile 'com.google.android.gms:play-services-auth:11.0.1'
-    compile 'com.google.android.gms:play-services-location:11.0.1'
-    compile 'com.google.android.gms:play-services-places:11.0.1'
+    compile 'com.google.android.gms:play-services-auth:11.0.2'
+    compile 'com.google.android.gms:play-services-location:11.0.2'
+    compile 'com.google.android.gms:play-services-places:11.0.2'
 
 
-    compile 'com.google.firebase:firebase-auth:11.0.1'
-    compile 'com.google.firebase:firebase-database:11.0.1'
-    compile 'com.google.firebase:firebase-crash:11.0.1'
+    compile 'com.google.firebase:firebase-auth:11.0.2'
+    compile 'com.google.firebase:firebase-database:11.0.2'
+    compile 'com.google.firebase:firebase-crash:11.0.2'
     compile 'com.firebase:firebase-client-android:2.5.2'
-    compile 'com.google.firebase:firebase-messaging:11.0.1'
-    compile 'com.facebook.android:facebook-android-sdk:4.23.0'
+    compile 'com.google.firebase:firebase-messaging:11.0.2'
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
+    compile 'com.firebase:geofire-android:2.1.1'
 
 
     compile 'com.github.bumptech.glide:glide:3.7.0'
 
 
     compile 'com.android.support:support-v4:25.4.0'
-    compile 'com.google.android.gms:play-services-gcm:11.0.1'
+    compile 'com.google.android.gms:play-services-gcm:11.0.2'
 
     compile 'com.google.code.findbugs:jsr305:3.0.1'
 
@@ -85,6 +86,7 @@ dependencies {
 
     // For integration with Fresco
     compile 'com.facebook.litho:litho-fresco:0.3.1'
+    implementation 'com.android.support:support-v4:25.4.0'
 }
 android {
     packagingOptions {

@@ -30,12 +30,13 @@ public class LobbyViewSpec {
                 .widthPercent(100)
                 .heightPercent(100)
                 .paddingDip(YogaEdge.ALL, 8)
-                .backgroundColor(0xe1e1e1)
                 .child(
                         Row.create(c)
-                                .flexGrow(6)
+                                .heightPercent(100)
+                                .widthPercent(100)
                                 .child(
                                         Recycler.create(c)
+                                                .hasFixedSize(false)
                                                 .binder(binder)
                                                 .onScrollListener(new RecyclerView.OnScrollListener() {
                                                     /**

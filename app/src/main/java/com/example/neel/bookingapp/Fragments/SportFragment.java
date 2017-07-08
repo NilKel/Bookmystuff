@@ -12,14 +12,15 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
-import com.example.neel.bookingapp.Activities.LoginActivity;
 import com.example.neel.bookingapp.Activities.MainActivity;
+import com.example.neel.bookingapp.Deprecated.LoginActivity2;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
@@ -42,7 +43,7 @@ public class SportFragment extends Fragment {
     public LocationManager locationManager;
     //PRIVATE VARIABLES
     private ArrayList<Lobby> lobbies = new ArrayList<>();
-    private ListView lobbyList;
+    private RecyclerView lobbyList;
     private DatabaseConnector databaseConnector;
 
     public SportFragment() {
@@ -98,10 +99,11 @@ public class SportFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        lobbyList = (ListView) getView().findViewById(R.id.lobbyListView);
+        lobbyList = (RecyclerView) getView().findViewById(R.id.lobbyListView);
         databaseConnector = new DatabaseConnector();
 
-        lobbyList.setOnItemClickListener((parent, view, position, id) -> {
+        lobbyList.setLayoutManager(new LinearLayoutManager(getContext()));
+        lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies, (v, position) -> {
             Log.d("Lobby clicked", lobbies.get(position).toString());
             databaseConnector.readLobby(lobbies.get(position)).promise()
                     .done(lobby -> {
@@ -118,13 +120,12 @@ public class SportFragment extends Fragment {
                         } catch (NullPointerException e) {
                             FirebaseAuth.getInstance().signOut();
                             ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOGIN_FAIL);
-                            startActivity(new Intent(getActivity(), LoginActivity.class));
+                            startActivity(new Intent(getActivity(), LoginActivity2.class));
                         }
                     }).fail(e -> ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOBBY_READ_FAILED));
             ((MainActivity) getActivity()).startLobby(lobbies.get(position));
-        });
+        }));
 
-        //V2.0 Change Inline ProgressDialogs to Activity level progress dialogs through a central showProgress(bool) method
         ProgressDialog dialog = new ProgressDialog(getContext());
         dialog.setMessage("Loading lobbies");
         dialog.show();
@@ -142,7 +143,7 @@ public class SportFragment extends Fragment {
             databaseConnector.getLobbiesBySport((Sport) getArguments().getSerializable("ARGUMENT"), null)
                     .promise().done(lobbies1 -> {
                 lobbies = (ArrayList<Lobby>) lobbies1;
-                lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                lobbyList.getAdapter().notifyDataSetChanged();
                 dialog.dismiss();
             }).fail(error -> {
                 Log.e("SportFragment", error.getMessage());
@@ -161,7 +162,7 @@ public class SportFragment extends Fragment {
                         databaseConnector.getLobbiesBySport(sport, location).promise()
                                 .done(lobbies1 -> {
                                     lobbies = (ArrayList<Lobby>) lobbies1;
-                                    lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                                    lobbyList.getAdapter().notifyDataSetChanged();
                                     dialog.dismiss();
                                 }).fail(error -> {
                             Log.e("SportFragment", error.getMessage());
@@ -187,7 +188,7 @@ public class SportFragment extends Fragment {
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
                             lobbies = (ArrayList<Lobby>) lobbies1;
-                            lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                            lobbyList.getAdapter().notifyDataSetChanged();
                             dialog.dismiss();
                         }).fail(error -> {
                             Log.e("SportFragment", error.getMessage());
@@ -227,7 +228,7 @@ public class SportFragment extends Fragment {
                         }
                         databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
                             lobbies = (ArrayList<Lobby>) lobbies1;
-                            lobbyList.setAdapter(new LobbyListAdapter(getContext(), lobbies1));
+                            lobbyList.getAdapter().notifyDataSetChanged();
                             dialog.dismiss();
                         }).fail(error -> {
                             Log.e("SportFragment", error.getMessage());

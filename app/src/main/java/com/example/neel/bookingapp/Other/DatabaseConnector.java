@@ -89,6 +89,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null) {
                     lobby.getLobbyFromRef(dataSnapshot.getValue(Lobby.LobbyRef.class));
+                    lobby.setKey(dataSnapshot.getKey());
                     deferred.resolve(lobby);
                     ref.removeEventListener(this);
                 } else {
@@ -247,10 +248,8 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         Deferred<ChatMessage, DatabaseException, Void> deferred = new DeferredObject<>();
         Log.d(TAG, "creating message: " + chatMessage.toString());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + chatMessage.lobby.getKey() + "/messages");
-        ref.push().setValue(chatMessage.toRef(), (databaseError, databaseReference) -> {
+        ref.push().updateChildren(chatMessage.toRef().toMap(), (databaseError, databaseReference) -> {
             if (databaseError == null) {
-                chatMessage.id = databaseReference.getKey();
-                ref.child(chatMessage.id + "/id").setValue(chatMessage.id);
                 deferred.resolve(chatMessage);
             } else {
                 deferred.reject(databaseError.toException());
@@ -439,10 +438,14 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
 
     public void listenForMessages(final Lobby lobby, MessageListener mMessageListener) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + lobby.getKey() + "/messages");
-        ref.addChildEventListener(new ChildEventListener() {
+        ref.limitToLast(50).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mMessageListener.onNewMessage(dataSnapshot.getValue(ChatMessage.class));
+                if (dataSnapshot != null) {
+                    ChatMessage.ChatMessageRef chatMessageRef = dataSnapshot.getValue(ChatMessage.ChatMessageRef.class);
+                    chatMessageRef.key = dataSnapshot.getKey();
+                    chatMessageRef.getChatMessageFromRef().promise().done(mMessageListener::onNewMessage).fail(mMessageListener::onError);
+                }
             }
 
             @Override
@@ -492,6 +495,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                 mListenerMap.put(ref, this);
                 if (dataSnapshot != null) {
                     Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
+                    temp.key = dataSnapshot.getKey();
                     if (temp.sport == sport && temp.numFree > 0) {
                         lobbies.add(new Lobby().getLobbyFromRef(temp));
                     }
@@ -547,6 +551,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                         Log.d("Retrieved Lobby", dataSnapshot.toString());
                         if (dataSnapshot != null) {
                             Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
+                            temp.key = dataSnapshot.getKey();
                             lobbyArrayList.add(new Lobby().getLobbyFromRef(temp));
                         }
                     }
@@ -575,13 +580,17 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                deferred.resolve(lobbyArrayList);
+                if (!deferred.isResolved()) {
+                    deferred.resolve(lobbyArrayList);
+                }
                 cleanupReferences();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                deferred.reject(databaseError.toException());
+                if (!deferred.isRejected()) {
+                    deferred.reject(databaseError.toException());
+                }
                 cleanupReferences();
                 //TODO: OnLogout reference cleanup deferred already rejected/resolved
             }

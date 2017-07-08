@@ -1,8 +1,11 @@
 package com.example.neel.bookingapp.Activities;
 
-import android.app.ProgressDialog;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -20,10 +23,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.neel.bookingapp.Deprecated.LoginActivity2;
 import com.example.neel.bookingapp.Fragments.HomeFragment;
 import com.example.neel.bookingapp.Fragments.LobbyFragment;
 import com.example.neel.bookingapp.Fragments.SportFragment;
@@ -73,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     private Handler mHandler;
     private boolean inLobby = false;
     private DatabaseConnector mDatabaseConnector;
+    private ProgressBar mProgressBar;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -80,18 +86,15 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mDatabaseConnector = new DatabaseConnector();
-
-        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
-        dialog.setMessage("Initializing");
-        dialog.show();
-
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        showProgress(true);
 
         currentUser = new User(FirebaseAuth.getInstance().getCurrentUser());
         //Update the on-device user object from all the data from the database
         mDatabaseConnector.readUser(currentUser).promise().done((user) -> {
             Log.d("Current user", currentUser.toString());
             Log.d("MainActivity", "Started");
-            dialog.dismiss();
+            showProgress(false);
 
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -139,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             // load nav menu header data
             loadNavHeader();
 
+
             // initializing navigation menu
             setUpNavigationView();
 
@@ -146,6 +150,11 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
                 navItemIndex = 0;
                 CURRENT_TAG = TAG_HOME;
                 loadHomeFragment();
+            } else {
+                //Set header title
+                setToolbarTitle();
+                selectNavMenu();
+                toggleFab();
             }
         }).fail((error) -> {
             Log.e("User data retrieval", error.getMessage());
@@ -233,6 +242,15 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         return mLobby;
     }
 
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("title", CURRENT_TAG);
+        outState.putInt("navItemIndex", navItemIndex);
+        super.onSaveInstanceState(outState);
+
+    }
+
     private Fragment getHomeFragment() {
         Bundle bundle = new Bundle();
         SportFragment sportFragment = new SportFragment();
@@ -265,11 +283,20 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     }
 
     private void setToolbarTitle() {
-        getSupportActionBar().setTitle(activityTitles[navItemIndex]);
+        if (navItemIndex >= 0) {
+            getSupportActionBar().setTitle(activityTitles[navItemIndex]);
+        }
     }
 
     private void selectNavMenu() {
-        navigationView.getMenu().getItem(navItemIndex).setChecked(true);
+        if (navItemIndex >= 0) {
+            navigationView.getMenu().getItem(navItemIndex).setChecked(true);
+        } else {
+            int size = navigationView.getMenu().size();
+            for (int i = 0; i < size; i++) {
+                navigationView.getMenu().getItem(i).setChecked(false);
+            }
+        }
     }
 
     private void setUpNavigationView() {
@@ -426,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {
             FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            startActivity(new Intent(MainActivity.this, LoginActivity2.class));
             return true;
         }
 
@@ -481,6 +508,8 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             inLobby = true;
             toggleFab();
             navItemIndex = -1;
+            setToolbarTitle();
+            selectNavMenu();
             getSupportActionBar().setTitle(CURRENT_TAG);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.setCustomAnimations(android.R.anim.slide_in_left,
@@ -493,6 +522,26 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         if (mPendingRunnable != null) {
             mHandler.post(mPendingRunnable);
         }
+    }
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    public void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressBar.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
 

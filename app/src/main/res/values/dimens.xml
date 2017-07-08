@@ -9,5 +9,5 @@
     <dimen name="profile_width">75dp</dimen>
     <dimen name="profile_height">75dp</dimen>
     <dimen name="app_title_size">30sp</dimen>
-    <dimen name="baloon_dim">200dp</dimen>
+    <dimen name="baloon_dim">150dp</dimen>
 </resources>

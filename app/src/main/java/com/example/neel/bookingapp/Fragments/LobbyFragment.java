@@ -82,14 +82,14 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
         mDatabaseConnector.getNextChatMessages(lobby, null)
                 .promise().done(chatMessages -> {
             for (ChatMessage message : chatMessages) {
-                binder.insertItemAt(0, ChatMessageView.create(c).date(new Date(message.time)).senderName(message.sender.name).own(message.sender.id == user.id).build());
+                binder.insertItemAt(0, ChatMessageView.create(c).chatMessage(message).own(message.sender.id == user.id).build());
             }
         }).fail(e -> ErrorHandler.handleError(getContext(), e, ERROR_CODES.MESSAGE_RECEIVE_FAILED));
 
         mDatabaseConnector.listenForMessages(lobby, new DatabaseConnector.MessageListener() {
             @Override
             public void onNewMessage(ChatMessage message) {
-                binder.insertItemAt(0, ChatMessageView.create(c).date(new Date(message.time)).senderName(message.sender.name).own(user.id.equals(message.sender.id)).text(message.message).build());
+                binder.insertItemAt(0, ChatMessageView.create(c).chatMessage(message).own(user.id.equals(message.sender.id)).build());
             }
 
             @Override
@@ -97,10 +97,12 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
                 ErrorHandler.handleError(getContext(), e, ERROR_CODES.MESSAGE_RECEIVE_FAILED);
             }
         });
-        View view = inflater.inflate(R.layout.fragment_lobby, container);
+        View view = inflater.inflate(R.layout.fragment_lobby, container, false);
         LinearLayout layout = (LinearLayout) view.findViewById(R.id.msgListView);
+        layout.removeAllViews();
         layout.addView(lithoView);
         messageSendEditText = (EditText) view.findViewById(R.id.messageEditText);
+        view.findViewById(R.id.sendMessageButton).setOnClickListener(this);
         return view;
     }
 
@@ -118,11 +120,12 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
      */
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.messageSendButton && messageSendEditText.getText() != null) {
+        if (v.getId() == R.id.sendMessageButton && messageSendEditText.getText() != null) {
             ChatMessage message = new ChatMessage(user, lobby, "", new Date().getTime(), messageSendEditText.getText().toString());
-            binder.insertItemAt(0, ChatMessageView.create(c).text(message.message).senderName(user.name).date(new Date(message.time)).own(true).build());
+            //binder.insertItemAt(0, ChatMessageView.create(c).text(message.message).senderName(user.name).date(new Date(message.time)).own(true).build());
             //TODO: PROD: add sending animation to the message itself and update that once the message is successfully written. Or add an error message
             mDatabaseConnector.createChatMessage(message);
+            messageSendEditText.setText("");
         }
     }
 }

@@ -3,11 +3,13 @@ package com.example.neel.bookingapp.Fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.example.neel.bookingapp.Activities.MainActivity;
 import com.example.neel.bookingapp.Model.Lobby;
@@ -37,19 +39,32 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         lobbyArrayList = new ArrayList<>();
-        final ListView lobbyList = (ListView) view.findViewById(R.id.lobbyListView);
+        SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        final RecyclerView lobbyList = (RecyclerView) view.findViewById(R.id.lobbyListView);
         Log.d(TAG, "Loading");
-
-        databaseConnector = new DatabaseConnector();
-
-        //Configure event listeners for listView
-        lobbyList.setOnItemClickListener((parent, view1, position, id) -> {
+        LobbyListAdapter adapter = new LobbyListAdapter(getContext(), lobbyArrayList, (v, position) -> {
             ((MainActivity) getActivity()).startLobby(lobbyArrayList.get(position));
+        });
+        lobbyList.setAdapter(adapter);
+        lobbyList.setLayoutManager(new LinearLayoutManager(getContext()));
+        databaseConnector = new DatabaseConnector();
+        refreshLayout.setOnRefreshListener(() -> {
+            databaseConnector.getLobbiesByUser(FirebaseAuth.getInstance().getCurrentUser())
+                    .promise().done(lobbyArrayList -> {
+                this.lobbyArrayList = (ArrayList<Lobby>) lobbyArrayList;
+                adapter.lobbyList = this.lobbyArrayList;
+                adapter.notifyDataSetChanged();
+                refreshLayout.setRefreshing(false);
+            }).fail(error -> {
+                refreshLayout.setRefreshing(false);
+                Log.e(TAG, error.getMessage());
+            });
         });
         databaseConnector.getLobbiesByUser(FirebaseAuth.getInstance().getCurrentUser())
                 .promise().done(lobbyArrayList -> {
-            lobbyList.setAdapter(new LobbyListAdapter(getActivity(), lobbyArrayList));
             this.lobbyArrayList = (ArrayList<Lobby>) lobbyArrayList;
+            adapter.lobbyList = this.lobbyArrayList;
+            adapter.notifyDataSetChanged();
         }).fail(error -> {
             Log.e(TAG, error.getMessage());
         });

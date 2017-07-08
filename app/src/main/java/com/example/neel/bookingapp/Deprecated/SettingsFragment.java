@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Fragments;
+package com.example.neel.bookingapp.Deprecated;
 
 import android.content.Context;
 import android.os.Build;

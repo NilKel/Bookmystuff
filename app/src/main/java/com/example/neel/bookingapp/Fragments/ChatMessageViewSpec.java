@@ -5,6 +5,7 @@ import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.example.neel.bookingapp.Model.ChatMessage;
 import com.facebook.litho.ClickEvent;
 import com.facebook.litho.Column;
 import com.facebook.litho.ComponentContext;
@@ -14,7 +15,6 @@ import com.facebook.litho.annotations.LayoutSpec;
 import com.facebook.litho.annotations.OnCreateLayout;
 import com.facebook.litho.annotations.OnEvent;
 import com.facebook.litho.annotations.Prop;
-import com.facebook.litho.annotations.ResType;
 import com.facebook.litho.widget.Text;
 import com.facebook.yoga.YogaAlign;
 import com.facebook.yoga.YogaEdge;
@@ -31,35 +31,33 @@ import java.util.Random;
 @LayoutSpec
 public class ChatMessageViewSpec {
 
-    private static final int BACKGROUND_COLOR = 0x232323;
-    private static final int TXT_COLOR = 0xc4c4c4;
+    private static final int BACKGROUND_COLOR = 0xcdcdcd;
+    private static final int TXT_COLOR = 0x000000;
     private static final int MAX_RAND_LIMIT = 0x999999;
 
 
     @OnCreateLayout
     static ComponentLayout onCreateLayout(
             ComponentContext c,
-            @Prop(resType = ResType.STRING) String text,
-            @Prop Date date,
-            @Prop String senderName,
+            @Prop ChatMessage chatMessage,
             @Prop boolean own
     ) {
         return Column.create(c)
-                .backgroundColor(own ? 0x98FFB3 : BACKGROUND_COLOR)
+                .backgroundColor(own ? 0x123456 : BACKGROUND_COLOR)
                 .clickHandler(ChatMessageView.onClick(c))
-                .maxWidthDip(100)
+                .maxWidthDip(200)
                 .alignSelf(own ? YogaAlign.FLEX_END : YogaAlign.FLEX_START)
-                .paddingDip(YogaEdge.ALL, 16)
+                .alignItems(own ? YogaAlign.FLEX_END : YogaAlign.FLEX_START)
                 .marginDip(YogaEdge.ALL, 16)
                 .child(
                         Row.create(c)
                                 .child(
                                         Text.create(c)
                                                 .isSingleLine(true)
-                                                .textAlignment(Layout.Alignment.ALIGN_NORMAL)
-                                                .text(senderName)
+                                                .textAlignment(Layout.Alignment.ALIGN_OPPOSITE)
+                                                .text(chatMessage.sender.name)
                                                 .textColor(new Random().nextInt(MAX_RAND_LIMIT))
-                                                .textSizeSp(14)
+                                                .textSizeSp(10)
                                                 .ellipsize(TextUtils.TruncateAt.END)
                                                 .build()
                                 )
@@ -73,7 +71,7 @@ public class ChatMessageViewSpec {
                                         Text.create(c)
                                                 .textSizeSp(15)
                                                 .textColor(TXT_COLOR)
-                                                .text(text)
+                                                .text(chatMessage.message)
                                                 .typeface(Typeface.SANS_SERIF)
                                                 .build()
                                 ).build()
@@ -84,7 +82,7 @@ public class ChatMessageViewSpec {
                                 .marginDip(YogaEdge.TOP, 8)
                                 .child(
                                         Text.create(c)
-                                                .text(DateFormat.getDateInstance().format(date))
+                                                .text(DateFormat.getDateInstance().format(new Date(chatMessage.time)))
                                                 .textAlignment(Layout.Alignment.ALIGN_OPPOSITE)
                                                 .build()
                                 ).build()
