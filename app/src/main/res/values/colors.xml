@@ -6,9 +6,11 @@
     <color name="colorSecondary">#c62828</color>
     <color name="colorSecondaryLight">#ff5f52</color>
     <color name="colorSecondaryDark">#8e0000</color>
-    <color name="colorAccent">#e2f1fc</color>
+    <color name="colorAccent">#43000000</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000</color>
 
     <color name="black_overlay">#66000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="color_bottom_sheet">#ffffff</color>
 </resources>

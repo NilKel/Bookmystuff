@@ -21,7 +21,6 @@ import java.util.Map;
 
 /**
  * This is a model representation of a Lobby implemented in the app.
- *
  */
 public class Lobby implements Parcelable {
     public static final Creator<Lobby> CREATOR = new Creator<Lobby>() {
@@ -43,6 +42,7 @@ public class Lobby implements Parcelable {
     private Location location; //TODO: Change to GeoFire
     private GeoFire geoFire;
     private ArrayList<ChatMessage> messages;
+    private Turf turf;
     @Exclude
     private String key;
 
@@ -90,6 +90,14 @@ public class Lobby implements Parcelable {
         name = in.readString();
         sport = (Sport) in.readSerializable();
         key = in.readString();
+    }
+
+    public Turf getTurf() {
+        return turf;
+    }
+
+    public void setTurf(Turf turf) {
+        this.turf = turf;
     }
 
     //Getters/Setters
@@ -158,9 +166,8 @@ public class Lobby implements Parcelable {
     }
 
     /**
-     *
      * @param ref {@link LobbyRef}
-     * This method takes a {@link LobbyRef} object and returns a new lobby.
+     *            This method takes a {@link LobbyRef} object and returns a new lobby.
      * @return Lobby
      */
     public Lobby getLobbyFromRef(LobbyRef ref) {
@@ -243,6 +250,7 @@ public class Lobby implements Parcelable {
         public String name;
         public Sport sport;
         public String location;
+        public String turf;
         @Exclude
         public String key;
 
@@ -265,6 +273,7 @@ public class Lobby implements Parcelable {
             }
             this.sport = lobby.getSport();
             this.key = lobby.key;
+            this.turf = lobby.turf.getId();
             return this;
         }
 
@@ -279,6 +288,7 @@ public class Lobby implements Parcelable {
             map.put("sport", this.sport);
             map.put("location", this.location);
             map.put("lobbyList", this.lobbyList);
+            map.put("turf", this.turf);
             return map;
         }
 

@@ -24,6 +24,9 @@ import com.loopj.android.http.RequestParams;
 
 import org.apache.commons.codec.binary.Hex;
 import org.jdeferred.Deferred;
+import org.jdeferred.DeferredManager;
+import org.jdeferred.Promise;
+import org.jdeferred.impl.DefaultDeferredManager;
 import org.jdeferred.impl.DeferredObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -248,7 +251,8 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         Deferred<ChatMessage, DatabaseException, Void> deferred = new DeferredObject<>();
         Log.d(TAG, "creating message: " + chatMessage.toString());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + chatMessage.lobby.getKey() + "/messages");
-        ref.push().updateChildren(chatMessage.toRef().toMap(), (databaseError, databaseReference) -> {
+        DatabaseReference ref1 = ref.push();
+        ref1.updateChildren(chatMessage.toRef().toMap(), (databaseError, databaseReference) -> {
             if (databaseError == null) {
                 deferred.resolve(chatMessage);
             } else {
@@ -352,7 +356,9 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         }
 
         Log.d(TAG, "retreiving 50 messages" + (lastChatID == null ? "" : "after chatMessageID: " + lastChatID));
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + lobby.getKey() + "messages");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + lobby.getKey() + "/messages");
+        DeferredManager manager = new DefaultDeferredManager();
+        ArrayList<Promise> promises = new ArrayList<>();
         if (lastChatID == null) {//First 20
             final int[] counter = {0};
             ref.orderByKey().limitToFirst(20)
@@ -360,7 +366,14 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             mListenerMap.put(ref, this);
-                            messages.add(dataSnapshot.getValue(ChatMessage.class));
+                            if (dataSnapshot != null) {
+                                Promise<ChatMessage, DatabaseException, Void> promise = dataSnapshot.getValue(ChatMessage.ChatMessageRef.class) //TODO: Load key into chatMessage
+                                        .getChatMessageFromRef()
+                                        .promise();
+                                promises.add(promise);
+                                        promise.done(messages::add)
+                                        .fail(e -> Log.e(TAG, e.getLocalizedMessage()));
+                            }
                         }
 
                         @Override
@@ -381,19 +394,26 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                             deferred.reject(databaseError.toException());
+                            ref.removeEventListener(this);
                             cleanupReferences();
                         }
                     });
             ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    deferred.resolve(messages);
-                    cleanupReferences();
+                    Promise[] promises1 = new Promise[promises.size()];
+                    manager.when(promises.toArray(promises1)).done(result -> {
+                        deferred.resolve(messages);
+                        ref.removeEventListener(this);
+                        cleanupReferences();
+                    });
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     deferred.reject(databaseError.toException());
+                    ref.removeEventListener(this);
+                    cleanupReferences();
                 }
             });
         } else {
@@ -403,7 +423,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             mListenerMap.put(ref, this);
-                            messages.add(dataSnapshot.getValue(ChatMessage.class));
+                            dataSnapshot.getValue(ChatMessage.ChatMessageRef.class).getChatMessageFromRef().promise().done(messages::add).fail(e -> Log.e(TAG, e.getLocalizedMessage()));
                             counter[0]++;
                             if (counter[0] >= 20) {
                                 deferred.resolve(messages);
@@ -436,9 +456,9 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         return deferred;
     }
 
-    public void listenForMessages(final Lobby lobby, MessageListener mMessageListener) {
+    public MessageCleaner listenForMessages(final Lobby lobby, MessageListener mMessageListener) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + lobby.getKey() + "/messages");
-        ref.limitToLast(50).addChildEventListener(new ChildEventListener() {
+        ChildEventListener eventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot != null) {
@@ -467,8 +487,9 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
             public void onCancelled(DatabaseError databaseError) {
                 mMessageListener.onError(databaseError.toException());
             }
-        });
-
+        };
+        ref.limitToLast(50).addChildEventListener(eventListener);
+        return () -> ref.removeEventListener(eventListener);
     }
 
     /**
@@ -527,12 +548,14 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 deferred.resolve(lobbies);
+                ref.removeEventListener(this);
                 cleanupReferences();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 deferred.reject(databaseError.toException());
+                ref.removeEventListener(this);
                 cleanupReferences();
             }
         });
@@ -813,7 +836,10 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
 
     public interface MessageListener {
         void onNewMessage(ChatMessage message);
-
         void onError(Exception e);
+    }
+
+    public interface MessageCleaner {
+        void cleanupListener();
     }
 }

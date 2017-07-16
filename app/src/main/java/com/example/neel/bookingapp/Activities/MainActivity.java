@@ -28,7 +28,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.example.neel.bookingapp.Deprecated.LoginActivity2;
 import com.example.neel.bookingapp.Fragments.HomeFragment;
 import com.example.neel.bookingapp.Fragments.LobbyFragment;
 import com.example.neel.bookingapp.Fragments.SportFragment;
@@ -40,6 +39,8 @@ import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.Other.NewLobbyDialogFragment;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.lang.ref.WeakReference;
 
 
 public class MainActivity extends AppCompatActivity implements NewLobbyDialogFragment.OnCompleteListener {
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     private boolean inLobby = false;
     private DatabaseConnector mDatabaseConnector;
     private ProgressBar mProgressBar;
+    private WeakReference<LobbyFragment> lobbyFragment;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -151,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
                 CURRENT_TAG = TAG_HOME;
                 loadHomeFragment();
             } else {
+                CURRENT_TAG = savedInstanceState.getString("title");
+                navItemIndex = savedInstanceState.getInt("navItemIndex");
+                inLobby = savedInstanceState.getBoolean("inLobby");
                 //Set header title
                 setToolbarTitle();
                 selectNavMenu();
@@ -160,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             Log.e("User data retrieval", error.getMessage());
         });
     }
-
 
     /***
      * Load navigation menu header information
@@ -238,6 +242,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     private Fragment getHomeFragment(Lobby newLobby) {
         Bundle bundle = new Bundle();
         LobbyFragment mLobby = new LobbyFragment();
+        lobbyFragment = new WeakReference<>(mLobby);
         bundle.putParcelable("lobby", newLobby);
         return mLobby;
     }
@@ -247,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("title", CURRENT_TAG);
         outState.putInt("navItemIndex", navItemIndex);
+        outState.putBoolean("inLobby", inLobby);
         super.onSaveInstanceState(outState);
 
     }
@@ -423,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         } else {
             getFragmentManager().popBackStack();
         }
-
+        invalidateOptionsMenu();
         super.onBackPressed();
     }
 
@@ -440,6 +446,10 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         if (navItemIndex == 3) {
 //            getMenuInflater().inflate(R.menu.notifications, menu);
         }
+
+        if (inLobby){
+            getMenuInflater().inflate(R.menu.menu_lobby, menu);
+        }
         return true;
     }
 
@@ -453,7 +463,23 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {
             FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(MainActivity.this, LoginActivity2.class));
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            return true;
+        }
+
+        //if user is in a lobby fragment
+        if (id == R.id.lobby_share) {
+            //TODO: Add shareable functionality with deep linking
+            return true;
+        }
+
+        if (id == R.id.lobby_members) {
+            //TODO: Show fragment with members list
+            return true;
+        }
+
+        if (id == R.id.lobby_delete) {
+            //TODO: show dialog fragment asking if user wants to delete, and then delete
             return true;
         }
 
@@ -510,6 +536,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
             navItemIndex = -1;
             setToolbarTitle();
             selectNavMenu();
+            invalidateOptionsMenu();
             getSupportActionBar().setTitle(CURRENT_TAG);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.setCustomAnimations(android.R.anim.slide_in_left,
@@ -545,4 +572,7 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
     }
 
 
+//    public CoordinatorLayout.LayoutParams getCoordinatorLayoutParams() {
+//        return (CoordinatorLayout.LayoutParams) ((CoordinatorLayout) findViewById(R.id.main_coordinator_layout)).getLayoutParams();
+//    }
 }

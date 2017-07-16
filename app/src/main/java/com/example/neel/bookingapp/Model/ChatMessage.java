@@ -101,6 +101,7 @@ public class ChatMessage {
             map.put("sender", sender);
             map.put("lobby", lobby);
             map.put("time", time);
+//            map.put("message", AES.encrypt(message, sender+time));
             map.put("message", message);
             return map;
         }
