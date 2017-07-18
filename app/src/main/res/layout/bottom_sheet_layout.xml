@@ -9,9 +9,55 @@
     app:layout_behavior="@string/bottom_sheet_behavior"
     app:behavior_peekHeight="@dimen/bottom_sheet_peek"
     app:behavior_hideable="true"
-    android:background="@drawable/bottom_sheet_drawable"
-    tools:showIn="@layout/activity_main">
+    android:background="@drawable/bottom_sheet_drawable">
     <!-- TODO Decide on all the layout stuff for this bottom modal sheet -->
+
+
+
+    <TabHost
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <HorizontalScrollView
+                android:layout_width="302dp"
+                android:layout_height="60dp">
+
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="0dip"
+                    android:layout_marginRight="0dip" />
+            </HorizontalScrollView>
+
+            <ImageButton
+                android:id="@+id/add_tab"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srcCompat="@android:drawable/ic_menu_add" />
+            <!--this button looks like shite tho-->
+        </LinearLayout>
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
     <View
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

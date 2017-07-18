@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Bookmyturf.iml" filepath="$PROJECT_DIR$/Bookmyturf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Bookmystuff.iml" filepath="$PROJECT_DIR$/.idea/Bookmystuff.iml" />
+      <module fileurl="file://C:\Users\Admin123\appwork\Bookmystuff\Bookmyturf.iml" filepath="C:\Users\Admin123\appwork\Bookmystuff\Bookmyturf.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
