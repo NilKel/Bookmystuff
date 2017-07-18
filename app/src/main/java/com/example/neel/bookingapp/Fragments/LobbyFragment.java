@@ -24,11 +24,11 @@ import android.widget.TextSwitcher;
 import com.example.neel.bookingapp.Model.ChatMessage;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
-import com.example.neel.bookingapp.Other.ERROR_CODES;
-import com.example.neel.bookingapp.Other.ErrorHandler;
-import com.example.neel.bookingapp.Other.MessageCleaner;
-import com.example.neel.bookingapp.Other.MessageViewAdapter;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
+import com.example.neel.bookingapp.Other.Err.ERROR_CODES;
+import com.example.neel.bookingapp.Other.Err.ErrorHandler;
+import com.example.neel.bookingapp.Other.DB.MessageCleaner;
+import com.example.neel.bookingapp.Other.UIAdapters.MessageViewAdapter;
 import com.example.neel.bookingapp.R;
 
 import java.util.Date;

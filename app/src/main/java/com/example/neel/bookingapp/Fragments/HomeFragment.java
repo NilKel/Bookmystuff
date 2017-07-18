@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 
 import com.example.neel.bookingapp.Activities.MainActivity;
 import com.example.neel.bookingapp.Model.Lobby;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
-import com.example.neel.bookingapp.Other.LobbyListAdapter;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
+import com.example.neel.bookingapp.Other.UIAdapters.LobbyListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 

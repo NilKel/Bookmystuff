@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Other.DB;
 
 /**
  * Created by sushrutshringarputale on 7/18/17.

@@ -30,7 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.example.neel.bookingapp.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;

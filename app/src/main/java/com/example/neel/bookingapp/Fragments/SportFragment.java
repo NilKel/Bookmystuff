@@ -19,15 +19,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.neel.bookingapp.Activities.LoginActivity;
 import com.example.neel.bookingapp.Activities.MainActivity;
-import com.example.neel.bookingapp.Deprecated.LoginActivity2;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
-import com.example.neel.bookingapp.Other.ERROR_CODES;
-import com.example.neel.bookingapp.Other.ErrorHandler;
-import com.example.neel.bookingapp.Other.LobbyListAdapter;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
+import com.example.neel.bookingapp.Other.Err.ERROR_CODES;
+import com.example.neel.bookingapp.Other.Err.ErrorHandler;
+import com.example.neel.bookingapp.Other.UIAdapters.LobbyListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -120,7 +120,7 @@ public class SportFragment extends Fragment {
                         } catch (NullPointerException e) {
                             FirebaseAuth.getInstance().signOut();
                             ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOGIN_FAIL);
-                            startActivity(new Intent(getActivity(), LoginActivity2.class));
+                            startActivity(new Intent(getActivity(), LoginActivity.class));
                         }
                     }).fail(e -> ErrorHandler.handleError(getContext(), e, ERROR_CODES.LOBBY_READ_FAILED));
             ((MainActivity) getActivity()).startLobby(lobbies.get(position));

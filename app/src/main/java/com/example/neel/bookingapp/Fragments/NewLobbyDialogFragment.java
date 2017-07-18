@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.example.neel.bookingapp.R;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;

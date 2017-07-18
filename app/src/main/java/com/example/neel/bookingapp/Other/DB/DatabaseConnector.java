@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Other.DB;
 
 import android.location.Location;
 import android.util.Log;
@@ -474,7 +474,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         return deferred;
     }
 
-    public com.example.neel.bookingapp.Other.MessageCleaner listenForMessages(final Lobby lobby, MessageListener mMessageListener) {
+    public MessageCleaner listenForMessages(final Lobby lobby, MessageListener mMessageListener) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies/" + lobby.getKey() + "/messages");
         ChildEventListener eventListener = new ChildEventListener() {
             @Override

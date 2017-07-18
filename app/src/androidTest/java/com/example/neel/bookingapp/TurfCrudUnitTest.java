@@ -8,7 +8,7 @@ import android.util.Log;
 import com.example.neel.bookingapp.Model.Rating;
 import com.example.neel.bookingapp.Model.Turf;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.firebase.client.Firebase;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryEventListener;

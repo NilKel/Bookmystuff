@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Other.Err;
 
 /**
  * Created by sushrutshringarputale on 6/14/17.

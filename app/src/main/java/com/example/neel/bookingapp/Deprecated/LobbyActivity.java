@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.LobbyUserListAdapter;
+import com.example.neel.bookingapp.Other.UIAdapters.LobbyUserListAdapter;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 
