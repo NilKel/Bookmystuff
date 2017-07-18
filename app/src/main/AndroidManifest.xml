@@ -22,7 +22,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
-        android:name=".Other.BookMyStuffApp"
+        android:name="com.example.neel.bookingapp.Other.BookMyStuffApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -65,9 +65,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.LoginActivity" />
-            <!-- <intent-filter> -->
-            <!-- <action android:name="" -->
-            <!-- </intent-filter> -->
         </activity>
 
         <!--
@@ -79,13 +76,7 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
 
-        <activity android:name=".Activities.LoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".Activities.LoginActivity"/>
         <activity
             android:name=".Activities.OnboardingActivity"
             android:parentActivityName=".Activities.LoginActivity">
@@ -93,13 +84,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.MainActivity" />
         </activity>
-        <!-- <activity -->
-        <!-- android:name=".Flocator" -->
-        <!-- android:label="@string/title_activity_flocator"> -->
-        <!-- <meta-data -->
-        <!-- android:name="android.support.PARENT_ACTIVITY" -->
-        <!-- android:value="com.example.neel.bookingapp.Football" /> -->
-        <!-- </activity> -->
         <activity
             android:name=".Activities.UserEditActivity"
             android:label="@string/title_activity_user_edit"
@@ -119,13 +103,12 @@
         <activity
             android:name=".Activities.SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_splash"
             android:theme="@style/FullscreenTheme">
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
+            <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
-            <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

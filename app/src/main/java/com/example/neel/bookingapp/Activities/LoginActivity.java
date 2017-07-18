@@ -198,7 +198,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(view -> attemptLogin());
 
         mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = (ProgressBar) findViewById(R.id.progress_bar);
     }
 
     private void populateAutoComplete() {

@@ -3,7 +3,7 @@
     <!-- AUTH STRINGS -->
     <string name="web_client_id"> 81680596990-liak4jjs298vkcm832aoap2m52g9bn5p.apps.googleusercontent.com </string>
 
-    <string name="app_name">BookMyStuff</string>
+    <string name="app_name">BookMyTurf</string>
     <string name="title_activity_football">Football</string>
     <string name="facebook_app_id">168888936886354</string>
     <string name="fb_login_protocol_scheme">fb168888936886354</string>

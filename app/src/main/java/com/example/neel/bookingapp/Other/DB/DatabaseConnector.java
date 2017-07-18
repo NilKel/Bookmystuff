@@ -630,7 +630,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         mListenerMap.put(ref, this);
                         Log.d("Retrieved Lobby", dataSnapshot.toString());
-                        if (dataSnapshot != null) {
+                        if (dataSnapshot.getValue() != null) {
                             Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
                             temp.key = dataSnapshot.getKey();
                             lobbyArrayList.add(new Lobby().getLobbyFromRef(temp));
@@ -669,7 +669,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                if (!deferred.isRejected()) {
+                if (deferred.isPending()) {
                     deferred.reject(databaseError.toException());
                 }
                 cleanupReferences();

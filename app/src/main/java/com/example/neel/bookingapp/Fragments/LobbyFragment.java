@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.util.SortedList;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -17,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextSwitcher;
 
@@ -25,9 +26,9 @@ import com.example.neel.bookingapp.Model.ChatMessage;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.MessageCleaner;
 import com.example.neel.bookingapp.Other.Err.ERROR_CODES;
 import com.example.neel.bookingapp.Other.Err.ErrorHandler;
-import com.example.neel.bookingapp.Other.DB.MessageCleaner;
 import com.example.neel.bookingapp.Other.UIAdapters.MessageViewAdapter;
 import com.example.neel.bookingapp.R;
 
@@ -54,8 +55,8 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     public MessageViewAdapter mMessageViewAdapter;
     private ImageButton mImageButton;
     private MessageCleaner cleaner;
-    private FrameLayout mTurfLayout;
     private BottomSheetBehavior mBottomSheetBehavior;
+    private TextSwitcher mTurfToggle;
 
     public LobbyFragment() {
         // Required empty public constructor
@@ -169,8 +170,14 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
         NestedScrollView nestedScrollView = (NestedScrollView) getActivity().findViewById(R.id.bottom_sheet_layout);
         mBottomSheetBehavior = BottomSheetBehavior.from(nestedScrollView);
         mBottomSheetBehavior.setHideable(false);
-        TextSwitcher mTurfToggle = (TextSwitcher) nestedScrollView.findViewById(R.id.view_turf_info_textswitcher);
-        mTurfToggle.setFactory(() -> mTurfToggle.findViewById(R.id.view_turf_info_textview));
+        mTurfToggle = (TextSwitcher) nestedScrollView.findViewById(R.id.view_turf_info_textswitcher);
+        mTurfToggle.setFactory(() -> {
+            AppCompatTextView mLobbyInfoTextView = new AppCompatTextView(getContext(), null, 0);
+            mLobbyInfoTextView.setText(R.string.string_view_turf_information);
+            mLobbyInfoTextView.setCompoundDrawables(ContextCompat.getDrawable(getContext(), R.drawable.ic_menu_black_24dp), null, null, null);
+            mLobbyInfoTextView.setCompoundDrawablePadding(R.dimen.activity_horizontal_margin);
+            return mLobbyInfoTextView;
+        });
         mTurfToggle.setInAnimation(AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in));
         mTurfToggle.setOutAnimation(AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out));
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -207,14 +214,18 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     }
 
 
-
+    @Override
+    public void onStop() {
+        mTurfToggle.removeAllViews();
+        mBottomSheetBehavior.setHideable(true);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        cleaner.cleanupListener();
+        super.onStop();
+    }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mBottomSheetBehavior.setHideable(true);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        cleaner.cleanupListener();
     }
 
 
