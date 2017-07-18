@@ -138,4 +138,6 @@
     <string name="string_delete_lobby">Delete lobby</string>
     <string name="string_view_members">View members</string>
     <string name="string_share_lobby">Share lobby</string>
+    <string name="string_view_turf_information">Turf information</string>
+    <string name="string_browse_turfs">Click here to browse turfs</string>
 </resources>

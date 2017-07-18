@@ -7,6 +7,7 @@
     <color name="colorSecondaryLight">#ff5f52</color>
     <color name="colorSecondaryDark">#8e0000</color>
     <color name="colorAccent">#43000000</color>
+    <color name="colorAccentLight">#4db6ac</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000</color>
 

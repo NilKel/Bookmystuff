@@ -4,11 +4,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.util.SortedList;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,6 +21,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextSwitcher;
 
 import com.example.neel.bookingapp.Model.ChatMessage;
 import com.example.neel.bookingapp.Model.Lobby;
@@ -51,7 +56,7 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     private ImageButton mImageButton;
     private DatabaseConnector.MessageCleaner cleaner;
     private FrameLayout mTurfLayout;
-    private TurfBottomSheetDialogFragment mBottomSheetDialogFragment;
+    private BottomSheetBehavior mBottomSheetBehavior;
 
     public LobbyFragment() {
         // Required empty public constructor
@@ -144,70 +149,12 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         messageRecyclerView.setLayoutManager(linearLayoutManager);
         mMessageViewAdapter = new MessageViewAdapter(getContext(), messages, user);
-
-//        mTurfLayout.setOnTouchListener((v, event) -> {
-//            switch (event.getAction()){
-//
-//                case MotionEvent.ACTION_DOWN:
-//                    startY = (int) event.getY();
-//                    break;
-//                case MotionEvent.ACTION_UP:
-//                    switch (getMotionEventType(event)) {
-//                        case 0:
-//                            return false;
-//                        case SWIPE_DOWN_EVENT:
-//                            return false;
-//                        case SWIPE_UP_EVENT:
-//                            if (mTurfLayout.getVisibility() == View.VISIBLE) {
-//                                mTurfLayout.animate().setListener(new Animator.AnimatorListener() {
-//                                    @Override
-//                                    public void onAnimationStart(Animator animation) {
-//                                        mTurfLayout.setScaleY(1f);
-//                                    }
-//
-//                                    @Override
-//                                    public void onAnimationEnd(Animator animation) {
-//                                        mTurfLayout.setScaleY(0f);
-//                                        mTurfLayout.setVisibility(View.GONE);
-//                                    }
-//
-//                                    @Override
-//                                    public void onAnimationCancel(Animator animation) {
-//
-//                                    }
-//
-//                                    @Override
-//                                    public void onAnimationRepeat(Animator animation) {
-//
-//                                    }
-//                                });
-//                                return true;
-//                            }
-//                            break;
-//                        default:
-//                            break;
-//
-//                    }
-//                    break;
-//                default:
-//                    break;
-//            }
-//            return false;
-//        });
-//        mTurfLayout.setOnClickListener(v1 -> {
-//            Log.d("TAG", "Lobby View CLICKED");
-//        });
         messageRecyclerView.setAdapter(mMessageViewAdapter);
-//        mDatabaseConnector.getNextChatMessages(lobby, null)
-//                .promise().done(chatMessages -> {
-//                    messages.addAll(chatMessages);
-//                mMessageViewAdapter.notifyDataSetChanged();
-//        }).fail(e -> ErrorHandler.handleError(getContext(), e, ERROR_CODES.MESSAGE_RECEIVE_FAILED));
-        messageRecyclerView.scrollToPosition(0);
         cleaner = mDatabaseConnector.listenForMessages(lobby, new DatabaseConnector.MessageListener() {
             @Override
             public void onNewMessage(ChatMessage message) {
                 messages.add(message);
+                messageRecyclerView.smoothScrollToPosition(mMessageViewAdapter.getItemCount());
                 mMessageViewAdapter.notifyDataSetChanged();
             }
 
@@ -216,12 +163,43 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
                 ErrorHandler.handleError(getContext(), e, ERROR_CODES.MESSAGE_RECEIVE_FAILED);
             }
         });
-        mBottomSheetDialogFragment = TurfBottomSheetDialogFragment.newInstance(lobby);
-        if (mBottomSheetDialogFragment.getView() != null) {
-            BottomSheetBehavior mBehavior = BottomSheetBehavior.from(mBottomSheetDialogFragment.getView());
-            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
-        mBottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), "Turf Bottom Sheet");
+        NestedScrollView nestedScrollView = (NestedScrollView) getActivity().findViewById(R.id.bottom_sheet_layout);
+        mBottomSheetBehavior = BottomSheetBehavior.from(nestedScrollView);
+        mBottomSheetBehavior.setHideable(false);
+        TextSwitcher mTurfToggle = (TextSwitcher) nestedScrollView.findViewById(R.id.view_turf_info_textview);
+        mTurfToggle.setFactory(() -> new AppCompatTextView(new ContextThemeWrapper(getContext(), R.style.AppTheme), null, 0));
+        mTurfToggle.setInAnimation(AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in));
+        mTurfToggle.setOutAnimation(AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out));
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        Log.e("Bottom Sheet Behaviour", "STATE_COLLAPSED");
+                        mTurfToggle.setText(getActivity().getString(R.string.string_view_turf_information));
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        Log.e("Bottom Sheet Behaviour", "STATE_DRAGGING");
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        Log.d("Bottom Sheet Behaviour", "STATE_EXPANDED");
+                        mTurfToggle.setText(getActivity().getString(R.string.string_browse_turfs));
+                        break;
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        Log.e("Bottom Sheet Behaviour", "STATE_HIDDEN");
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        Log.e("Bottom Sheet Behaviour", "STATE_SETTLING");
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         return view;
     }
 
@@ -231,7 +209,8 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDetach() {
         super.onDetach();
-        mBottomSheetDialogFragment.onDetach();
+        mBottomSheetBehavior.setHideable(true);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         cleaner.cleanupListener();
     }
 
@@ -243,9 +222,8 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
      */
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.sendMessageButton && messageSendEditText.getText() != null) {
+        if (v.getId() == R.id.sendMessageButton && messageSendEditText.getText() != null && messageSendEditText.getText().length() > 0) {
             ChatMessage message = new ChatMessage(user, lobby, "", new Date().getTime(), messageSendEditText.getText().toString());
-            //binder.insertItemAt(0, ChatMessageView.create(c).text(message.message).senderName(user.name).date(new Date(message.time)).own(true).build());
             //TODO: PROD: add sending animation to the message itself and update that once the message is successfully written. Or add an error message
             mDatabaseConnector.createChatMessage(message);
             messageSendEditText.setText("");
