@@ -140,7 +140,7 @@ public class SportFragment extends Fragment {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            databaseConnector.getLobbiesBySport((Sport) getArguments().getSerializable("ARGUMENT"), null)
+            databaseConnector.getLobbiesBySport((Sport) getArguments().getSerializable("ARGUMENT"), null, 0, null)
                     .promise().done(lobbies1 -> {
                 lobbies = (ArrayList<Lobby>) lobbies1;
                 lobbyList.getAdapter().notifyDataSetChanged();
@@ -159,7 +159,7 @@ public class SportFragment extends Fragment {
                                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             location = null;
                         }
-                        databaseConnector.getLobbiesBySport(sport, location).promise()
+                        databaseConnector.getLobbiesBySport(sport, location, 0, null).promise()
                                 .done(lobbies1 -> {
                                     lobbies = (ArrayList<Lobby>) lobbies1;
                                     lobbyList.getAdapter().notifyDataSetChanged();
@@ -184,9 +184,10 @@ public class SportFragment extends Fragment {
                         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             location = null;
+                        } else {
+                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         }
-                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
+                        databaseConnector.getLobbiesBySport(sport, location, 0, null).promise().done(lobbies1 -> {
                             lobbies = (ArrayList<Lobby>) lobbies1;
                             lobbyList.getAdapter().notifyDataSetChanged();
                             dialog.dismiss();
@@ -226,7 +227,7 @@ public class SportFragment extends Fragment {
                         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || location == null) {
                             location = null;
                         }
-                        databaseConnector.getLobbiesBySport(sport, location).promise().done(lobbies1 -> {
+                        databaseConnector.getLobbiesBySport(sport, location, 0 , null).promise().done(lobbies1 -> {
                             lobbies = (ArrayList<Lobby>) lobbies1;
                             lobbyList.getAdapter().notifyDataSetChanged();
                             dialog.dismiss();

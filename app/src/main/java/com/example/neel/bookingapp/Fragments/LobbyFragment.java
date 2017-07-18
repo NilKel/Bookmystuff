@@ -6,13 +6,11 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.util.SortedList;
-import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +27,7 @@ import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.DatabaseConnector;
 import com.example.neel.bookingapp.Other.ERROR_CODES;
 import com.example.neel.bookingapp.Other.ErrorHandler;
+import com.example.neel.bookingapp.Other.MessageCleaner;
 import com.example.neel.bookingapp.Other.MessageViewAdapter;
 import com.example.neel.bookingapp.R;
 
@@ -54,7 +53,7 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
     private RecyclerView messageRecyclerView;
     public MessageViewAdapter mMessageViewAdapter;
     private ImageButton mImageButton;
-    private DatabaseConnector.MessageCleaner cleaner;
+    private MessageCleaner cleaner;
     private FrameLayout mTurfLayout;
     private BottomSheetBehavior mBottomSheetBehavior;
 
@@ -136,7 +135,11 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mImageButton.setAnimation(s.length() == 0 ? AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out) : AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in));
-                mImageButton.setVisibility(s.length() == 0 ? View.GONE : View.VISIBLE); //TODO: TRIGGER ONLY ON STATE CHANGE
+                if (mImageButton.getVisibility() == View.VISIBLE && s.length() == 0) {
+                    mImageButton.setVisibility(View.GONE);
+                } else if (mImageButton.getVisibility() == View.GONE && s.length() != 0) {
+                    mImageButton.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -166,8 +169,8 @@ public class LobbyFragment extends Fragment implements View.OnClickListener {
         NestedScrollView nestedScrollView = (NestedScrollView) getActivity().findViewById(R.id.bottom_sheet_layout);
         mBottomSheetBehavior = BottomSheetBehavior.from(nestedScrollView);
         mBottomSheetBehavior.setHideable(false);
-        TextSwitcher mTurfToggle = (TextSwitcher) nestedScrollView.findViewById(R.id.view_turf_info_textview);
-        mTurfToggle.setFactory(() -> new AppCompatTextView(new ContextThemeWrapper(getContext(), R.style.AppTheme), null, 0));
+        TextSwitcher mTurfToggle = (TextSwitcher) nestedScrollView.findViewById(R.id.view_turf_info_textswitcher);
+        mTurfToggle.setFactory(() -> mTurfToggle.findViewById(R.id.view_turf_info_textview));
         mTurfToggle.setInAnimation(AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in));
         mTurfToggle.setOutAnimation(AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out));
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {

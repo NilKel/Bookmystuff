@@ -17,7 +17,6 @@
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/text_message_name"
-        android:text="John Doe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"

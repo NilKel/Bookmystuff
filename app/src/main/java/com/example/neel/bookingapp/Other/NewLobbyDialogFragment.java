@@ -22,6 +22,7 @@ import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.R;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -138,11 +139,16 @@ public class NewLobbyDialogFragment extends DialogFragment {
                     startActivityForResult(builder.build(getActivity()), 1, bundle);
                     dialog.dismiss();
                 } else {
-                    mLobby.setLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
                     Log.d("Created Lobby", mLobby.toString());
                     databaseConnector.createLobby(mLobby).promise().done((d) -> {
-                        dialog.dismiss();
-                        mListener.onComplete(d);
+                        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                        databaseConnector.updateLobbyLocation(d, new GeoLocation(location.getLatitude(), location.getLongitude()))
+                        .promise().done(result -> dialog.dismiss()).fail(result -> {
+                            Log.e(TAG, result.getMessage());
+                            dialog.dismiss();
+                        }).always((state, resolved, rejected) -> {
+                            mListener.onComplete(d);
+                        });
                     }).fail(error -> {
                         Log.e(TAG, error.getMessage());
                     });
@@ -168,13 +174,11 @@ public class NewLobbyDialogFragment extends DialogFragment {
                 Lobby mLobby = data.getParcelableExtra("lobby");
                 Place place = PlacePicker.getPlace(getContext(), data);
                 LatLng latLng = place.getLatLng();
-                Location mLocation = new Location("");
-                mLocation.setLatitude(latLng.latitude);
-                mLocation.setLongitude(latLng.longitude);
-                mLobby.setLocation(mLocation);
-                databaseConnector.createLobby(mLobby).promise().done((d) -> {
-                    mListener.onComplete(d);
-                }).fail(error -> {
+                databaseConnector.createLobby(mLobby).promise().done(d -> databaseConnector.updateLobbyLocation(d, new GeoLocation(latLng.latitude, latLng.longitude))
+                        .promise().done(result -> mListener.onComplete(d)).fail(error -> {
+                    Log.e(TAG, error.getMessage());
+                    Toast.makeText(getContext(), "Could not create lobby", Toast.LENGTH_SHORT).show();
+                })).fail(error -> {
                     Log.e(TAG, error.getMessage());
                     Toast.makeText(getContext(), "Could not create lobby", Toast.LENGTH_SHORT).show();
                 });

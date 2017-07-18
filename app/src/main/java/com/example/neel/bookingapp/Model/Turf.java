@@ -5,7 +5,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.firebase.database.DatabaseException;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 
 import org.jdeferred.Deferred;
@@ -30,9 +33,8 @@ public class Turf implements Parcelable {
             return new Turf[size];
         }
     };
-    @Exclude
     public HashMap<Long, HashMap<Long, String>> availability;
-    private Location location;
+    private GeoFire location;
     private String name;
     private User owner;
     private String description;
@@ -40,7 +42,7 @@ public class Turf implements Parcelable {
     private HashMap<String, String> attributes;
     private String id;
 
-    public Turf(Location location, String name, User owner, String description, Rating rating, HashMap<String, String> attributes, String id) {
+    public Turf(GeoFire location, String name, User owner, String description, Rating rating, HashMap<String, String> attributes, String id, HashMap<Long, HashMap<Long, String>> availability) {
         this.location = location;
         this.name = name;
         this.owner = owner;
@@ -48,10 +50,11 @@ public class Turf implements Parcelable {
         this.rating = rating;
         this.attributes = attributes;
         this.id = id;
+        this.availability = availability;
     }
 
-    public Turf(Location location, String name, User owner) {
-        this(location, name, owner, "", new Rating(), null, null);
+    public Turf(GeoFire location, String name, User owner) {
+        this(location, name, owner, "", new Rating(), null, null, new HashMap<>());
     }
 
     public Turf() {
@@ -77,7 +80,7 @@ public class Turf implements Parcelable {
     public static Deferred<Turf, DatabaseException, Void> getTurfFromRef(TurfRef ref) {
         Turf turf = new Turf();
         Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
-        turf.location = LocationPlus.getLocationFromRepresentation(ref.location);
+        turf.location = new GeoFire(ref.location);
         turf.name = ref.name;
         turf.description = ref.description;
         turf.rating = new Rating(ref.rating);
@@ -91,11 +94,11 @@ public class Turf implements Parcelable {
         return deferred;
     }
 
-    public Location getLocation() {
+    public GeoFire getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(GeoFire location) {
         this.location = location;
     }
 
@@ -172,7 +175,6 @@ public class Turf implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(location, flags);
         dest.writeString(name);
         dest.writeParcelable(owner, flags);
         dest.writeParcelable(rating, flags);
@@ -197,24 +199,44 @@ public class Turf implements Parcelable {
         Deferred updateTurf(Turf user);
 
         Deferred deleteTurf(Turf user);
+
+        Deferred updateTurfLocation(Turf turf, GeoLocation location);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Turf{");
+        sb.append("availability=").append(availability);
+        sb.append(", location=").append(location);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", owner=").append(owner);
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", rating=").append(rating);
+        sb.append(", attributes=").append(attributes);
+        sb.append(", id='").append(id).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
     public static class TurfRef {
-        public String location;
+        public HashMap<Long, HashMap<Long, String>> availability;
         public String name;
         public String ownerId;
         public String description;
-        public float rating;
+        public Double rating;
         public HashMap<String, String> attributes;
         public String id;
+        @Exclude
+        public DatabaseReference location;
 
-        public TurfRef(String location, String name, String ownerId, String description, int rating, HashMap<String, String> attributes, String id) {
+        public TurfRef(DatabaseReference location, String name, String ownerId, String description, Double rating, HashMap<String, String> attributes, String id, HashMap<Long, HashMap<Long, String>> availability) {
             this.location = location;
             this.name = name;
             this.ownerId = ownerId;
             this.description = description;
             this.rating = rating;
             this.attributes = attributes;
+            this.availability = availability;
             this.id = id;
         }
 
@@ -223,25 +245,41 @@ public class Turf implements Parcelable {
 
         public TurfRef copyData(Turf turf) {
             TurfRef ref = new TurfRef();
+            ref.availability = turf.availability;
             ref.attributes = turf.attributes;
             ref.description = turf.description;
             ref.id = turf.id;
-            ref.location = turf.location.toString();
+            ref.location = turf.location.getDatabaseReference();
             ref.rating = turf.rating.getRating();
             ref.name = turf.name;
             ref.ownerId = turf.owner.id;
             return ref;
         }
 
+        @Override
+        public String toString() {
+            final StringBuffer sb = new StringBuffer("TurfRef{");
+            sb.append("availability=").append(availability);
+            sb.append(", name='").append(name).append('\'');
+            sb.append(", ownerId='").append(ownerId).append('\'');
+            sb.append(", description='").append(description).append('\'');
+            sb.append(", rating=").append(rating);
+            sb.append(", attributes=").append(attributes);
+            sb.append(", id='").append(id).append('\'');
+            sb.append(", location=").append(location);
+            sb.append('}');
+            return sb.toString();
+        }
+
         @Exclude
         public Map<String, Object> toMap() {
             Map<String, Object> map = new HashMap<>();
-            map.put("location", location);
             map.put("name", name);
             map.put("ownerId", ownerId);
             map.put("description", description);
             map.put("rating", rating);
             map.put("attributes", attributes);
+            map.put("availability", availability);
             map.put("id", id);
             return map;
         }
