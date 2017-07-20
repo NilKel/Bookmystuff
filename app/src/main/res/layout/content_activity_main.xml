@@ -44,4 +44,7 @@
         app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@android:drawable/ic_input_add" />
 
+    <include layout="@layout/bottom_sheet_layout"/>
+
+
 </android.support.design.widget.CoordinatorLayout>

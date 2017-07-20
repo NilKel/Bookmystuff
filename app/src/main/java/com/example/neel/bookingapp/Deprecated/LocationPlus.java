@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Model;
+package com.example.neel.bookingapp.Deprecated;
 
 import android.location.Location;
 
@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 /**
  * Wrapper class for {@link Location}
  */
-
+@Deprecated
 public class LocationPlus {
 
 

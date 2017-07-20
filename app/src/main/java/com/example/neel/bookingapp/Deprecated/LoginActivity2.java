@@ -16,7 +16,7 @@ import com.example.neel.bookingapp.Activities.MainActivity;
 import com.example.neel.bookingapp.Activities.OnboardingActivity;
 import com.example.neel.bookingapp.Activities.SignupActivity;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.example.neel.bookingapp.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;

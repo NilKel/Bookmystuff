@@ -42,8 +42,8 @@ import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.CircleTransform;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
-import com.example.neel.bookingapp.Other.NewLobbyDialogFragment;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
+import com.example.neel.bookingapp.Fragments.NewLobbyDialogFragment;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 

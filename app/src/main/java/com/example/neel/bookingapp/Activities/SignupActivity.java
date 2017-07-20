@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.example.neel.bookingapp.Deprecated.LoginActivity2;
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 

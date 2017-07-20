@@ -1,11 +1,12 @@
 package com.example.neel.bookingapp.Model;
 
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
 import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 
 import org.jdeferred.Deferred;
@@ -39,15 +40,14 @@ public class Lobby implements Parcelable {
     private Map<String, LobbySlot> lobbyList;
     private String name;
     private Sport sport;
-    private Location location; //TODO: Change to GeoFire
-    private GeoFire geoFire;
+    private GeoFire location;
     private ArrayList<ChatMessage> messages;
     private Turf turf;
     @Exclude
     private String key;
 
     //Constructors
-    public Lobby(User owner, int numFree, Map<String, LobbySlot> lobbyList, String name, Sport sport, Location location, ArrayList<ChatMessage> messages, String key) {
+    public Lobby(User owner, int numFree, Map<String, LobbySlot> lobbyList, String name, Sport sport, GeoFire location, ArrayList<ChatMessage> messages, String key) {
         this.owner = owner;
         this.numFree = numFree;
         this.lobbyList = lobbyList;
@@ -181,7 +181,7 @@ public class Lobby implements Parcelable {
             }
         }
         try {
-            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport, LocationPlus.getLocationFromRepresentation(ref.getLocation()), new ArrayList<>(), ref.key);
+            return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport, new GeoFire(ref.getLocation()), new ArrayList<>(), ref.key);
         } catch (NullPointerException e) {
             Log.e("NPE", e.getMessage());
             return new Lobby(new User(ref.ownerId, ref.ownerName), ref.numFree, lobbyList, ref.name, ref.sport, ref.key);
@@ -194,11 +194,11 @@ public class Lobby implements Parcelable {
 
 //    public Deferred initializeLobby() { return new DatabaseConnector().createLobby(this);}
 
-    public Location getLocation() {
+    public GeoFire getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(GeoFire location) {
         this.location = location;
     }
 
@@ -232,6 +232,8 @@ public class Lobby implements Parcelable {
         Deferred updateLobby(Lobby lobby);
 
         Deferred deleteLobby(Lobby lobby);
+
+        public Deferred updateLobbyLocation(Lobby lobby, GeoLocation location);
     }
 
     /**
@@ -249,10 +251,11 @@ public class Lobby implements Parcelable {
         public HashMap<String, String> lobbyList;
         public String name;
         public Sport sport;
-        public String location;
         public String turf;
         @Exclude
         public String key;
+        @Exclude
+        public DatabaseReference location;
 
         public LobbyRef() {
         }
@@ -266,7 +269,7 @@ public class Lobby implements Parcelable {
             this.ownerId = lobby.getOwner().id;
             this.numFree = lobby.getNumFree();
             this.lobbyList = new HashMap<>();
-            this.location = lobby.getLocation().toString();
+            this.location = lobby.location.getDatabaseReference();
             this.name = lobby.getName();
             for (String index : lobby.getLobbyList().keySet()) {
                 this.lobbyList.put(index, lobby.getLobbyList().get(index).id);
@@ -286,17 +289,16 @@ public class Lobby implements Parcelable {
             map.put("lobbyList", this.lobbyList);
             map.put("name", this.name);
             map.put("sport", this.sport);
-            map.put("location", this.location);
             map.put("lobbyList", this.lobbyList);
             map.put("turf", this.turf);
             return map;
         }
 
-        public String getLocation() {
+        public DatabaseReference getLocation() {
             return this.location;
         }
 
-        public void setLocation(String location) {
+        public void setLocation(DatabaseReference location) {
             this.location = location;
         }
     }

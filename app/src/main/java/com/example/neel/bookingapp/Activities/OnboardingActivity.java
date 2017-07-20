@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 
 /**
  * Created by sushrutshringarputale on 5/21/17.

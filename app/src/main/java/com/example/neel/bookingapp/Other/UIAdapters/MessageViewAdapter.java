@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Other.UIAdapters;
 
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.neel.bookingapp.Model.ChatMessage;
 import com.example.neel.bookingapp.Model.User;
+import com.example.neel.bookingapp.Other.CircleTransform;
 import com.example.neel.bookingapp.R;
 
 import java.text.DateFormat;
