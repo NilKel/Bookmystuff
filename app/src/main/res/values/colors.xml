@@ -9,7 +9,7 @@
     <color name="colorAccent">#43000000</color>
     <color name="colorAccentLight">#4db6ac</color>
     <color name="white">#FFFFFF</color>
-    <color name="black">#000</color>
+    <color name="black">#000000</color>
 
     <color name="black_overlay">#66000000</color>
     <color name="transparent">#00000000</color>
