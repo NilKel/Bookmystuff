@@ -3,7 +3,7 @@ package com.example.neel.bookingapp.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.Exclude;
 

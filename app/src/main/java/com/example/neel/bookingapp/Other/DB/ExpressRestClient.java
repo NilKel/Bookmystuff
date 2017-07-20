@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Other.DB;
 
 import android.support.annotation.Nullable;
 import android.util.Log;

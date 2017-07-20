@@ -30,7 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.neel.bookingapp.Model.User;
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.example.neel.bookingapp.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -198,7 +198,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(view -> attemptLogin());
 
         mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = (ProgressBar) findViewById(R.id.progress_bar);
     }
 
     private void populateAutoComplete() {

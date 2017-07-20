@@ -19,33 +19,34 @@ public class Rating implements Parcelable {
             return new Rating[size];
         }
     };
-    private float rating;
+    private Double rating;
 
-    public Rating(float rating) {
+    public Rating(Double rating) {
         this.rating = rating;
+        validate();
     }
 
     public Rating() {
-        this.rating = 0;
+        this.rating = 0d;
     }
 
     protected Rating(Parcel in) {
-        rating = in.readInt();
+        rating = in.readDouble();
     }
 
-    public float getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
     private void validate() {
         if (this.rating < 0)
-            this.rating = 0;
+            this.rating = 0d;
         else if (this.rating > 5)
-            this.rating = 5;
+            this.rating = 5d;
     }
 
     /**
@@ -73,7 +74,7 @@ public class Rating implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeFloat(rating);
+        dest.writeDouble(rating);
     }
 }
 

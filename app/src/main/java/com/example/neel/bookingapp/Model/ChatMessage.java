@@ -1,6 +1,6 @@
 package com.example.neel.bookingapp.Model;
 
-import com.example.neel.bookingapp.Other.DatabaseConnector;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.Exclude;
 

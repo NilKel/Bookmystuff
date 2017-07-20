@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Other.UIAdapters;
 
 
 import android.content.Context;

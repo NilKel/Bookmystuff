@@ -2,6 +2,7 @@ package com.example.neel.bookingapp.Other;
 
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.User;
+import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.Before;

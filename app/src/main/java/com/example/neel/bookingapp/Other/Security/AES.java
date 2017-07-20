@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Other.Security;
 
 /**
  * Created by sushrutshringarputale on 7/9/17.

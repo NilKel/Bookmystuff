@@ -79,9 +79,6 @@
                 android:textColorHint="@color/colorAccent" />
         </android.support.design.widget.TextInputLayout>
 
-
-        colo
-
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/loginButton"
             android:layout_width="match_parent"

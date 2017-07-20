@@ -1,4 +1,4 @@
-package com.example.neel.bookingapp.Other;
+package com.example.neel.bookingapp.Other.DB;
 
 import android.location.Location;
 import android.util.Log;
@@ -9,6 +9,9 @@ import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.Turf;
 import com.example.neel.bookingapp.Model.User;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -17,7 +20,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -66,6 +68,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         Log.d(TAG, "Creating lobby" + lobby.toString());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("lobbies");
         DatabaseReference node = ref.push();
+        lobby.setLocation(new GeoFire(FirebaseDatabase.getInstance().getReference("lobby-locations/"+node.getKey())));
         node.setValue(new Lobby.LobbyRef().copyData(lobby)).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 lobby.setKey(node.getKey());
@@ -90,8 +93,10 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null) {
-                    lobby.getLobbyFromRef(dataSnapshot.getValue(Lobby.LobbyRef.class));
+                if (dataSnapshot.getValue() != null) {
+                    Lobby.LobbyRef mLobbyRef = dataSnapshot.getValue(Lobby.LobbyRef.class);
+                    mLobbyRef.location = FirebaseDatabase.getInstance().getReference("lobby-locations");
+                    lobby.getLobbyFromRef(mLobbyRef);
                     lobby.setKey(dataSnapshot.getKey());
                     deferred.resolve(lobby);
                     ref.removeEventListener(this);
@@ -129,6 +134,19 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                 deferred.resolve(lobby);
             } else {
                 deferred.reject(databaseError.toException());
+            }
+        });
+        return deferred;
+    }
+
+    @Override
+    public Deferred<Lobby, DatabaseException, Void> updateLobbyLocation(Lobby lobby, GeoLocation location) {
+        Deferred<Lobby, DatabaseException, Void> deferred = new DeferredObject<>();
+        lobby.getLocation().setLocation(lobby.getKey(), location, (key, error) -> {
+            if (error != null) {
+                deferred.reject(error.toException());
+            } else {
+                deferred.resolve(lobby);
             }
         });
         return deferred;
@@ -498,67 +516,107 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
      * @return
      * @throws NullPointerException
      */
-    public Deferred<List<Lobby>, DatabaseException, Void> getLobbiesBySport(final Sport sport, @Nullable Location location) throws NullPointerException {
+    public Deferred<List<Lobby>, DatabaseException, Void> getLobbiesBySport(final Sport sport, @Nullable Location location, int offset, @Nullable Integer radius) throws NullPointerException {
         Deferred<List<Lobby>, DatabaseException, Void> deferred = new DeferredObject<>();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lobbies");
         List<Lobby> lobbies = new ArrayList<>();
-        Query q;
         if (location != null) {
-            q = ref.orderByChild("location")
-                    .startAt("Location[fused " + Double.toString(location.getLatitude() - 0.5) + ", " + Double.toString(location.getLongitude() - 0.5))
-                    .endAt("Location[fused " + Double.toString(location.getLatitude() + 0.5) + ", " + Double.toString(location.getLongitude() + 0.5));
+            new GeoFire(FirebaseDatabase.getInstance().getReference("lobby-locations"))
+                    .queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), radius == null ? 15 : radius)
+                    .addGeoQueryEventListener(new GeoQueryEventListener() {
+                        @Override
+                        public void onKeyEntered(String key, GeoLocation location) {
+                            ref.orderByChild("sport").equalTo(sport.name()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot != null) {
+                                        Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
+                                        temp.key = dataSnapshot.getKey();
+                                        if (temp.sport == sport && temp.numFree > 0) {
+                                            lobbies.add(new Lobby().getLobbyFromRef(temp));
+                                        }
+                                    }
+                                    ref.removeEventListener(this);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    deferred.reject(databaseError.toException());
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onKeyExited(String key) {
+
+                        }
+
+                        @Override
+                        public void onKeyMoved(String key, GeoLocation location) {
+
+                        }
+
+                        @Override
+                        public void onGeoQueryReady() {
+                            deferred.resolve(lobbies);
+                        }
+
+                        @Override
+                        public void onGeoQueryError(DatabaseError error) {
+                            deferred.reject(error.toException());
+                        }
+                    });
         } else {
-            q = ref.orderByChild("sport").equalTo(sport.name()).limitToFirst(20);
-        }
-        q.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mListenerMap.put(ref, this);
-                if (dataSnapshot != null) {
-                    Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
-                    temp.key = dataSnapshot.getKey();
-                    if (temp.sport == sport && temp.numFree > 0) {
-                        lobbies.add(new Lobby().getLobbyFromRef(temp));
+            ref.orderByChild("sport").equalTo(sport.name()).startAt(offset).limitToFirst(20).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    mListenerMap.put(ref, this);
+                    if (dataSnapshot != null) {
+                        Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
+                        temp.key = dataSnapshot.getKey();
+                        if (temp.sport == sport && temp.numFree > 0) {
+                            lobbies.add(new Lobby().getLobbyFromRef(temp));
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            }
+                }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            }
+                }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                deferred.reject(databaseError.toException());
-                cleanupReferences();
-            }
-        });
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                deferred.resolve(lobbies);
-                ref.removeEventListener(this);
-                cleanupReferences();
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    deferred.reject(databaseError.toException());
+                    cleanupReferences();
+                }
+            });
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    deferred.resolve(lobbies);
+                    ref.removeEventListener(this);
+                    cleanupReferences();
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                deferred.reject(databaseError.toException());
-                ref.removeEventListener(this);
-                cleanupReferences();
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    deferred.reject(databaseError.toException());
+                    ref.removeEventListener(this);
+                    cleanupReferences();
+                }
+            });
+        }
         return deferred;
     }
 
@@ -572,7 +630,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         mListenerMap.put(ref, this);
                         Log.d("Retrieved Lobby", dataSnapshot.toString());
-                        if (dataSnapshot != null) {
+                        if (dataSnapshot.getValue() != null) {
                             Lobby.LobbyRef temp = dataSnapshot.getValue(Lobby.LobbyRef.class);
                             temp.key = dataSnapshot.getKey();
                             lobbyArrayList.add(new Lobby().getLobbyFromRef(temp));
@@ -611,7 +669,7 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                if (!deferred.isRejected()) {
+                if (deferred.isPending()) {
                     deferred.reject(databaseError.toException());
                 }
                 cleanupReferences();
@@ -706,7 +764,8 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
     public Deferred<Turf, DatabaseException, Void> createTurf(Turf turf) {
         Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
         turf.setId(FirebaseDatabase.getInstance().getReference("turfs").push().getKey());
-        FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId()).setValue(turf).addOnSuccessListener(aVoid -> {
+        turf.setLocation(new GeoFire(FirebaseDatabase.getInstance().getReference("turf-locations")));
+        FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId()).updateChildren(new Turf.TurfRef().copyData(turf).toMap()).addOnSuccessListener(aVoid -> {
             deferred.resolve(turf);
         }).addOnFailureListener(f -> deferred.reject((DatabaseException) f));
         return deferred;
@@ -715,12 +774,21 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
     @Override
     public Deferred<Turf, DatabaseException, Void> readTurf(Turf turf) {
         Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
-        FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId());
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Turf.getTurfFromRef(dataSnapshot.getValue(Turf.TurfRef.class))
-                                .promise().done(deferred::resolve).fail(deferred::reject);
+                        if (dataSnapshot.getValue() == null) {
+                            deferred.reject(new DatabaseException("Data not found"));
+                        } else {
+                            Turf.TurfRef mTurfRef = dataSnapshot.getValue(Turf.TurfRef.class);
+                            mTurfRef.id = dataSnapshot.getKey();
+                            mTurfRef.location = FirebaseDatabase.getInstance().getReference("turf-locations");
+                            Turf.getTurfFromRef(mTurfRef)
+                                    .promise().done(deferred::resolve).fail(deferred::reject).always((state, resolved, rejected) -> {
+                                ref.removeEventListener(this);
+                            });
+                        }
                     }
 
                     @Override
@@ -734,12 +802,31 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
     @Override
     public Deferred<Turf, DatabaseException, Void> updateTurf(Turf turf) {
         Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
-        FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId())
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("turfs").child(turf.getId());
+        ref
                 .updateChildren(new Turf.TurfRef().copyData(turf).toMap())
-                .addOnSuccessListener(aVoid -> deferred.resolve(turf))
+                .addOnSuccessListener(aVoid -> {
+                    turf.setLocation(new GeoFire(ref.child("location")));
+                    deferred.resolve(turf);
+                })
                 .addOnFailureListener(f -> deferred.reject((DatabaseException) f));
+
         return deferred;
     }
+
+    @Override
+    public Deferred<Turf, DatabaseException, Void> updateTurfLocation(Turf turf, GeoLocation location) {
+        Deferred<Turf, DatabaseException, Void> deferred = new DeferredObject<>();
+        turf.getLocation().setLocation(turf.getId(), location, (key, error) -> {
+            if (error == null) {
+                deferred.resolve(turf);
+            } else {
+                deferred.reject(error.toException());
+            }
+        });
+        return deferred;
+    }
+
 
     @Override
     public Deferred deleteTurf(Turf turf) {
@@ -837,9 +924,5 @@ public final class DatabaseConnector implements User.IUserCrud, ChatMessage.ICha
     public interface MessageListener {
         void onNewMessage(ChatMessage message);
         void onError(Exception e);
-    }
-
-    public interface MessageCleaner {
-        void cleanupListener();
     }
 }
