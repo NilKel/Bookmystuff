@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "81680596990-nd4emv88evup6trf1a56r9isqee940n0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.neel.bookingapp",
+            "certificate_hash": "e9b082a934c8277219f882c14f6b2a35095438aa"
+          }
+        },
+        {
+          "client_id": "81680596990-46fuhphgu93q8k46k812ng3tj4j10orf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.neel.bookingapp",
+            "certificate_hash": "963446215306cc709572c4f03ffd106011cf000e"
+          }
+        },
+        {
           "client_id": "81680596990-liak4jjs298vkcm832aoap2m52g9bn5p.apps.googleusercontent.com",
           "client_type": 3
         }

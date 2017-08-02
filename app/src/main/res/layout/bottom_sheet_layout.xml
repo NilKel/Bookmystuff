@@ -1,65 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="450dp"
     android:layout_gravity="bottom"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
     app:layout_behavior="@string/bottom_sheet_behavior"
     app:behavior_peekHeight="@dimen/bottom_sheet_peek"
     app:behavior_hideable="true"
     android:background="@drawable/bottom_sheet_drawable">
     <!-- TODO Decide on all the layout stuff for this bottom modal sheet -->
 
-
-
-    <TabHost
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
+        <TextSwitcher
+            android:id="@+id/view_turf_info_textswitcher"
+            android:textColor="@color/colorAccent"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
         <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <HorizontalScrollView
-                android:layout_width="302dp"
-                android:layout_height="60dp">
-
-                <TabWidget
-                    android:id="@android:id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="0dip"
-                    android:layout_marginRight="0dip" />
-            </HorizontalScrollView>
-
-            <ImageButton
-                android:id="@+id/add_tab"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/ic_menu_add" />
-            <!--this button looks like shite tho-->
+            android:weightSum="1"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_height="wrap_content">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/time_slot_recycler_view"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_weight="0.99"
+                android:layout_height="wrap_content"/>
+            <android.support.v7.widget.AppCompatImageButton
+                app:srcCompat="@drawable/ic_add_black_24dp"
+                android:id="@+id/add_slot_"
+                android:layout_width="wrap_content"
+                android:background="@color/transparent"
+                android:layout_weight="0.01"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
 
-
-            </FrameLayout>
-        </LinearLayout>
-    </TabHost>
-
-    <View
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        />
-</LinearLayout>
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

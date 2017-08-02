@@ -140,4 +140,6 @@
     <string name="string_share_lobby">Share lobby</string>
     <string name="string_view_turf_information">Turf information</string>
     <string name="string_browse_turfs">Click here to browse turfs</string>
+    <string name="title_action_list">Actions</string>
+    <string name="title_action_detail">Action Detail</string>
 </resources>

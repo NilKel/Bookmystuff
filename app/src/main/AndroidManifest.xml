@@ -22,7 +22,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
-        android:name="com.example.neel.bookingapp.Other.BookMyStuffApp"
+        android:name=".Other.BookMyStuffApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -76,7 +76,7 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
 
-        <activity android:name=".Activities.LoginActivity"/>
+        <activity android:name=".Activities.LoginActivity" />
         <activity
             android:name=".Activities.OnboardingActivity"
             android:parentActivityName=".Activities.LoginActivity">
@@ -105,11 +105,27 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/FullscreenTheme">
             <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Activities.ActionListActivity"
+            android:label="@string/title_action_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".Activities.ActionDetailActivity"
+            android:label="@string/title_action_detail"
+            android:parentActivityName=".Activities.ActionListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.neel.bookingapp.Activities.ActionListActivity" />
+        </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="05a76a9376d47acf4f92d3cf4c602dc3955c48cb" />
     </application>
 
 </manifest>

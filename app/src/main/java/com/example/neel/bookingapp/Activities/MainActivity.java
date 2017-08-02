@@ -22,28 +22,21 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.app.TabActivity;
-import android.view.LayoutInflater;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.TabHost;
-import android.widget.TabHost.TabSpec;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.neel.bookingapp.Fragments.HomeFragment;
 import com.example.neel.bookingapp.Fragments.LobbyFragment;
+import com.example.neel.bookingapp.Fragments.NewLobbyDialogFragment;
 import com.example.neel.bookingapp.Fragments.SportFragment;
 import com.example.neel.bookingapp.Model.Lobby;
 import com.example.neel.bookingapp.Model.Sport;
 import com.example.neel.bookingapp.Model.User;
 import com.example.neel.bookingapp.Other.CircleTransform;
 import com.example.neel.bookingapp.Other.DB.DatabaseConnector;
-import com.example.neel.bookingapp.Fragments.NewLobbyDialogFragment;
 import com.example.neel.bookingapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -352,6 +345,8 @@ public class MainActivity extends AppCompatActivity implements NewLobbyDialogFra
                     return true;
                 case R.id.manager_mode:
                     //launch manager mode
+                    startActivity(new Intent(this, ActionListActivity.class));
+                    drawer.closeDrawers();
                     return true;
                 default:
                     navItemIndex = 0;
